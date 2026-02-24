@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>QXO Ecom 2.0 — Reorder from Job (B-4-01)</title>
+<style>
+  :root {
+    --primary: #004BEA; --primary-hover: #0040CC; --primary-light: #EBF0FF;
+    --primary-border: #B3CCFF; --primary-glow: rgba(0,75,234,0.12);
+    --bg: #F2F2F2; --white: #FFFFFF; --text: #111827;
+    --text-secondary: #6B7280; --text-tertiary: #9CA3AF;
+    --border: #E5E7EB; --border-light: #F3F4F6;
+    --green: #22C55E; --green-light: #F0FDF4; --green-border: #BBF7D0;
+    --red: #EF4444; --orange: #F59E0B; --orange-light: #FFFBEB; --orange-border: #FDE68A;
+    --purple: #8B5CF6; --purple-light: #F5F3FF; --purple-border: #DDD6FE;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04); --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.08); --shadow-xl: 0 8px 30px rgba(0,0,0,0.10);
+    --radius: 12px; --radius-sm: 8px; --radius-lg: 16px; --transition: 0.15s ease;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.5; }
+
+  /* Sidebar */
+  .sidebar { position:fixed; left:0; top:0; width:240px; height:100vh; background:var(--white); border-right:1px solid var(--border); display:flex; flex-direction:column; z-index:10; box-shadow:1px 0 4px rgba(0,0,0,0.03); }
+  .sidebar-logo { padding:22px 20px 18px; display:flex; align-items:center; gap:10px; }
+  .sidebar-logo-icon { width:34px; height:34px; border-radius:10px; background:var(--primary); display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:15px; }
+  .sidebar-logo-text { font-weight:800; font-size:17px; color:var(--text); letter-spacing:-0.03em; }
+  .sidebar-build-btn { margin:0 14px 18px; padding:11px 16px; background:var(--primary); color:white; border:none; border-radius:var(--radius-sm); font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 2px 8px rgba(0,75,234,0.3); position:relative; }
+  .sidebar-build-btn::after { content:''; position:absolute; inset:-3px; border:2px solid var(--primary); border-radius:11px; animation:build-ring 2s infinite; opacity:0; }
+  @keyframes build-ring { 0%,100% { opacity:0; transform:scale(1); } 50% { opacity:0.4; transform:scale(1.02); } }
+  .sidebar-nav { flex:1; padding:0 10px; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:9px 14px; border-radius:var(--radius-sm); margin-bottom:2px; cursor:pointer; font-size:14px; color:var(--text-secondary); font-weight:450; transition:all var(--transition); }
+  .nav-item:hover { background:var(--border-light); color:var(--text); }
+  .nav-item.active { background:var(--primary-light); color:var(--primary); font-weight:600; }
+  .nav-badge { margin-left:auto; font-size:11px; font-weight:600; padding:1px 8px; border-radius:10px; background:var(--border-light); color:var(--text-secondary); }
+  .nav-section-label { padding:18px 14px 6px; font-size:11px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.06em; }
+  .nav-item.coming { color:var(--text-tertiary); opacity:0.45; }
+  .sidebar-user { padding:16px 18px; border-top:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+  .sidebar-user-avatar { width:34px; height:34px; border-radius:50%; background:var(--bg); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--text-secondary); }
+  .sidebar-user-name { font-size:13px; font-weight:600; }
+  .sidebar-user-email { font-size:11px; color:var(--text-secondary); }
+
+  .main { margin-left:240px; min-height:100vh; }
+
+  .topbar { background:var(--white); border-bottom:1px solid var(--border); padding:16px 36px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:5; box-shadow:var(--shadow-sm); }
+  .topbar-left { display:flex; align-items:center; gap:16px; }
+  .topbar-back { width:36px; height:36px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--white); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-secondary); transition:all var(--transition); }
+  .topbar-back:hover { border-color:var(--primary-border); color:var(--primary); background:var(--primary-light); }
+  .topbar h1 { font-size:22px; font-weight:800; letter-spacing:-0.03em; }
+  .topbar-subtitle { font-size:13px; color:var(--text-secondary); }
+
+  .btn { padding:10px 22px; border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer; transition:all var(--transition); display:flex; align-items:center; gap:7px; border:none; }
+  .btn-primary { background:var(--primary); color:white; box-shadow:0 2px 8px rgba(0,75,234,0.25); }
+  .btn-primary:hover { background:var(--primary-hover); box-shadow:0 4px 14px rgba(0,75,234,0.35); transform:translateY(-1px); }
+  .btn-secondary { background:var(--white); color:var(--text-secondary); border:1px solid var(--border); }
+  .btn-secondary:hover { border-color:var(--primary-border); color:var(--primary); background:var(--primary-light); }
+  .btn-ghost { background:transparent; color:var(--text-secondary); border:none; }
+  .btn-ghost:hover { color:var(--primary); }
+
+  .content { padding:28px 36px; max-width:1100px; }
+
+  /* Search */
+  .search-bar {
+    display:flex; align-items:center; gap:12px;
+    background:var(--white); border:1px solid var(--border);
+    border-radius:var(--radius); padding:12px 20px;
+    box-shadow:var(--shadow-sm); margin-bottom:20px;
+    transition:all var(--transition);
+  }
+  .search-bar:focus-within { border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow), var(--shadow-sm); }
+  .search-bar svg { flex-shrink:0; color:var(--text-tertiary); }
+  .search-bar input { flex:1; border:none; outline:none; font-size:15px; color:var(--text); background:transparent; font-family:inherit; }
+  .search-bar input::placeholder { color:var(--text-tertiary); }
+
+  /* Sort & filter row */
+  .controls-row {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:20px;
+  }
+  .filter-pills { display:flex; gap:8px; }
+  .filter-pill {
+    padding:6px 16px; border-radius:20px; font-size:13px; font-weight:600;
+    border:1px solid var(--border); background:var(--white);
+    cursor:pointer; transition:all var(--transition); color:var(--text-secondary);
+  }
+  .filter-pill:hover { border-color:var(--primary-border); color:var(--primary); }
+  .filter-pill.active { background:var(--primary); color:white; border-color:var(--primary); }
+  .sort-control {
+    display:flex; align-items:center; gap:8px;
+    font-size:13px; color:var(--text-secondary);
+  }
+  .sort-select {
+    padding:6px 12px; border:1px solid var(--border); border-radius:6px;
+    font-size:13px; color:var(--text); background:var(--white);
+    font-family:inherit; cursor:pointer; font-weight:500;
+  }
+
+  /* Job cards list */
+  .job-list { display:flex; flex-direction:column; gap:12px; margin-bottom:28px; }
+
+  .job-card {
+    background:var(--white); border-radius:var(--radius);
+    border:2px solid var(--border); overflow:hidden;
+    cursor:pointer; transition:all 0.2s ease;
+    display:grid; grid-template-columns:auto 1fr auto;
+  }
+  .job-card:hover { border-color:var(--primary-border); box-shadow:var(--shadow-md); }
+  .job-card.selected { border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow); }
+
+  /* Map thumbnail placeholder */
+  .job-map {
+    width:140px; background:var(--border-light);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--text-tertiary); position:relative;
+    border-right:1px solid var(--border-light);
+  }
+  .job-map-overlay {
+    position:absolute; bottom:8px; left:8px; right:8px;
+    background:rgba(0,0,0,0.6); color:white;
+    font-size:10px; font-weight:600; text-align:center;
+    padding:3px 6px; border-radius:4px; backdrop-filter:blur(4px);
+  }
+
+  .job-info { padding:18px 22px; }
+  .job-address { font-size:16px; font-weight:700; letter-spacing:-0.02em; margin-bottom:2px; }
+  .job-homeowner { font-size:13px; color:var(--text-secondary); margin-bottom:10px; }
+
+  .job-meta-row { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:10px; }
+  .job-meta-item {
+    display:flex; align-items:center; gap:5px;
+    font-size:12px; color:var(--text-secondary);
+  }
+  .job-meta-item svg { flex-shrink:0; }
+  .job-meta-item strong { font-weight:600; color:var(--text); }
+
+  .job-materials {
+    display:flex; flex-wrap:wrap; gap:6px;
+  }
+  .job-material-tag {
+    font-size:11px; font-weight:500; padding:3px 10px;
+    border-radius:6px; background:var(--border-light);
+    color:var(--text-secondary);
+  }
+
+  /* Right section: order summary + clone button */
+  .job-action {
+    padding:18px 22px; display:flex; flex-direction:column;
+    align-items:flex-end; justify-content:space-between;
+    border-left:1px solid var(--border-light); min-width:200px;
+  }
+  .job-total {
+    text-align:right;
+  }
+  .job-total-label { font-size:11px; color:var(--text-tertiary); text-transform:uppercase; font-weight:600; letter-spacing:0.04em; }
+  .job-total-amount { font-size:24px; font-weight:800; color:var(--text); letter-spacing:-0.03em; }
+  .job-total-items { font-size:12px; color:var(--text-tertiary); }
+  .job-total-date { font-size:12px; color:var(--text-tertiary); margin-top:2px; }
+
+  .clone-btn {
+    padding:9px 18px; border-radius:var(--radius-sm);
+    font-size:13px; font-weight:600; cursor:pointer;
+    border:1px solid var(--border); background:var(--white);
+    color:var(--text-secondary); transition:all var(--transition);
+    display:flex; align-items:center; gap:6px;
+  }
+  .clone-btn:hover { border-color:var(--primary-border); color:var(--primary); background:var(--primary-light); }
+  .job-card.selected .clone-btn { background:var(--primary); color:white; border-color:var(--primary); }
+
+  /* Status badge */
+  .job-status {
+    display:inline-flex; align-items:center; gap:4px;
+    font-size:11px; font-weight:600; padding:3px 10px;
+    border-radius:20px;
+  }
+  .job-status.completed { background:var(--green-light); color:var(--green); }
+  .job-status.delivered { background:var(--primary-light); color:var(--primary); }
+
+  /* Info tip */
+  .info-tip {
+    background:var(--primary-light); border:1px solid var(--primary-border);
+    border-radius:var(--radius); padding:14px 20px;
+    display:flex; align-items:center; gap:12px;
+    margin-bottom:24px;
+    font-size:13px; color:var(--text-secondary);
+  }
+  .info-tip-icon {
+    width:36px; height:36px; border-radius:50%;
+    background:var(--primary); color:white;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .info-tip strong { color:var(--primary); font-weight:600; }
+
+  /* Bottom action bar */
+  .action-bar {
+    background:var(--white); border-radius:var(--radius);
+    border:1px solid var(--border); box-shadow:var(--shadow-md);
+    padding:18px 24px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .action-bar-info { display:flex; align-items:center; gap:12px; }
+  .action-bar-selected { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:600; color:var(--primary); }
+  .action-bar-dot { width:8px; height:8px; border-radius:50%; background:var(--primary); }
+  .action-bar-detail { font-size:13px; color:var(--text-secondary); }
+  .action-bar-warning {
+    display:flex; align-items:center; gap:6px;
+    font-size:12px; color:var(--orange); font-weight:500;
+  }
+
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="sidebar-logo-icon">Q</div><div class="sidebar-logo-text">QXO</div></div>
+  <button class="sidebar-build-btn"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3v14M3 10h14" stroke-linecap="round"/></svg> BUILD</button>
+  <nav class="sidebar-nav">
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg> Dashboard</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h14M3 8h14M3 12h10M3 16h7" stroke-linecap="round"/></svg> Jobs <span class="nav-badge">12</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 10h6M7 14h3" stroke-linecap="round"/></svg> Proposals <span class="nav-badge">4</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h10v9H2z"/><path d="M12 8h4l2 3v2h-6V8z"/><circle cx="6" cy="15" r="2"/><circle cx="15" cy="15" r="2"/></svg> Deliveries <span class="nav-badge">3</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 9h6M7 12h4M12 15h2" stroke-linecap="round"/></svg> Invoices</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2L18 6v8l-8 4L2 14V6l8-4z"/><path d="M2 6l8 4m0 0l8-4m-8 4v8"/></svg> Products</div>
+    <div class="nav-item active"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4l4 4-4 4M10 14h6" stroke-linecap="round"/></svg> Builds</div>
+    <div class="nav-section-label">Coming Soon</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="7" r="4"/><path d="M3 18c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg> CRM</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2l2.5 5.5L18 8.5l-4 4 1 5.5-5-3-5 3 1-5.5-4-4 5.5-1z"/></svg> Loyalty</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v2m0 12v2M2 10h2m12 0h2"/><circle cx="10" cy="10" r="4"/></svg> Storm Center</div>
+  </nav>
+  <div class="sidebar-user"><div class="sidebar-user-avatar">MR</div><div><div class="sidebar-user-name">Rivera Roofing</div><div class="sidebar-user-email">marcus@riveraroofing.com</div></div></div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="topbar-back"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div>
+        <h1>Reorder from Job</h1>
+        <div class="topbar-subtitle">Clone a materials list from a previous job and adjust for your new project</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- Info tip -->
+    <div class="info-tip">
+      <div class="info-tip-icon">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3v14M3 10h14" stroke-linecap="round"/><circle cx="10" cy="10" r="8"/></svg>
+      </div>
+      <div>
+        <strong>How reordering works:</strong> Select a completed job below. We'll clone its full materials list into a new Build, attached to your new job. You can adjust quantities, swap products, and modify anything before submitting.
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-bar">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="6"/><path d="M14 14l4 4" stroke-linecap="round"/></svg>
+      <input type="text" placeholder="Search by address, homeowner, or order number...">
+    </div>
+
+    <!-- Controls row -->
+    <div class="controls-row">
+      <div class="filter-pills">
+        <div class="filter-pill active">All Completed</div>
+        <div class="filter-pill">Roofing</div>
+        <div class="filter-pill">Gutters</div>
+        <div class="filter-pill">Siding</div>
+      </div>
+      <div class="sort-control">
+        Sort by:
+        <select class="sort-select">
+          <option>Most Recent</option>
+          <option>Order Total</option>
+          <option>Address A-Z</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Job cards -->
+    <div class="job-list">
+
+      <!-- Job 1 (selected) -->
+      <div class="job-card selected">
+        <div class="job-map">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3"><rect x="8" y="12" width="32" height="28" rx="2"/><path d="M8 22h32M18 12v28M28 12v28"/></svg>
+          <div class="job-map-overlay">Street view</div>
+        </div>
+        <div class="job-info">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:2px;">
+            <div class="job-address">312 Oakwood Drive, Arvada</div>
+            <div class="job-status completed">
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Completed
+            </div>
+          </div>
+          <div class="job-homeowner">Tom & Lisa Chen &middot; Residential re-roof</div>
+          <div class="job-meta-row">
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M2 6h12M6 2v12" stroke-linecap="round"/></svg>
+              <strong>Jan 18, 2026</strong>
+            </div>
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="1"/><path d="M6 5h4M6 8h4M6 11h2" stroke-linecap="round"/></svg>
+              <strong>12 items</strong>
+            </div>
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-8 9 8M5 10v9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <strong>22 squares</strong>
+            </div>
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2l1.5 3.5H13l-3 2.5 1 3.5L8 9l-3 2.5 1-3.5-3-2.5h3.5L8 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Order #ORD-2026-03891
+            </div>
+          </div>
+          <div class="job-materials">
+            <span class="job-material-tag">GAF Timberline HDZ</span>
+            <span class="job-material-tag">FeltBuster</span>
+            <span class="job-material-tag">WeatherWatch I&W</span>
+            <span class="job-material-tag">+4 more</span>
+          </div>
+        </div>
+        <div class="job-action">
+          <div class="job-total">
+            <div class="job-total-label">Order Total</div>
+            <div class="job-total-amount">$6,180</div>
+            <div class="job-total-items">12 line items</div>
+          </div>
+          <div class="clone-btn">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M5 11H3.5A1.5 1.5 0 012 9.5v-7A1.5 1.5 0 013.5 1h7A1.5 1.5 0 0112 2.5V5" stroke-linecap="round"/></svg>
+            Clone this order
+          </div>
+        </div>
+      </div>
+
+      <!-- Job 2 -->
+      <div class="job-card">
+        <div class="job-map">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3"><rect x="8" y="12" width="32" height="28" rx="2"/><path d="M8 22h32M18 12v28M28 12v28"/></svg>
+          <div class="job-map-overlay">Street view</div>
+        </div>
+        <div class="job-info">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:2px;">
+            <div class="job-address">891 Pine Ridge Ct, Golden</div>
+            <div class="job-status completed">
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Completed
+            </div>
+          </div>
+          <div class="job-homeowner">Dave Kowalski &middot; Full tear-off + re-roof</div>
+          <div class="job-meta-row">
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M2 6h12M6 2v12" stroke-linecap="round"/></svg>
+              <strong>Dec 5, 2025</strong>
+            </div>
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="1"/><path d="M6 5h4M6 8h4M6 11h2" stroke-linecap="round"/></svg>
+              <strong>15 items</strong>
+            </div>
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-8 9 8M5 10v9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <strong>34 squares</strong>
+            </div>
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2l1.5 3.5H13l-3 2.5 1 3.5L8 9l-3 2.5 1-3.5-3-2.5h3.5L8 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Order #ORD-2025-03214
+            </div>
+          </div>
+          <div class="job-materials">
+            <span class="job-material-tag">GAF Timberline UHDZ</span>
+            <span class="job-material-tag">Deck-Armor Premium</span>
+            <span class="job-material-tag">Full system accessories</span>
+            <span class="job-material-tag">+6 more</span>
+          </div>
+        </div>
+        <div class="job-action">
+          <div class="job-total">
+            <div class="job-total-label">Order Total</div>
+            <div class="job-total-amount">$9,840</div>
+            <div class="job-total-items">15 line items</div>
+          </div>
+          <div class="clone-btn">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M5 11H3.5A1.5 1.5 0 012 9.5v-7A1.5 1.5 0 013.5 1h7A1.5 1.5 0 0112 2.5V5" stroke-linecap="round"/></svg>
+            Clone this order
+          </div>
+        </div>
+      </div>
+
+      <!-- Job 3 -->
+      <div class="job-card">
+        <div class="job-map">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3"><rect x="8" y="12" width="32" height="28" rx="2"/><path d="M8 22h32M18 12v28M28 12v28"/></svg>
+          <div class="job-map-overlay">Street view</div>
+        </div>
+        <div class="job-info">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:2px;">
+            <div class="job-address">2200 Maple St, Lakewood</div>
+            <div class="job-status completed">
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Completed
+            </div>
+          </div>
+          <div class="job-homeowner">Sarah & Mike Gutierrez &middot; Roof + gutters</div>
+          <div class="job-meta-row">
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M2 6h12M6 2v12" stroke-linecap="round"/></svg>
+              <strong>Nov 12, 2025</strong>
+            </div>
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="1"/><path d="M6 5h4M6 8h4M6 11h2" stroke-linecap="round"/></svg>
+              <strong>18 items</strong>
+            </div>
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-8 9 8M5 10v9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <strong>28 squares</strong>
+            </div>
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2l1.5 3.5H13l-3 2.5 1 3.5L8 9l-3 2.5 1-3.5-3-2.5h3.5L8 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Order #ORD-2025-02987
+            </div>
+          </div>
+          <div class="job-materials">
+            <span class="job-material-tag">GAF Timberline HDZ</span>
+            <span class="job-material-tag">5" K-style gutter</span>
+            <span class="job-material-tag">Downspouts</span>
+            <span class="job-material-tag">+8 more</span>
+          </div>
+        </div>
+        <div class="job-action">
+          <div class="job-total">
+            <div class="job-total-label">Order Total</div>
+            <div class="job-total-amount">$8,420</div>
+            <div class="job-total-items">18 line items</div>
+          </div>
+          <div class="clone-btn">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M5 11H3.5A1.5 1.5 0 012 9.5v-7A1.5 1.5 0 013.5 1h7A1.5 1.5 0 0112 2.5V5" stroke-linecap="round"/></svg>
+            Clone this order
+          </div>
+        </div>
+      </div>
+
+      <!-- Job 4 -->
+      <div class="job-card">
+        <div class="job-map">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3"><rect x="8" y="12" width="32" height="28" rx="2"/><path d="M8 22h32M18 12v28M28 12v28"/></svg>
+          <div class="job-map-overlay">Street view</div>
+        </div>
+        <div class="job-info">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:2px;">
+            <div class="job-address">445 Spruce Way, Denver</div>
+            <div class="job-status delivered">
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Delivered
+            </div>
+          </div>
+          <div class="job-homeowner">Jennifer Park &middot; Re-roof + skylights</div>
+          <div class="job-meta-row">
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M2 6h12M6 2v12" stroke-linecap="round"/></svg>
+              <strong>Oct 22, 2025</strong>
+            </div>
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="1"/><path d="M6 5h4M6 8h4M6 11h2" stroke-linecap="round"/></svg>
+              <strong>14 items</strong>
+            </div>
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-8 9 8M5 10v9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <strong>30 squares</strong>
+            </div>
+            <div class="job-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2l1.5 3.5H13l-3 2.5 1 3.5L8 9l-3 2.5 1-3.5-3-2.5h3.5L8 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Order #ORD-2025-02651
+            </div>
+          </div>
+          <div class="job-materials">
+            <span class="job-material-tag">GAF Timberline HDZ</span>
+            <span class="job-material-tag">Velux skylights x2</span>
+            <span class="job-material-tag">Flashing kit</span>
+            <span class="job-material-tag">+5 more</span>
+          </div>
+        </div>
+        <div class="job-action">
+          <div class="job-total">
+            <div class="job-total-label">Order Total</div>
+            <div class="job-total-amount">$7,650</div>
+            <div class="job-total-items">14 line items</div>
+          </div>
+          <div class="clone-btn">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M5 11H3.5A1.5 1.5 0 012 9.5v-7A1.5 1.5 0 013.5 1h7A1.5 1.5 0 0112 2.5V5" stroke-linecap="round"/></svg>
+            Clone this order
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom action bar -->
+    <div class="action-bar">
+      <div class="action-bar-info">
+        <div>
+          <div class="action-bar-selected">
+            <div class="action-bar-dot"></div>
+            312 Oakwood Drive selected
+          </div>
+          <div class="action-bar-detail">12 items &middot; $6,180 &middot; Jan 18, 2026</div>
+        </div>
+        <div class="action-bar-warning">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2L1 14h14L8 2z" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 6v4M8 12v.5" stroke-linecap="round"/></svg>
+          2 items may have price changes since last order
+        </div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12L12 4M12 4H6M12 4v6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          View Original Order
+        </button>
+        <button class="btn btn-primary">
+          Clone & Start New Build
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h12M10 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

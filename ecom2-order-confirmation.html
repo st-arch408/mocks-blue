@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>QXO Ecom 2.0 — Order Confirmation (B-CONFIRM)</title>
+<style>
+  :root {
+    --primary: #004BEA;
+    --primary-hover: #0040CC;
+    --primary-light: #EBF0FF;
+    --primary-border: #B3CCFF;
+    --bg: #F2F2F2;
+    --white: #FFFFFF;
+    --text: #111827;
+    --text-secondary: #6B7280;
+    --text-tertiary: #9CA3AF;
+    --border: #E5E7EB;
+    --border-light: #F3F4F6;
+    --green: #22C55E;
+    --green-light: #F0FDF4;
+    --green-border: #BBF7D0;
+    --orange: #F59E0B;
+    --orange-light: #FFFBEB;
+    --purple: #8B5CF6;
+    --purple-light: #F5F3FF;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-lg: 16px;
+    --transition: 0.15s ease;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    -webkit-font-smoothing: antialiased; line-height: 1.5;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: fixed; left: 0; top: 0; width: 240px; height: 100vh;
+    background: var(--white); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; z-index: 10; box-shadow: 1px 0 4px rgba(0,0,0,0.03);
+  }
+  .sidebar-logo { padding: 22px 20px 18px; display: flex; align-items: center; gap: 10px; }
+  .sidebar-logo-icon { width: 34px; height: 34px; border-radius: 10px; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 15px; }
+  .sidebar-logo-text { font-weight: 800; font-size: 17px; color: var(--text); letter-spacing: -0.03em; }
+  .sidebar-build-btn { margin: 0 14px 18px; padding: 11px 16px; background: var(--primary); color: white; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 8px rgba(0,75,234,0.3); }
+  .sidebar-nav { flex: 1; padding: 0 10px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-radius: var(--radius-sm); margin-bottom: 2px; cursor: pointer; font-size: 14px; color: var(--text-secondary); font-weight: 450; transition: all var(--transition); }
+  .nav-item:hover { background: var(--border-light); color: var(--text); }
+  .nav-badge { margin-left: auto; font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 10px; background: var(--border-light); color: var(--text-secondary); }
+  .nav-section-label { padding: 18px 14px 6px; font-size: 11px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; }
+  .nav-item.coming { color: var(--text-tertiary); opacity: 0.45; cursor: default; }
+  .sidebar-user { padding: 16px 18px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .sidebar-user-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--text-secondary); }
+  .sidebar-user-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .sidebar-user-email { font-size: 11px; color: var(--text-secondary); }
+
+  /* Main */
+  .main { margin-left: 240px; min-height: 100vh; }
+  .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 16px 36px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 5; box-shadow: var(--shadow-sm); }
+  .topbar h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; }
+  .topbar-subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 1px; }
+
+  .content { padding: 48px 36px; max-width: 800px; margin: 0 auto; }
+
+  /* Success hero */
+  .success-hero {
+    text-align: center; margin-bottom: 36px;
+  }
+
+  .success-check {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--green-light);
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .success-check::after {
+    content: ''; position: absolute; inset: -6px;
+    border: 2px solid var(--green-border); border-radius: 50%;
+    animation: check-ring 0.6s ease-out;
+  }
+  @keyframes check-ring {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .success-hero h2 {
+    font-size: 26px; font-weight: 800; letter-spacing: -0.03em;
+    color: var(--text); margin-bottom: 8px;
+  }
+  .success-hero p {
+    font-size: 15px; color: var(--text-secondary); max-width: 450px;
+    margin: 0 auto;
+  }
+
+  /* Order confirmation card */
+  .confirm-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    overflow: hidden; margin-bottom: 20px;
+  }
+
+  .cc-header {
+    padding: 20px 28px;
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--white) 100%);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cc-order-num {
+    font-size: 13px; color: var(--text-secondary); font-weight: 500;
+  }
+  .cc-order-num strong {
+    font-size: 18px; font-weight: 800; color: var(--primary);
+    letter-spacing: -0.02em;
+  }
+  .cc-date { font-size: 13px; color: var(--text-secondary); text-align: right; }
+
+  .cc-body { padding: 24px 28px; }
+
+  /* Job info */
+  .cc-job {
+    display: flex; align-items: center; gap: 14px;
+    padding-bottom: 20px; margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .cc-job-icon {
+    width: 44px; height: 44px; border-radius: var(--radius);
+    background: var(--border-light);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary);
+  }
+  .cc-job-address { font-size: 16px; font-weight: 700; color: var(--text); }
+  .cc-job-detail { font-size: 13px; color: var(--text-secondary); }
+
+  /* Summary rows */
+  .cc-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+  .cc-summary-item {
+    padding: 16px; border-radius: var(--radius-sm);
+    background: var(--border-light);
+  }
+  .cc-summary-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
+  .cc-summary-value { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+  .cc-summary-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
+
+  /* Delivery highlight */
+  .cc-delivery {
+    display: flex; align-items: center; gap: 14px;
+    padding: 18px; border-radius: var(--radius);
+    background: var(--primary-light); border: 1px solid var(--primary-border);
+    margin-bottom: 24px;
+  }
+  .cc-delivery-icon {
+    width: 44px; height: 44px; border-radius: var(--radius);
+    background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--primary);
+  }
+  .cc-delivery-title { font-size: 14px; font-weight: 600; color: var(--primary); }
+  .cc-delivery-detail { font-size: 13px; color: #3730A3; }
+  .cc-delivery-note { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
+
+  /* Items summary (collapsed) */
+  .cc-items-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 12px;
+  }
+  .cc-items-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .cc-items-count { font-size: 12px; color: var(--text-secondary); }
+
+  .cc-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; font-size: 13px;
+  }
+  .cc-item:not(:last-child) { border-bottom: 1px solid var(--border-light); }
+  .cc-item-name { color: var(--text); font-weight: 500; }
+  .cc-item-name .qty { color: var(--text-tertiary); font-weight: 400; }
+  .cc-item-price { font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+
+  .cc-total {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 14px; margin-top: 14px;
+    border-top: 2px solid var(--border);
+    font-size: 16px; font-weight: 700;
+  }
+
+  /* Credit update */
+  .cc-credit {
+    margin-top: 24px; padding: 16px;
+    background: var(--green-light); border-radius: var(--radius-sm);
+    border: 1px solid var(--green-border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .cc-credit-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: rgba(34,197,94,0.15);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--green); flex-shrink: 0;
+  }
+  .cc-credit-label { font-size: 13px; color: #166534; font-weight: 500; }
+  .cc-credit-value { font-size: 15px; font-weight: 700; color: #166534; }
+
+  /* Actions */
+  .actions {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin-top: 28px;
+  }
+  .action-card {
+    background: var(--white); border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 18px;
+    cursor: pointer; transition: all var(--transition);
+    text-align: center; text-decoration: none;
+  }
+  .action-card:hover { border-color: var(--primary-border); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+  .action-icon {
+    width: 40px; height: 40px; border-radius: var(--radius-sm);
+    background: var(--primary-light);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--primary); margin-bottom: 10px;
+  }
+  .action-card:hover .action-icon { background: var(--primary); color: white; }
+  .action-label { font-size: 14px; font-weight: 600; color: var(--text); display: block; }
+  .action-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+  /* Timeline teaser */
+  .timeline-card {
+    background: var(--white); border-radius: var(--radius-lg);
+    border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+    padding: 24px 28px; margin-top: 20px;
+  }
+  .timeline-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 16px; }
+
+  .tl-step {
+    display: flex; gap: 14px; position: relative;
+    padding-bottom: 20px;
+  }
+  .tl-step:last-child { padding-bottom: 0; }
+  .tl-step::before {
+    content: ''; position: absolute;
+    left: 15px; top: 28px; bottom: 0;
+    width: 2px; background: var(--border);
+  }
+  .tl-step:last-child::before { display: none; }
+
+  .tl-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; z-index: 1;
+  }
+  .tl-dot.done { background: var(--green-light); color: var(--green); }
+  .tl-dot.active { background: var(--primary-light); color: var(--primary); border: 2px solid var(--primary); }
+  .tl-dot.pending { background: var(--border-light); color: var(--text-tertiary); }
+
+  .tl-content { padding-top: 4px; }
+  .tl-label { font-size: 14px; font-weight: 600; color: var(--text); }
+  .tl-time { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+  .tl-step.future .tl-label { color: var(--text-tertiary); }
+  .tl-step.future .tl-time { color: var(--text-tertiary); }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="sidebar-logo-icon">Q</div><div class="sidebar-logo-text">QXO</div></div>
+  <button class="sidebar-build-btn"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3v14M3 10h14" stroke-linecap="round"/></svg> BUILD</button>
+  <nav class="sidebar-nav">
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg> Dashboard</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h14M3 8h14M3 12h10M3 16h7" stroke-linecap="round"/></svg> Jobs <span class="nav-badge">12</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 10h6M7 14h3" stroke-linecap="round"/></svg> Proposals <span class="nav-badge">4</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h10v9H2z"/><path d="M12 8h4l2 3v2h-6V8z"/><circle cx="6" cy="15" r="2"/><circle cx="15" cy="15" r="2"/></svg> Deliveries <span class="nav-badge">3</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 9h6M7 12h4M12 15h2" stroke-linecap="round"/></svg> Invoices</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2L18 6v8l-8 4L2 14V6l8-4z"/><path d="M2 6l8 4m0 0l8-4m-8 4v8"/></svg> Products</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4l4 4-4 4M10 14h6" stroke-linecap="round"/></svg> Builds</div>
+    <div class="nav-section-label">Coming Soon</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="7" r="4"/><path d="M3 18c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg> CRM</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2l2.5 5.5L18 8.5l-4 4 1 5.5-5-3-5 3 1-5.5-4-4 5.5-1z"/></svg> Loyalty</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v2m0 12v2M2 10h2m12 0h2"/><circle cx="10" cy="10" r="4"/></svg> Storm Center</div>
+  </nav>
+  <div class="sidebar-user"><div class="sidebar-user-avatar">MR</div><div><div class="sidebar-user-name">Rivera Roofing</div><div class="sidebar-user-email">marcus@riveraroofing.com</div></div></div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+  <header class="topbar">
+    <div>
+      <h1>Order Confirmed</h1>
+      <div class="topbar-subtitle">445 Spruce Way, Broomfield &middot; David Kim</div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- Success Hero -->
+    <div class="success-hero">
+      <div class="success-check">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="#22C55E" stroke-width="3"><path d="M8 18l8 8 12-14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2>Order Submitted Successfully</h2>
+      <p>Your materials order for 445 Spruce Way has been placed. Delivery is scheduled for Thursday morning.</p>
+    </div>
+
+    <!-- Confirmation Card -->
+    <div class="confirm-card">
+      <div class="cc-header">
+        <div class="cc-order-num">
+          Order <strong>#ORD-2026-04182</strong>
+        </div>
+        <div class="cc-date">
+          Placed February 23, 2026<br>
+          <span style="font-size:12px; color: var(--text-tertiary);">10:36 AM MST</span>
+        </div>
+      </div>
+      <div class="cc-body">
+
+        <!-- Job -->
+        <div class="cc-job">
+          <div class="cc-job-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10l7-7 7 7M5 9v7a1 1 0 001 1h3v-4h2v4h3a1 1 0 001-1V9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="cc-job-address">445 Spruce Way, Broomfield, CO</div>
+            <div class="cc-job-detail">David Kim &middot; Roofing Project &middot; Job #J-2026-0089</div>
+          </div>
+        </div>
+
+        <!-- Summary grid -->
+        <div class="cc-summary">
+          <div class="cc-summary-item">
+            <div class="cc-summary-label">Order Total</div>
+            <div class="cc-summary-value">$4,208.00</div>
+            <div class="cc-summary-sub">6 line items + delivery</div>
+          </div>
+          <div class="cc-summary-item">
+            <div class="cc-summary-label">Payment Method</div>
+            <div class="cc-summary-value">Credit Account</div>
+            <div class="cc-summary-sub">Net 30 terms</div>
+          </div>
+          <div class="cc-summary-item">
+            <div class="cc-summary-label">Branch</div>
+            <div class="cc-summary-value">Denver West #1247</div>
+            <div class="cc-summary-sub">8200 W Colfax Ave</div>
+          </div>
+          <div class="cc-summary-item">
+            <div class="cc-summary-label">Build Profile Used</div>
+            <div class="cc-summary-value">Standard GAF</div>
+            <div class="cc-summary-sub">12% waste, FeltBuster, coil nails</div>
+          </div>
+        </div>
+
+        <!-- Delivery highlight -->
+        <div class="cc-delivery">
+          <div class="cc-delivery-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h10v9H2z"/><path d="M12 8h4l2 3v2h-6V8z"/><circle cx="6" cy="15" r="2"/><circle cx="15" cy="15" r="2"/></svg>
+          </div>
+          <div>
+            <div class="cc-delivery-title">Standard AM Delivery</div>
+            <div class="cc-delivery-detail">Thursday, February 27 &middot; 7:00 – 9:00 AM</div>
+            <div class="cc-delivery-note">You'll receive a tracking link via text when the truck is dispatched</div>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="cc-items-header">
+          <div class="cc-items-title">Items Ordered</div>
+          <div class="cc-items-count">6 items</div>
+        </div>
+        <div class="cc-item"><span class="cc-item-name">GAF Timberline HDZ Charcoal <span class="qty">&times; 30 sq</span></span><span class="cc-item-price">$3,150.00</span></div>
+        <div class="cc-item"><span class="cc-item-name">GAF FeltBuster Synthetic <span class="qty">&times; 3 rolls</span></span><span class="cc-item-price">$195.00</span></div>
+        <div class="cc-item"><span class="cc-item-name">GAF WeatherWatch I&W <span class="qty">&times; 6 rolls</span></span><span class="cc-item-price">$318.00</span></div>
+        <div class="cc-item"><span class="cc-item-name">GAF ProStart Starter <span class="qty">&times; 3 boxes</span></span><span class="cc-item-price">$138.00</span></div>
+        <div class="cc-item"><span class="cc-item-name">GAF TimberTex H&R <span class="qty">&times; 5 bdl</span></span><span class="cc-item-price">$240.00</span></div>
+        <div class="cc-item"><span class="cc-item-name">Coil Nails 1-1/4" Galv. <span class="qty">&times; 1 box</span></span><span class="cc-item-price">$42.00</span></div>
+
+        <div class="cc-total">
+          <span>Total</span>
+          <span>$4,208.00</span>
+        </div>
+
+        <!-- Credit update -->
+        <div class="cc-credit">
+          <div class="cc-credit-icon">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="cc-credit-label">Credit account updated</div>
+            <div class="cc-credit-value">$23,292.00 available of $75,000 limit</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="actions">
+      <a class="action-card" href="#">
+        <div class="action-icon">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h14M3 8h14M3 12h10M3 16h7" stroke-linecap="round"/></svg>
+        </div>
+        <span class="action-label">View Job</span>
+        <span class="action-desc">See full job details for 445 Spruce Way</span>
+      </a>
+      <a class="action-card" href="#">
+        <div class="action-icon">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h10v9H2z"/><path d="M12 8h4l2 3v2h-6V8z"/><circle cx="6" cy="15" r="2"/><circle cx="15" cy="15" r="2"/></svg>
+        </div>
+        <span class="action-label">Track Delivery</span>
+        <span class="action-desc">Live tracking available Thursday AM</span>
+      </a>
+      <a class="action-card" href="#">
+        <div class="action-icon">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v16M2 10h16" stroke-linecap="round"/></svg>
+        </div>
+        <span class="action-label">New Build</span>
+        <span class="action-desc">Start another order or estimate</span>
+      </a>
+      <a class="action-card" href="#">
+        <div class="action-icon">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>
+        </div>
+        <span class="action-label">Dashboard</span>
+        <span class="action-desc">Return to your command center</span>
+      </a>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline-card">
+      <div class="timeline-title">What Happens Next</div>
+      <div class="tl-step">
+        <div class="tl-dot done">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="tl-content">
+          <div class="tl-label">Order Placed</div>
+          <div class="tl-time">Today, 10:36 AM</div>
+        </div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-dot active">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="3"/></svg>
+        </div>
+        <div class="tl-content">
+          <div class="tl-label">Branch Confirmation</div>
+          <div class="tl-time">Expected within 1 hour</div>
+        </div>
+      </div>
+      <div class="tl-step future">
+        <div class="tl-dot pending">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="2"/></svg>
+        </div>
+        <div class="tl-content">
+          <div class="tl-label">Materials Staged</div>
+          <div class="tl-time">Wednesday evening</div>
+        </div>
+      </div>
+      <div class="tl-step future">
+        <div class="tl-dot pending">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="2"/></svg>
+        </div>
+        <div class="tl-content">
+          <div class="tl-label">Truck Dispatched</div>
+          <div class="tl-time">Thursday AM &middot; SMS tracking link sent</div>
+        </div>
+      </div>
+      <div class="tl-step future">
+        <div class="tl-dot pending">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="2"/></svg>
+        </div>
+        <div class="tl-content">
+          <div class="tl-label">Delivered</div>
+          <div class="tl-time">Thursday, 7:00 – 9:00 AM &middot; Photos uploaded</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

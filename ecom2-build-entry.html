@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>QXO Ecom 2.0 — Build Entry (B-00)</title>
+<style>
+  :root {
+    --primary: #004BEA;
+    --primary-hover: #0040CC;
+    --primary-light: #EBF0FF;
+    --primary-border: #B3CCFF;
+    --bg: #F2F2F2;
+    --white: #FFFFFF;
+    --text: #111827;
+    --text-secondary: #6B7280;
+    --text-tertiary: #9CA3AF;
+    --border: #E5E7EB;
+    --border-light: #F3F4F6;
+    --green: #22C55E;
+    --green-light: #F0FDF4;
+    --red: #EF4444;
+    --orange: #F59E0B;
+    --orange-light: #FFFBEB;
+    --purple: #8B5CF6;
+    --purple-light: #F5F3FF;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+    --shadow-xl: 0 8px 30px rgba(0,0,0,0.10);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-lg: 16px;
+    --transition: 0.15s ease;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    -webkit-font-smoothing: antialiased; line-height: 1.5;
+  }
+
+  /* ---- Sidebar ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0;
+    width: 240px; height: 100vh;
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    z-index: 10; box-shadow: 1px 0 4px rgba(0,0,0,0.03);
+  }
+  .sidebar-logo { padding: 22px 20px 18px; display: flex; align-items: center; gap: 10px; }
+  .sidebar-logo-icon {
+    width: 34px; height: 34px; border-radius: 10px; background: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 800; font-size: 15px;
+  }
+  .sidebar-logo-text { font-weight: 800; font-size: 17px; color: var(--text); letter-spacing: -0.03em; }
+
+  .sidebar-build-btn {
+    margin: 0 14px 18px; padding: 11px 16px;
+    background: var(--primary); color: white; border: none;
+    border-radius: var(--radius-sm); font-size: 14px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+    box-shadow: 0 2px 8px rgba(0,75,234,0.3);
+    position: relative;
+  }
+  .sidebar-build-btn::after {
+    content: ''; position: absolute; inset: -3px;
+    border: 2px solid var(--primary); border-radius: 11px;
+    animation: build-ring 2s infinite; opacity: 0;
+  }
+  @keyframes build-ring {
+    0%, 100% { opacity: 0; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.02); }
+  }
+
+  .sidebar-nav { flex: 1; padding: 0 10px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 14px; border-radius: var(--radius-sm);
+    margin-bottom: 2px; cursor: pointer;
+    font-size: 14px; color: var(--text-secondary);
+    font-weight: 450; transition: all var(--transition);
+  }
+  .nav-item:hover { background: var(--border-light); color: var(--text); }
+  .nav-item svg { flex-shrink: 0; }
+  .nav-badge {
+    margin-left: auto; font-size: 11px; font-weight: 600;
+    padding: 1px 8px; border-radius: 10px;
+    background: var(--border-light); color: var(--text-secondary);
+  }
+  .nav-section-label {
+    padding: 18px 14px 6px; font-size: 11px; font-weight: 600;
+    color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .nav-item.coming { color: var(--text-tertiary); opacity: 0.45; cursor: default; }
+
+  .sidebar-user {
+    padding: 16px 18px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sidebar-user-avatar {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--text-secondary);
+  }
+  .sidebar-user-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .sidebar-user-email { font-size: 11px; color: var(--text-secondary); }
+
+  /* ---- Main ---- */
+  .main { margin-left: 240px; min-height: 100vh; }
+
+  .topbar {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 16px 36px; display: flex; align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 5;
+    box-shadow: var(--shadow-sm);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+  .topbar-back {
+    width: 36px; height: 36px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text-secondary); transition: all var(--transition);
+  }
+  .topbar-back:hover { border-color: var(--primary-border); color: var(--primary); background: var(--primary-light); }
+  .topbar h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; }
+  .topbar-subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 1px; }
+
+  /* ---- Content ---- */
+  .content { padding: 36px; max-width: 1100px; margin: 0 auto; }
+
+  /* Hero section */
+  .hero {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .hero h2 {
+    font-size: 28px; font-weight: 800; letter-spacing: -0.03em;
+    color: var(--text); margin-bottom: 8px;
+  }
+  .hero p {
+    font-size: 16px; color: var(--text-secondary);
+    max-width: 500px; margin: 0 auto;
+  }
+
+  /* ---- Path Cards Grid ---- */
+  .paths-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    margin-bottom: 40px;
+  }
+
+  .path-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--border);
+    padding: 28px 26px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .path-card:hover {
+    border-color: var(--primary-border);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-3px);
+  }
+  .path-card:hover .path-arrow { opacity: 1; transform: translateX(0); }
+  .path-card:hover .path-icon { background: var(--primary); color: white; }
+
+  .path-card.featured {
+    border-color: var(--primary-border);
+    background: linear-gradient(135deg, var(--white) 0%, var(--primary-light) 100%);
+  }
+  .path-card.featured:hover {
+    border-color: var(--primary);
+    box-shadow: 0 8px 30px rgba(0,75,234,0.15);
+  }
+
+  .path-card.disabled {
+    opacity: 0.45; cursor: default;
+    pointer-events: none;
+  }
+
+  .path-top {
+    display: flex; align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .path-icon {
+    width: 48px; height: 48px; border-radius: var(--radius);
+    background: var(--primary-light);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--primary);
+    transition: all var(--transition);
+  }
+
+  .path-badge {
+    font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .path-badge.popular { background: var(--primary-light); color: var(--primary); }
+  .path-badge.atb { background: var(--green-light); color: var(--green); }
+  .path-badge.coming-soon { background: var(--border-light); color: var(--text-tertiary); }
+
+  .path-name {
+    font-size: 18px; font-weight: 700; color: var(--text);
+    margin-bottom: 6px; letter-spacing: -0.02em;
+  }
+
+  .path-desc {
+    font-size: 14px; color: var(--text-secondary);
+    line-height: 1.6; margin-bottom: 16px;
+  }
+
+  .path-footer {
+    display: flex; align-items: center;
+    justify-content: space-between;
+  }
+
+  .path-tags { display: flex; gap: 6px; }
+  .path-tag {
+    font-size: 11px; font-weight: 500;
+    padding: 2px 8px; border-radius: 4px;
+    background: var(--border-light); color: var(--text-tertiary);
+  }
+
+  .path-arrow {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 13px; font-weight: 600; color: var(--primary);
+    opacity: 0; transform: translateX(-8px);
+    transition: all 0.2s ease;
+  }
+
+  /* ---- NL Quick Start ---- */
+  .quick-start {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--border);
+    padding: 28px 30px;
+    margin-bottom: 32px;
+  }
+
+  .qs-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px;
+  }
+  .qs-icon {
+    width: 40px; height: 40px; border-radius: var(--radius);
+    background: linear-gradient(135deg, var(--primary), #3B82F6);
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+  }
+  .qs-title { font-size: 16px; font-weight: 700; color: var(--text); }
+  .qs-subtitle { font-size: 13px; color: var(--text-secondary); }
+
+  .qs-input-bar {
+    display: flex; align-items: center; gap: 10px;
+    border: 2px solid var(--border); border-radius: var(--radius);
+    padding: 6px 6px 6px 18px;
+    transition: all 0.2s ease; background: var(--white);
+  }
+  .qs-input-bar:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(0,75,234,0.1), var(--shadow-md);
+  }
+  .qs-input-bar input {
+    flex: 1; border: none; outline: none;
+    font-size: 15px; color: var(--text); background: transparent;
+  }
+  .qs-input-bar input::placeholder { color: var(--text-tertiary); }
+
+  .qs-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+
+  .qs-mic, .qs-send {
+    width: 40px; height: 40px; border-radius: var(--radius-sm);
+    border: none; display: flex; align-items: center;
+    justify-content: center; cursor: pointer; flex-shrink: 0;
+    transition: all var(--transition);
+  }
+  .qs-mic { background: var(--primary-light); color: var(--primary); }
+  .qs-mic:hover { background: var(--primary); color: white; }
+  .qs-send { background: var(--primary); color: white; }
+  .qs-send:hover { background: var(--primary-hover); transform: scale(1.05); }
+
+  .qs-examples {
+    display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;
+  }
+  .qs-example {
+    font-size: 12px; color: var(--primary);
+    background: var(--primary-light);
+    padding: 5px 12px; border-radius: 20px;
+    cursor: pointer; transition: all var(--transition);
+    border: 1px solid transparent;
+  }
+  .qs-example:hover { border-color: var(--primary-border); background: var(--primary-border); }
+
+  /* ---- Recent Drafts ---- */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--text); }
+  .section-link {
+    font-size: 13px; color: var(--primary); font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 4px;
+    transition: gap var(--transition); text-decoration: none;
+  }
+  .section-link:hover { gap: 8px; }
+
+  .drafts-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .draft-card {
+    background: var(--white); border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 16px 18px;
+    cursor: pointer; transition: all var(--transition);
+  }
+  .draft-card:hover {
+    border-color: var(--primary-border);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .draft-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .draft-status {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; padding: 2px 8px;
+    border-radius: 20px;
+  }
+  .draft-status.draft { background: var(--orange-light); color: var(--orange); }
+  .draft-status .dot { width: 5px; height: 5px; border-radius: 50%; }
+  .draft-status.draft .dot { background: var(--orange); }
+
+  .draft-time { font-size: 11px; color: var(--text-tertiary); }
+
+  .draft-address { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .draft-detail { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+
+  .draft-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 10px; border-top: 1px solid var(--border-light);
+  }
+  .draft-items { font-size: 12px; color: var(--text-secondary); }
+  .draft-value { font-size: 13px; font-weight: 700; color: var(--text); }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ================ SIDEBAR ================ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">Q</div>
+    <div class="sidebar-logo-text">QXO</div>
+  </div>
+  <button class="sidebar-build-btn">
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3v14M3 10h14" stroke-linecap="round"/></svg>
+    BUILD
+  </button>
+  <nav class="sidebar-nav">
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg> Dashboard</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h14M3 8h14M3 12h10M3 16h7" stroke-linecap="round"/></svg> Jobs <span class="nav-badge">12</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 10h6M7 14h3" stroke-linecap="round"/></svg> Proposals <span class="nav-badge">4</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h10v9H2z"/><path d="M12 8h4l2 3v2h-6V8z"/><circle cx="6" cy="15" r="2"/><circle cx="15" cy="15" r="2"/></svg> Deliveries <span class="nav-badge">3</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 9h6M7 12h4M12 15h2" stroke-linecap="round"/></svg> Invoices</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2L18 6v8l-8 4L2 14V6l8-4z"/><path d="M2 6l8 4m0 0l8-4m-8 4v8"/></svg> Products</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4l4 4-4 4M10 14h6" stroke-linecap="round"/></svg> Builds</div>
+    <div class="nav-section-label">Coming Soon</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="7" r="4"/><path d="M3 18c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg> CRM</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2l2.5 5.5L18 8.5l-4 4 1 5.5-5-3-5 3 1-5.5-4-4 5.5-1z"/></svg> Loyalty</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v2m0 12v2M2 10h2m12 0h2"/><circle cx="10" cy="10" r="4"/></svg> Storm Center</div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="sidebar-user-avatar">MR</div>
+    <div>
+      <div class="sidebar-user-name">Rivera Roofing</div>
+      <div class="sidebar-user-email">marcus@riveraroofing.com</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ================ MAIN ================ -->
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="topbar-back">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div>
+        <h1>Build</h1>
+        <div class="topbar-subtitle">Choose how you want to build, or just tell us what you need</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- NL Quick Start -->
+    <div class="quick-start">
+      <div class="qs-header">
+        <div class="qs-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="2" width="6" height="10" rx="3"/><path d="M4 10a6 6 0 0012 0M10 16v2" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="qs-title">Just tell me what you need</div>
+          <div class="qs-subtitle">Type or speak — I'll figure out the right path and build your order</div>
+        </div>
+      </div>
+      <div class="qs-input-bar">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#9CA3AF" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3" stroke-linecap="round"/></svg>
+        <input type="text" placeholder='"30 squares of Timberline HDZ Charcoal for the Spruce Way job" or "new estimate for 4215 Elm Street"'>
+        <div class="qs-divider"></div>
+        <button class="qs-mic">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="2" width="6" height="10" rx="3"/><path d="M4 10a6 6 0 0012 0M10 16v2" stroke-linecap="round"/></svg>
+        </button>
+        <button class="qs-send">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h12M10 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="qs-examples">
+        <span class="qs-example">"Order materials for 445 Spruce Way"</span>
+        <span class="qs-example">"New estimate, 4215 Elm Street"</span>
+        <span class="qs-example">"Reorder from the Oakwood Dr job"</span>
+        <span class="qs-example">"Use my standard GAF template"</span>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+      <h2>Or choose a path</h2>
+      <p>Each path is optimized for a different workflow. You can switch to conversational or structured input at any point.</p>
+    </div>
+
+    <!-- Path Cards -->
+    <div class="paths-grid">
+
+      <!-- New Order -->
+      <div class="path-card featured">
+        <div class="path-top">
+          <div class="path-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 5h6M9 14l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="path-badge popular">Most Used</span>
+        </div>
+        <div class="path-name">New Order</div>
+        <div class="path-desc">Place a materials order for an existing job. Speak or type what you need, or use the structured form to search and add products.</div>
+        <div class="path-footer">
+          <div class="path-tags">
+            <span class="path-tag">Voice / Text</span>
+            <span class="path-tag">Form</span>
+          </div>
+          <div class="path-arrow">
+            Start
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h8M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- New Estimate (ATB Blue) -->
+      <div class="path-card featured">
+        <div class="path-top">
+          <div class="path-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0v-4a1 1 0 011-1h2a1 1 0 011 1v4m-4 0h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="path-badge atb">ATB Blue</span>
+        </div>
+        <div class="path-name">New Estimate</div>
+        <div class="path-desc">Enter an address to start. Order a $20 Bid Perfect measurement, then build good/better/best proposals to send to the homeowner.</div>
+        <div class="path-footer">
+          <div class="path-tags">
+            <span class="path-tag">Bid Perfect</span>
+            <span class="path-tag">Proposals</span>
+          </div>
+          <div class="path-arrow">
+            Start
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h8M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- From Template -->
+      <div class="path-card">
+        <div class="path-top">
+          <div class="path-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="path-name">From Template</div>
+        <div class="path-desc">Start from one of your saved builds. Your brand preferences, waste factors, and accessory packages are pre-loaded — just pick a job and go.</div>
+        <div class="path-footer">
+          <div class="path-tags">
+            <span class="path-tag">3 templates saved</span>
+          </div>
+          <div class="path-arrow">
+            Start
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h8M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reorder from Job -->
+      <div class="path-card">
+        <div class="path-top">
+          <div class="path-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4v5h5M20 20v-5h-5" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.49 9A9 9 0 005.64 5.64L4 4m16 16l-1.64-1.64A9 9 0 013.51 15" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <div class="path-name">Reorder from Job</div>
+        <div class="path-desc">Clone a materials list from a previous job. Great for similar houses — adjust quantities and swap products before submitting.</div>
+        <div class="path-footer">
+          <div class="path-tags">
+            <span class="path-tag">5 completed jobs</span>
+          </div>
+          <div class="path-arrow">
+            Start
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h8M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Future paths teaser (subtle) -->
+    <div style="display: flex; gap: 14px; margin-bottom: 40px;">
+      <div class="path-card disabled" style="flex:1; padding: 20px 22px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="path-icon" style="width:36px;height:36px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text-tertiary);">Storm / Insurance Job</div>
+            <div style="font-size:12px;color:var(--text-tertiary);">Coming soon</div>
+          </div>
+        </div>
+      </div>
+      <div class="path-card disabled" style="flex:1; padding: 20px 22px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="path-icon" style="width:36px;height:36px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text-tertiary);">Siding Estimate</div>
+            <div style="font-size:12px;color:var(--text-tertiary);">Coming soon</div>
+          </div>
+        </div>
+      </div>
+      <div class="path-card disabled" style="flex:1; padding: 20px 22px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="path-icon" style="width:36px;height:36px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2m-16 0H3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 4h6" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text-tertiary);">Commercial Project</div>
+            <div style="font-size:12px;color:var(--text-tertiary);">Coming soon</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Drafts -->
+    <div class="section-header">
+      <div class="section-title">Recent Drafts</div>
+      <a class="section-link" href="#">
+        View all drafts
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+    <div class="drafts-grid">
+      <div class="draft-card">
+        <div class="draft-top">
+          <span class="draft-status draft"><span class="dot"></span>Draft</span>
+          <span class="draft-time">2 hours ago</span>
+        </div>
+        <div class="draft-address">892 Maple Drive</div>
+        <div class="draft-detail">Tom Chen &middot; Roofing estimate</div>
+        <div class="draft-meta">
+          <span class="draft-items">8 items</span>
+          <span class="draft-value">$12,400</span>
+        </div>
+      </div>
+      <div class="draft-card">
+        <div class="draft-top">
+          <span class="draft-status draft"><span class="dot"></span>Draft</span>
+          <span class="draft-time">Yesterday</span>
+        </div>
+        <div class="draft-address">567 Birch Lane</div>
+        <div class="draft-detail">James Wilson &middot; Materials order</div>
+        <div class="draft-meta">
+          <span class="draft-items">3 items</span>
+          <span class="draft-value">$2,850</span>
+        </div>
+      </div>
+      <div class="draft-card">
+        <div class="draft-top">
+          <span class="draft-status draft"><span class="dot"></span>Draft</span>
+          <span class="draft-time">Feb 18</span>
+        </div>
+        <div class="draft-address">1100 Crestview Ct</div>
+        <div class="draft-detail">New lead &middot; Estimate started</div>
+        <div class="draft-meta">
+          <span class="draft-items">Measurement pending</span>
+          <span class="draft-value">&mdash;</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>QXO Ecom 2.0 — Build: Structured Mode (B-1S)</title>
+<style>
+  :root {
+    --primary: #004BEA;
+    --primary-hover: #0040CC;
+    --primary-light: #EBF0FF;
+    --primary-border: #B3CCFF;
+    --primary-glow: rgba(0,75,234,0.12);
+    --bg: #F2F2F2;
+    --white: #FFFFFF;
+    --text: #111827;
+    --text-secondary: #6B7280;
+    --text-tertiary: #9CA3AF;
+    --border: #E5E7EB;
+    --border-light: #F3F4F6;
+    --green: #22C55E;
+    --green-light: #F0FDF4;
+    --green-border: #BBF7D0;
+    --red: #EF4444;
+    --red-light: #FEF2F2;
+    --orange: #F59E0B;
+    --orange-light: #FFFBEB;
+    --orange-border: #FDE68A;
+    --purple: #8B5CF6;
+    --purple-light: #F5F3FF;
+    --purple-border: #DDD6FE;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --transition: 0.15s ease;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    -webkit-font-smoothing: antialiased; line-height: 1.5;
+  }
+
+  /* ---- Sidebar (condensed) ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0;
+    width: 240px; height: 100vh;
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    z-index: 10; box-shadow: 1px 0 4px rgba(0,0,0,0.03);
+  }
+  .sidebar-logo { padding: 22px 20px 18px; display: flex; align-items: center; gap: 10px; }
+  .sidebar-logo-icon {
+    width: 34px; height: 34px; border-radius: 10px; background: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 800; font-size: 15px;
+  }
+  .sidebar-logo-text { font-weight: 800; font-size: 17px; color: var(--text); letter-spacing: -0.03em; }
+  .sidebar-build-btn {
+    margin: 0 14px 18px; padding: 11px 16px;
+    background: var(--primary); color: white; border: none;
+    border-radius: var(--radius-sm); font-size: 14px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+    box-shadow: 0 2px 8px rgba(0,75,234,0.3);
+  }
+  .sidebar-nav { flex: 1; padding: 0 10px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 14px; border-radius: var(--radius-sm);
+    margin-bottom: 2px; cursor: pointer;
+    font-size: 14px; color: var(--text-secondary);
+    font-weight: 450; transition: all var(--transition);
+  }
+  .nav-item:hover { background: var(--border-light); color: var(--text); }
+  .nav-badge {
+    margin-left: auto; font-size: 11px; font-weight: 600;
+    padding: 1px 8px; border-radius: 10px;
+    background: var(--border-light); color: var(--text-secondary);
+  }
+  .nav-section-label {
+    padding: 18px 14px 6px; font-size: 11px; font-weight: 600;
+    color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .nav-item.coming { color: var(--text-tertiary); opacity: 0.45; cursor: default; }
+  .sidebar-user {
+    padding: 16px 18px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sidebar-user-avatar {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--text-secondary);
+  }
+  .sidebar-user-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .sidebar-user-email { font-size: 11px; color: var(--text-secondary); }
+
+  /* ---- Main ---- */
+  .main { margin-left: 240px; min-height: 100vh; }
+  .topbar {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 16px 36px; display: flex; align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 5; box-shadow: var(--shadow-sm);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+  .topbar-back {
+    width: 36px; height: 36px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text-secondary); transition: all var(--transition);
+  }
+  .topbar-back:hover { border-color: var(--primary-border); color: var(--primary); background: var(--primary-light); }
+  .topbar h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; }
+  .topbar-subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 1px; }
+  .topbar-actions { display: flex; align-items: center; gap: 12px; }
+
+  /* Mode Toggle */
+  .mode-toggle {
+    display: flex; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); overflow: hidden; background: var(--border-light);
+  }
+  .mode-btn {
+    padding: 7px 16px; font-size: 13px; font-weight: 500;
+    border: none; cursor: pointer; display: flex;
+    align-items: center; gap: 6px; transition: all var(--transition);
+    background: transparent; color: var(--text-secondary);
+  }
+  .mode-btn.active {
+    background: var(--white); color: var(--primary);
+    font-weight: 600; box-shadow: var(--shadow-sm);
+  }
+  .mode-btn:hover:not(.active) { color: var(--text); }
+
+  .content { padding: 28px 36px; max-width: 1320px; }
+
+  .build-layout {
+    display: grid; grid-template-columns: 1fr 420px;
+    gap: 24px; align-items: start;
+  }
+
+  /* ---- Left: Form Panel ---- */
+  .form-panel {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+
+  .form-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .form-title { font-size: 16px; font-weight: 700; }
+  .form-job-link {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--primary); font-weight: 500;
+    background: var(--primary-light); padding: 5px 12px;
+    border-radius: 20px; cursor: pointer; transition: all var(--transition);
+  }
+  .form-job-link:hover { background: var(--primary-border); }
+
+  /* Product Search */
+  .product-search {
+    padding: 20px 24px; border-bottom: 1px solid var(--border);
+  }
+  .search-label {
+    font-size: 13px; font-weight: 600; color: var(--text);
+    margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+  }
+  .search-bar {
+    display: flex; align-items: center; gap: 10px;
+    border: 2px solid var(--border); border-radius: var(--radius-sm);
+    padding: 4px 4px 4px 14px; transition: all 0.2s ease; background: var(--white);
+  }
+  .search-bar:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-glow);
+  }
+  .search-bar input {
+    flex: 1; border: none; outline: none;
+    font-size: 14px; color: var(--text); background: transparent;
+  }
+  .search-bar input::placeholder { color: var(--text-tertiary); }
+  .search-btn {
+    padding: 8px 16px; background: var(--primary-light); color: var(--primary);
+    border: none; border-radius: 6px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all var(--transition);
+  }
+  .search-btn:hover { background: var(--primary); color: white; }
+
+  /* Quick category filters */
+  .category-filters {
+    display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap;
+  }
+  .cat-filter {
+    font-size: 12px; font-weight: 500; padding: 4px 12px;
+    border-radius: 20px; border: 1px solid var(--border);
+    background: var(--white); color: var(--text-secondary);
+    cursor: pointer; transition: all var(--transition);
+  }
+  .cat-filter:hover { border-color: var(--primary-border); color: var(--primary); background: var(--primary-light); }
+  .cat-filter.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+
+  /* ---- Line Items Form ---- */
+  .line-items { padding: 0; }
+
+  .line-section {
+    border-bottom: 1px solid var(--border);
+  }
+  .line-section:last-child { border-bottom: none; }
+
+  .line-section-header {
+    padding: 10px 24px;
+    background: var(--border-light);
+    font-size: 11px; font-weight: 600; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .line-section-count {
+    font-size: 11px; font-weight: 600; color: var(--text-tertiary);
+    background: var(--white); padding: 1px 8px; border-radius: 10px;
+  }
+
+  .line-item {
+    padding: 16px 24px;
+    display: flex; gap: 16px; align-items: flex-start;
+    border-bottom: 1px solid var(--border-light);
+    transition: background var(--transition);
+  }
+  .line-item:last-child { border-bottom: none; }
+  .line-item:hover { background: #FAFBFC; }
+
+  .li-drag {
+    color: var(--text-tertiary); cursor: grab; margin-top: 12px;
+    opacity: 0; transition: opacity var(--transition);
+  }
+  .line-item:hover .li-drag { opacity: 1; }
+
+  .li-product { flex: 1; }
+  .li-product-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .li-product-sku { font-size: 12px; color: var(--text-tertiary); margin-top: 1px; }
+  .li-product-tags { display: flex; gap: 4px; margin-top: 6px; }
+  .li-tag {
+    font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 4px;
+  }
+  .li-tag.profile { background: var(--purple-light); color: var(--purple); }
+  .li-tag.request { background: var(--primary-light); color: var(--primary); }
+  .li-tag.ai { background: var(--purple-light); color: var(--purple); }
+  .li-tag.code { background: var(--orange-light); color: #92400E; }
+
+  .li-controls {
+    display: flex; align-items: center; gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .li-qty-control {
+    display: flex; align-items: center; gap: 0;
+    border: 1px solid var(--border); border-radius: 6px;
+    overflow: hidden;
+  }
+  .li-qty-btn {
+    width: 32px; height: 32px;
+    background: var(--border-light); border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text-secondary);
+    transition: all var(--transition); font-size: 16px;
+  }
+  .li-qty-btn:hover { background: var(--primary-light); color: var(--primary); }
+  .li-qty-input {
+    width: 48px; height: 32px; border: none;
+    text-align: center; font-size: 13px; font-weight: 600;
+    color: var(--text); background: var(--white); outline: none;
+  }
+  .li-qty-unit {
+    font-size: 11px; color: var(--text-tertiary); margin-left: 4px;
+    min-width: 40px;
+  }
+
+  .li-price {
+    text-align: right; min-width: 80px;
+  }
+  .li-price-total { font-size: 14px; font-weight: 600; color: var(--text); }
+  .li-price-unit { font-size: 11px; color: var(--text-tertiary); }
+
+  .li-remove {
+    width: 28px; height: 28px; border-radius: 6px;
+    border: none; background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text-tertiary);
+    transition: all var(--transition);
+    opacity: 0;
+  }
+  .line-item:hover .li-remove { opacity: 1; }
+  .li-remove:hover { background: var(--red-light); color: var(--red); }
+
+  /* AI suggestion inline */
+  .inline-suggestion {
+    margin: 0 24px 16px;
+    background: var(--purple-light);
+    border: 1px solid var(--purple-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .inline-sug-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: rgba(139,92,246,0.15);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--purple); flex-shrink: 0;
+  }
+  .inline-sug-body { flex: 1; }
+  .inline-sug-title { font-size: 13px; font-weight: 600; color: var(--purple); }
+  .inline-sug-text { font-size: 12px; color: #4C1D95; margin-top: 2px; line-height: 1.5; }
+  .inline-sug-actions { display: flex; gap: 6px; margin-top: 8px; }
+  .inline-sug-btn {
+    padding: 5px 12px; border-radius: 6px;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    transition: all var(--transition); border: none;
+  }
+  .inline-sug-btn.accept { background: var(--purple); color: white; }
+  .inline-sug-btn.accept:hover { background: #7C3AED; }
+  .inline-sug-btn.dismiss {
+    background: transparent; color: var(--purple);
+    border: 1px solid var(--purple-border);
+  }
+
+  /* Gap detection inline */
+  .inline-gap {
+    margin: 0 24px 16px;
+    background: var(--orange-light);
+    border: 1px solid var(--orange-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .inline-gap-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: rgba(245,158,11,0.15);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--orange); flex-shrink: 0;
+  }
+  .inline-gap-body { flex: 1; }
+  .inline-gap-title { font-size: 13px; font-weight: 600; color: #92400E; }
+  .inline-gap-text { font-size: 12px; color: #78350F; margin-top: 2px; line-height: 1.5; }
+  .inline-gap-actions { display: flex; gap: 6px; margin-top: 8px; }
+  .inline-gap-btn {
+    padding: 5px 12px; border-radius: 6px;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    transition: all var(--transition); border: none;
+  }
+  .inline-gap-btn.accept { background: var(--orange); color: white; }
+  .inline-gap-btn.dismiss { background: transparent; color: #92400E; border: 1px solid var(--orange-border); }
+
+  /* Add Product row */
+  .add-product-row {
+    padding: 14px 24px;
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer; color: var(--primary); font-size: 13px; font-weight: 600;
+    transition: all var(--transition);
+    border-top: 1px solid var(--border);
+  }
+  .add-product-row:hover { background: var(--primary-light); }
+
+  /* ---- Right: Order Summary (same as NL version) ---- */
+  .order-panel { display: flex; flex-direction: column; gap: 18px; }
+
+  .order-card {
+    background: var(--white); border-radius: var(--radius);
+    border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .order-card-header {
+    padding: 16px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .order-card-title { font-size: 15px; font-weight: 700; }
+  .order-card-status {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px;
+  }
+  .order-card-status.building { background: var(--primary-light); color: var(--primary); }
+  .order-card-status .dot {
+    width: 6px; height: 6px; border-radius: 50%; animation: pulse-dot 1.5s infinite;
+  }
+  .order-card-status.building .dot { background: var(--primary); }
+  @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .order-job-context {
+    padding: 14px 20px; background: var(--border-light);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .order-job-icon {
+    width: 36px; height: 36px; border-radius: var(--radius-sm);
+    background: var(--white); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; color: var(--text-secondary);
+  }
+  .order-job-address { font-size: 14px; font-weight: 600; color: var(--text); }
+  .order-job-detail { font-size: 12px; color: var(--text-secondary); }
+
+  .order-items-mini { padding: 0; }
+
+  .oi-section-label {
+    padding: 10px 20px 6px;
+    font-size: 10px; font-weight: 600; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+
+  .oi-item {
+    padding: 8px 20px; display: flex; justify-content: space-between;
+    align-items: center; font-size: 13px;
+  }
+  .oi-item:not(:last-child) { border-bottom: 1px solid var(--border-light); }
+  .oi-name { color: var(--text); font-weight: 500; }
+  .oi-name .oi-qty { color: var(--text-tertiary); font-weight: 400; }
+  .oi-price { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  .order-totals {
+    padding: 14px 20px; background: var(--border-light);
+    border-top: 1px solid var(--border);
+  }
+  .ot-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 13px; }
+  .ot-row.sub { color: var(--text-secondary); }
+  .ot-row.total {
+    font-size: 16px; font-weight: 700; color: var(--text);
+    padding-top: 8px; margin-top: 4px; border-top: 1px solid var(--border);
+  }
+
+  .credit-impact {
+    padding: 14px 20px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .credit-icon {
+    width: 32px; height: 32px; border-radius: 8px; background: var(--green-light);
+    display: flex; align-items: center; justify-content: center; color: var(--green);
+  }
+  .credit-impact-label { font-size: 12px; color: var(--text-secondary); }
+  .credit-impact-value { font-size: 14px; font-weight: 700; color: var(--green); }
+
+  .order-actions {
+    padding: 16px 20px; display: flex; flex-direction: column; gap: 8px;
+    border-top: 1px solid var(--border);
+  }
+  .btn-primary {
+    width: 100%; padding: 12px; background: var(--primary); color: white;
+    border: none; border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all var(--transition); box-shadow: 0 2px 8px rgba(0,75,234,0.25);
+  }
+  .btn-primary:hover { background: var(--primary-hover); box-shadow: 0 4px 14px rgba(0,75,234,0.35); transform: translateY(-1px); }
+  .btn-secondary {
+    width: 100%; padding: 10px; background: var(--white); color: var(--text-secondary);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all var(--transition);
+  }
+  .btn-secondary:hover { border-color: var(--primary-border); color: var(--primary); background: var(--primary-light); }
+
+  /* Delivery card */
+  .delivery-card {
+    background: var(--white); border-radius: var(--radius);
+    border: 1px solid var(--border); box-shadow: var(--shadow-sm); padding: 18px 20px;
+  }
+  .delivery-card-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+  .delivery-option {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 14px; border-radius: var(--radius-sm);
+    border: 2px solid var(--border); cursor: pointer;
+    transition: all var(--transition); margin-bottom: 8px;
+  }
+  .delivery-option:hover { border-color: var(--primary-border); }
+  .delivery-option.selected { border-color: var(--primary); background: var(--primary-light); }
+  .delivery-radio {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; margin-top: 1px;
+  }
+  .delivery-option.selected .delivery-radio { border-color: var(--primary); }
+  .delivery-option.selected .delivery-radio::after {
+    content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--primary);
+  }
+  .delivery-option-label { font-size: 13px; font-weight: 600; color: var(--text); }
+  .delivery-option-detail { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+  .delivery-option-price { font-size: 12px; font-weight: 600; color: var(--text); margin-top: 2px; }
+
+  /* Profile card */
+  .profile-card {
+    background: var(--white); border-radius: var(--radius);
+    border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden;
+  }
+  .profile-card-header {
+    padding: 14px 20px; background: var(--purple-light);
+    border-bottom: 1px solid var(--purple-border);
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 600; color: var(--purple);
+  }
+  .profile-card-body { padding: 14px 20px; }
+  .profile-row {
+    display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px;
+  }
+  .profile-row:not(:last-child) { border-bottom: 1px solid var(--border-light); }
+  .profile-row-label { color: var(--text-secondary); }
+  .profile-row-value { color: var(--text); font-weight: 500; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ================ SIDEBAR ================ -->
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="sidebar-logo-icon">Q</div><div class="sidebar-logo-text">QXO</div></div>
+  <button class="sidebar-build-btn"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3v14M3 10h14" stroke-linecap="round"/></svg> BUILD</button>
+  <nav class="sidebar-nav">
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg> Dashboard</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h14M3 8h14M3 12h10M3 16h7" stroke-linecap="round"/></svg> Jobs <span class="nav-badge">12</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 10h6M7 14h3" stroke-linecap="round"/></svg> Proposals <span class="nav-badge">4</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h10v9H2z"/><path d="M12 8h4l2 3v2h-6V8z"/><circle cx="6" cy="15" r="2"/><circle cx="15" cy="15" r="2"/></svg> Deliveries <span class="nav-badge">3</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 9h6M7 12h4M12 15h2" stroke-linecap="round"/></svg> Invoices</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2L18 6v8l-8 4L2 14V6l8-4z"/><path d="M2 6l8 4m0 0l8-4m-8 4v8"/></svg> Products</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4l4 4-4 4M10 14h6" stroke-linecap="round"/></svg> Builds</div>
+    <div class="nav-section-label">Coming Soon</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="7" r="4"/><path d="M3 18c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg> CRM</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2l2.5 5.5L18 8.5l-4 4 1 5.5-5-3-5 3 1-5.5-4-4 5.5-1z"/></svg> Loyalty</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v2m0 12v2M2 10h2m12 0h2"/><circle cx="10" cy="10" r="4"/></svg> Storm Center</div>
+  </nav>
+  <div class="sidebar-user"><div class="sidebar-user-avatar">MR</div><div><div class="sidebar-user-name">Rivera Roofing</div><div class="sidebar-user-email">marcus@riveraroofing.com</div></div></div>
+</aside>
+
+<!-- ================ MAIN ================ -->
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="topbar-back"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div>
+        <h1>Build &mdash; New Order</h1>
+        <div class="topbar-subtitle">Attached to 445 Spruce Way, Broomfield &middot; David Kim</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <div class="mode-toggle">
+        <button class="mode-btn">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="2" width="6" height="10" rx="3"/><path d="M4 10a6 6 0 0012 0M10 16v2" stroke-linecap="round"/></svg>
+          Conversational
+        </button>
+        <button class="mode-btn active">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h14M3 8h14M3 12h10M3 16h7" stroke-linecap="round"/></svg>
+          Structured
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="build-layout">
+
+      <!-- ============ LEFT: Structured Form ============ -->
+      <div class="form-panel">
+        <div class="form-header">
+          <div class="form-title">Add Products</div>
+          <div class="form-job-link">
+            <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h14M3 8h14M3 12h10M3 16h7" stroke-linecap="round"/></svg>
+            445 Spruce Way
+          </div>
+        </div>
+
+        <!-- Product Search -->
+        <div class="product-search">
+          <div class="search-label">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3" stroke-linecap="round"/></svg>
+            Search products or paste a SKU
+          </div>
+          <div class="search-bar">
+            <input type="text" placeholder="GAF Timberline HDZ, starter strip, underlayment...">
+            <button class="search-btn">Search</button>
+          </div>
+          <div class="category-filters">
+            <span class="cat-filter active">All</span>
+            <span class="cat-filter">Shingles</span>
+            <span class="cat-filter">Underlayment</span>
+            <span class="cat-filter">Accessories</span>
+            <span class="cat-filter">Ventilation</span>
+            <span class="cat-filter">Fasteners</span>
+            <span class="cat-filter">Flashing</span>
+          </div>
+        </div>
+
+        <!-- Line Items -->
+        <div class="line-items">
+
+          <!-- Shingles Section -->
+          <div class="line-section">
+            <div class="line-section-header">
+              Shingles
+              <span class="line-section-count">1 item</span>
+            </div>
+            <div class="line-item">
+              <div class="li-drag">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><circle cx="4" cy="2" r="1"/><circle cx="8" cy="2" r="1"/><circle cx="4" cy="6" r="1"/><circle cx="8" cy="6" r="1"/><circle cx="4" cy="10" r="1"/><circle cx="8" cy="10" r="1"/></svg>
+              </div>
+              <div class="li-product">
+                <div class="li-product-name">GAF Timberline HDZ — Charcoal</div>
+                <div class="li-product-sku">SKU 203-0142 &middot; 3 bundles/sq &middot; In Stock</div>
+                <div class="li-product-tags">
+                  <span class="li-tag profile">Profile default</span>
+                </div>
+              </div>
+              <div class="li-controls">
+                <div class="li-qty-control">
+                  <button class="li-qty-btn">&minus;</button>
+                  <input class="li-qty-input" type="text" value="90">
+                  <button class="li-qty-btn">+</button>
+                </div>
+                <div class="li-qty-unit">bundles<br><span style="font-size:10px;color:var(--text-tertiary);">(30 sq)</span></div>
+              </div>
+              <div class="li-price">
+                <div class="li-price-total">$3,150.00</div>
+                <div class="li-price-unit">$105.00/sq</div>
+              </div>
+              <button class="li-remove">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l8 8M12 4l-8 8" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quantity gap detection -->
+          <div class="inline-gap">
+            <div class="inline-gap-icon">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="6"/><path d="M8 5v3M8 10.5v.5" stroke-linecap="round"/></svg>
+            </div>
+            <div class="inline-gap-body">
+              <div class="inline-gap-title">Quantity Check</div>
+              <div class="inline-gap-text">Bid Perfect measurement shows 28.3 sq. With your 12% waste factor, that's 32 sq recommended. You have 30 sq.</div>
+              <div class="inline-gap-actions">
+                <button class="inline-gap-btn accept">Adjust to 32</button>
+                <button class="inline-gap-btn dismiss">Keep 30</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Underlayment Section -->
+          <div class="line-section">
+            <div class="line-section-header">
+              Underlayment
+              <span class="line-section-count">2 items</span>
+            </div>
+            <div class="line-item">
+              <div class="li-drag"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><circle cx="4" cy="2" r="1"/><circle cx="8" cy="2" r="1"/><circle cx="4" cy="6" r="1"/><circle cx="8" cy="6" r="1"/><circle cx="4" cy="10" r="1"/><circle cx="8" cy="10" r="1"/></svg></div>
+              <div class="li-product">
+                <div class="li-product-name">GAF FeltBuster Synthetic</div>
+                <div class="li-product-sku">SKU 203-0287 &middot; 10 sq/roll &middot; In Stock</div>
+                <div class="li-product-tags"><span class="li-tag profile">Profile default</span></div>
+              </div>
+              <div class="li-controls">
+                <div class="li-qty-control">
+                  <button class="li-qty-btn">&minus;</button>
+                  <input class="li-qty-input" type="text" value="3">
+                  <button class="li-qty-btn">+</button>
+                </div>
+                <div class="li-qty-unit">rolls</div>
+              </div>
+              <div class="li-price">
+                <div class="li-price-total">$195.00</div>
+                <div class="li-price-unit">$65.00/roll</div>
+              </div>
+              <button class="li-remove"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l8 8M12 4l-8 8" stroke-linecap="round"/></svg></button>
+            </div>
+
+            <div class="line-item">
+              <div class="li-drag"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><circle cx="4" cy="2" r="1"/><circle cx="8" cy="2" r="1"/><circle cx="4" cy="6" r="1"/><circle cx="8" cy="6" r="1"/><circle cx="4" cy="10" r="1"/><circle cx="8" cy="10" r="1"/></svg></div>
+              <div class="li-product">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div class="li-product-name">GAF WeatherWatch Ice & Water</div>
+                  <span class="li-tag ai">AI added</span>
+                </div>
+                <div class="li-product-sku">SKU 203-0301 &middot; 2 sq/roll &middot; In Stock</div>
+                <div class="li-product-tags"><span class="li-tag code">Code compliance</span></div>
+              </div>
+              <div class="li-controls">
+                <div class="li-qty-control">
+                  <button class="li-qty-btn">&minus;</button>
+                  <input class="li-qty-input" type="text" value="6">
+                  <button class="li-qty-btn">+</button>
+                </div>
+                <div class="li-qty-unit">rolls</div>
+              </div>
+              <div class="li-price">
+                <div class="li-price-total">$318.00</div>
+                <div class="li-price-unit">$53.00/roll</div>
+              </div>
+              <button class="li-remove"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l8 8M12 4l-8 8" stroke-linecap="round"/></svg></button>
+            </div>
+          </div>
+
+          <!-- AI suggestion for missing accessories -->
+          <div class="inline-suggestion">
+            <div class="inline-sug-icon">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v12M5 5l3-3 3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="inline-sug-body">
+              <div class="inline-sug-title">Missing Ventilation</div>
+              <div class="inline-sug-text">Your standard package includes ridge vent. Add <strong>Cobra Snow Country Advanced</strong> (4 pieces, $168)?</div>
+              <div class="inline-sug-actions">
+                <button class="inline-sug-btn accept">Add to Order</button>
+                <button class="inline-sug-btn dismiss">Skip</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accessories Section -->
+          <div class="line-section">
+            <div class="line-section-header">
+              Accessories
+              <span class="line-section-count">3 items</span>
+            </div>
+            <div class="line-item">
+              <div class="li-drag"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><circle cx="4" cy="2" r="1"/><circle cx="8" cy="2" r="1"/><circle cx="4" cy="6" r="1"/><circle cx="8" cy="6" r="1"/><circle cx="4" cy="10" r="1"/><circle cx="8" cy="10" r="1"/></svg></div>
+              <div class="li-product">
+                <div class="li-product-name">GAF ProStart Starter Strip</div>
+                <div class="li-product-sku">SKU 203-0156 &middot; 120 LF/box &middot; In Stock</div>
+                <div class="li-product-tags"><span class="li-tag profile">Standard package</span></div>
+              </div>
+              <div class="li-controls">
+                <div class="li-qty-control">
+                  <button class="li-qty-btn">&minus;</button>
+                  <input class="li-qty-input" type="text" value="3">
+                  <button class="li-qty-btn">+</button>
+                </div>
+                <div class="li-qty-unit">boxes</div>
+              </div>
+              <div class="li-price">
+                <div class="li-price-total">$138.00</div>
+                <div class="li-price-unit">$46.00/box</div>
+              </div>
+              <button class="li-remove"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l8 8M12 4l-8 8" stroke-linecap="round"/></svg></button>
+            </div>
+
+            <div class="line-item">
+              <div class="li-drag"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><circle cx="4" cy="2" r="1"/><circle cx="8" cy="2" r="1"/><circle cx="4" cy="6" r="1"/><circle cx="8" cy="6" r="1"/><circle cx="4" cy="10" r="1"/><circle cx="8" cy="10" r="1"/></svg></div>
+              <div class="li-product">
+                <div class="li-product-name">GAF TimberTex Hip & Ridge</div>
+                <div class="li-product-sku">SKU 203-0163 &middot; 20 LF/bdl &middot; In Stock</div>
+                <div class="li-product-tags"><span class="li-tag profile">Standard package</span></div>
+              </div>
+              <div class="li-controls">
+                <div class="li-qty-control">
+                  <button class="li-qty-btn">&minus;</button>
+                  <input class="li-qty-input" type="text" value="5">
+                  <button class="li-qty-btn">+</button>
+                </div>
+                <div class="li-qty-unit">bundles</div>
+              </div>
+              <div class="li-price">
+                <div class="li-price-total">$240.00</div>
+                <div class="li-price-unit">$48.00/bdl</div>
+              </div>
+              <button class="li-remove"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l8 8M12 4l-8 8" stroke-linecap="round"/></svg></button>
+            </div>
+
+            <div class="line-item">
+              <div class="li-drag"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><circle cx="4" cy="2" r="1"/><circle cx="8" cy="2" r="1"/><circle cx="4" cy="6" r="1"/><circle cx="8" cy="6" r="1"/><circle cx="4" cy="10" r="1"/><circle cx="8" cy="10" r="1"/></svg></div>
+              <div class="li-product">
+                <div class="li-product-name">Coil Nails 1-1/4" Galvanized</div>
+                <div class="li-product-sku">SKU 401-0089 &middot; 7,200/box &middot; In Stock</div>
+                <div class="li-product-tags"><span class="li-tag request">Added manually</span></div>
+              </div>
+              <div class="li-controls">
+                <div class="li-qty-control">
+                  <button class="li-qty-btn">&minus;</button>
+                  <input class="li-qty-input" type="text" value="1">
+                  <button class="li-qty-btn">+</button>
+                </div>
+                <div class="li-qty-unit">box</div>
+              </div>
+              <div class="li-price">
+                <div class="li-price-total">$42.00</div>
+                <div class="li-price-unit">$42.00/box</div>
+              </div>
+              <button class="li-remove"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l8 8M12 4l-8 8" stroke-linecap="round"/></svg></button>
+            </div>
+          </div>
+
+          <!-- Add Product -->
+          <div class="add-product-row">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
+            Add another product
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ RIGHT: Order Summary ============ -->
+      <div class="order-panel">
+        <div class="order-card">
+          <div class="order-card-header">
+            <div class="order-card-title">Order Summary</div>
+            <div class="order-card-status building"><span class="dot"></span> Building</div>
+          </div>
+          <div class="order-job-context">
+            <div class="order-job-icon"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10l7-7 7 7M5 9v7a1 1 0 001 1h3v-4h2v4h3a1 1 0 001-1V9" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div>
+              <div class="order-job-address">445 Spruce Way, Broomfield, CO</div>
+              <div class="order-job-detail">David Kim &middot; Roofing &middot; 28.3 sq measured</div>
+            </div>
+          </div>
+          <div class="order-items-mini">
+            <div class="oi-section-label">Shingles</div>
+            <div class="oi-item"><span class="oi-name">GAF Timberline HDZ Charcoal <span class="oi-qty">&times; 30 sq</span></span><span class="oi-price">$3,150</span></div>
+            <div class="oi-section-label">Underlayment</div>
+            <div class="oi-item"><span class="oi-name">FeltBuster Synthetic <span class="oi-qty">&times; 3</span></span><span class="oi-price">$195</span></div>
+            <div class="oi-item"><span class="oi-name">WeatherWatch I&W <span class="oi-qty">&times; 6</span></span><span class="oi-price">$318</span></div>
+            <div class="oi-section-label">Accessories</div>
+            <div class="oi-item"><span class="oi-name">ProStart Starter <span class="oi-qty">&times; 3</span></span><span class="oi-price">$138</span></div>
+            <div class="oi-item"><span class="oi-name">TimberTex H&R <span class="oi-qty">&times; 5</span></span><span class="oi-price">$240</span></div>
+            <div class="oi-item"><span class="oi-name">Coil Nails 1-1/4" <span class="oi-qty">&times; 1</span></span><span class="oi-price">$42</span></div>
+          </div>
+          <div class="order-totals">
+            <div class="ot-row sub"><span>Materials Subtotal</span><span style="font-weight:600;">$4,083.00</span></div>
+            <div class="ot-row sub"><span>Delivery (Standard AM)</span><span style="font-weight:600;">$125.00</span></div>
+            <div class="ot-row total"><span>Order Total</span><span>$4,208.00</span></div>
+          </div>
+          <div class="credit-impact">
+            <div class="credit-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div>
+              <div class="credit-impact-label">Within credit limit</div>
+              <div class="credit-impact-value">$23,292 remaining after order</div>
+            </div>
+          </div>
+          <div class="order-actions">
+            <button class="btn-primary">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Confirm &amp; Submit Order
+            </button>
+            <button class="btn-secondary">Save as Draft</button>
+          </div>
+        </div>
+
+        <!-- Delivery -->
+        <div class="delivery-card">
+          <div class="delivery-card-title">Delivery</div>
+          <div class="delivery-option selected">
+            <div class="delivery-radio"></div>
+            <div><div class="delivery-option-label">Standard AM Delivery</div><div class="delivery-option-detail">Thursday, Feb 27 &middot; 7:00–9:00 AM</div><div class="delivery-option-price">$125.00</div></div>
+          </div>
+          <div class="delivery-option">
+            <div class="delivery-radio"></div>
+            <div><div class="delivery-option-label">Priority Early AM</div><div class="delivery-option-detail">Thursday, Feb 27 &middot; 6:00–7:00 AM</div><div class="delivery-option-price">$195.00</div></div>
+          </div>
+          <div class="delivery-option">
+            <div class="delivery-radio"></div>
+            <div><div class="delivery-option-label">Will Call (Branch Pickup)</div><div class="delivery-option-detail">Ready Wednesday evening</div><div class="delivery-option-price">Free</div></div>
+          </div>
+        </div>
+
+        <!-- Profile -->
+        <div class="profile-card">
+          <div class="profile-card-header">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+            Profile Applied — Rivera Roofing
+          </div>
+          <div class="profile-card-body">
+            <div class="profile-row"><span class="profile-row-label">Preferred Brand</span><span class="profile-row-value">GAF</span></div>
+            <div class="profile-row"><span class="profile-row-label">Waste Factor</span><span class="profile-row-value">12%</span></div>
+            <div class="profile-row"><span class="profile-row-label">Underlayment</span><span class="profile-row-value">FeltBuster Synthetic</span></div>
+            <div class="profile-row"><span class="profile-row-label">Nail Type</span><span class="profile-row-value">1-1/4" Galv. Coil</span></div>
+            <div class="profile-row"><span class="profile-row-label">Branch</span><span class="profile-row-value">Denver West #1247</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

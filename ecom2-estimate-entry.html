@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>QXO Ecom 2.0 — New Estimate: Address Entry (B-2C-01)</title>
+<style>
+  :root {
+    --primary: #004BEA; --primary-hover: #0040CC; --primary-light: #EBF0FF;
+    --primary-border: #B3CCFF; --primary-glow: rgba(0,75,234,0.12);
+    --bg: #F2F2F2; --white: #FFFFFF; --text: #111827;
+    --text-secondary: #6B7280; --text-tertiary: #9CA3AF;
+    --border: #E5E7EB; --border-light: #F3F4F6;
+    --green: #22C55E; --green-light: #F0FDF4; --green-border: #BBF7D0;
+    --red: #EF4444; --orange: #F59E0B; --orange-light: #FFFBEB;
+    --purple: #8B5CF6; --purple-light: #F5F3FF; --purple-border: #DDD6FE;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04); --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+    --radius: 12px; --radius-sm: 8px; --radius-lg: 16px; --transition: 0.15s ease;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; line-height: 1.5; }
+
+  /* Sidebar */
+  .sidebar { position:fixed; left:0; top:0; width:240px; height:100vh; background:var(--white); border-right:1px solid var(--border); display:flex; flex-direction:column; z-index:10; box-shadow:1px 0 4px rgba(0,0,0,0.03); }
+  .sidebar-logo { padding:22px 20px 18px; display:flex; align-items:center; gap:10px; }
+  .sidebar-logo-icon { width:34px; height:34px; border-radius:10px; background:var(--primary); display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:15px; }
+  .sidebar-logo-text { font-weight:800; font-size:17px; color:var(--text); letter-spacing:-0.03em; }
+  .sidebar-build-btn { margin:0 14px 18px; padding:11px 16px; background:var(--primary); color:white; border:none; border-radius:var(--radius-sm); font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 2px 8px rgba(0,75,234,0.3); }
+  .sidebar-nav { flex:1; padding:0 10px; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:9px 14px; border-radius:var(--radius-sm); margin-bottom:2px; cursor:pointer; font-size:14px; color:var(--text-secondary); font-weight:450; transition:all var(--transition); }
+  .nav-item:hover { background:var(--border-light); color:var(--text); }
+  .nav-badge { margin-left:auto; font-size:11px; font-weight:600; padding:1px 8px; border-radius:10px; background:var(--border-light); color:var(--text-secondary); }
+  .nav-section-label { padding:18px 14px 6px; font-size:11px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.06em; }
+  .nav-item.coming { color:var(--text-tertiary); opacity:0.45; cursor:default; }
+  .sidebar-user { padding:16px 18px; border-top:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+  .sidebar-user-avatar { width:34px; height:34px; border-radius:50%; background:var(--bg); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--text-secondary); }
+  .sidebar-user-name { font-size:13px; font-weight:600; color:var(--text); }
+  .sidebar-user-email { font-size:11px; color:var(--text-secondary); }
+
+  .main { margin-left:240px; min-height:100vh; }
+  .topbar { background:var(--white); border-bottom:1px solid var(--border); padding:16px 36px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:5; box-shadow:var(--shadow-sm); }
+  .topbar-left { display:flex; align-items:center; gap:16px; }
+  .topbar-back { width:36px; height:36px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--white); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-secondary); transition:all var(--transition); }
+  .topbar-back:hover { border-color:var(--primary-border); color:var(--primary); background:var(--primary-light); }
+  .topbar h1 { font-size:22px; font-weight:800; letter-spacing:-0.03em; }
+  .topbar-subtitle { font-size:13px; color:var(--text-secondary); margin-top:1px; }
+  .topbar-badge { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; background:var(--green-light); color:var(--green); margin-left:10px; vertical-align:middle; }
+
+  .content { padding:28px 36px; max-width:1320px; }
+
+  .estimate-layout { display:grid; grid-template-columns:1fr 400px; gap:24px; align-items:start; }
+
+  /* Left: Conversation */
+  .conv-panel { background:var(--white); border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow-sm); overflow:hidden; display:flex; flex-direction:column; min-height:700px; }
+  .conv-header { padding:18px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .conv-title { font-size:16px; font-weight:700; }
+
+  .conv-messages { flex:1; padding:24px; display:flex; flex-direction:column; gap:20px; overflow-y:auto; }
+
+  .msg { display:flex; gap:12px; max-width:90%; }
+  .msg.user { align-self:flex-end; flex-direction:row-reverse; }
+  .msg-avatar { width:32px; height:32px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+  .msg.user .msg-avatar { background:var(--primary-light); color:var(--primary); }
+  .msg.ai .msg-avatar { background:linear-gradient(135deg,var(--primary),#3B82F6); color:white; }
+  .msg-bubble { padding:14px 18px; border-radius:16px; font-size:14px; line-height:1.6; }
+  .msg.user .msg-bubble { background:var(--primary); color:white; border-bottom-right-radius:4px; }
+  .msg.ai .msg-bubble { background:var(--border-light); color:var(--text); border-bottom-left-radius:4px; border:1px solid var(--border); }
+  .msg-time { font-size:11px; color:var(--text-tertiary); margin-top:4px; padding:0 4px; }
+  .msg.user .msg-time { text-align:right; }
+
+  /* Property card inside AI message */
+  .property-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius-sm); margin-top:10px; overflow:hidden; }
+  .property-card-map { height:120px; background:linear-gradient(135deg,#E8F0FE 0%,#D4E4FC 100%); display:flex; align-items:center; justify-content:center; color:var(--primary); font-size:12px; font-weight:600; position:relative; }
+  .property-card-map::after { content:'Map View'; position:absolute; bottom:8px; right:10px; font-size:10px; background:var(--white); padding:2px 8px; border-radius:4px; color:var(--text-secondary); }
+  .property-pin { width:32px; height:32px; background:var(--primary); border-radius:50% 50% 50% 4px; transform:rotate(-45deg); display:flex; align-items:center; justify-content:center; }
+  .property-pin svg { transform:rotate(45deg); }
+  .property-card-body { padding:14px 16px; }
+  .property-address { font-size:15px; font-weight:700; color:var(--text); }
+  .property-detail { font-size:13px; color:var(--text-secondary); margin-top:2px; }
+  .property-tags { display:flex; gap:6px; margin-top:8px; }
+  .property-tag { font-size:11px; font-weight:500; padding:3px 10px; border-radius:20px; }
+  .property-tag.new { background:var(--green-light); color:var(--green); }
+  .property-tag.residential { background:var(--border-light); color:var(--text-secondary); }
+
+  /* Measurement options */
+  .measurement-options { margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+  .meas-option { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; border-radius:var(--radius-sm); border:2px solid var(--border); cursor:pointer; transition:all var(--transition); background:var(--white); }
+  .meas-option:hover { border-color:var(--primary-border); }
+  .meas-option.recommended { border-color:var(--primary); background:var(--primary-light); }
+  .meas-radio { width:18px; height:18px; border-radius:50%; border:2px solid var(--border); flex-shrink:0; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+  .meas-option.recommended .meas-radio { border-color:var(--primary); }
+  .meas-option.recommended .meas-radio::after { content:''; width:8px; height:8px; border-radius:50%; background:var(--primary); }
+  .meas-name { font-size:14px; font-weight:600; color:var(--text); }
+  .meas-desc { font-size:12px; color:var(--text-secondary); margin-top:2px; line-height:1.5; }
+  .meas-price { font-size:14px; font-weight:700; color:var(--primary); margin-top:4px; }
+  .meas-badge { display:inline-flex; font-size:10px; font-weight:600; padding:2px 8px; border-radius:4px; background:var(--green-light); color:var(--green); margin-left:8px; }
+  .meas-turnaround { font-size:11px; color:var(--text-tertiary); margin-top:2px; }
+
+  .meas-cta { margin-top:10px; display:flex; gap:8px; }
+  .meas-btn { padding:8px 18px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; transition:all var(--transition); border:none; }
+  .meas-btn.primary { background:var(--primary); color:white; }
+  .meas-btn.primary:hover { background:var(--primary-hover); }
+  .meas-btn.secondary { background:transparent; color:var(--text-secondary); border:1px solid var(--border); }
+
+  /* Input bar */
+  .conv-input { padding:16px 20px; border-top:1px solid var(--border); background:var(--white); }
+  .conv-input-bar { display:flex; align-items:center; gap:10px; border:2px solid var(--border); border-radius:var(--radius); padding:4px 4px 4px 16px; transition:all 0.2s ease; }
+  .conv-input-bar:focus-within { border-color:var(--primary); box-shadow:0 0 0 4px var(--primary-glow); }
+  .conv-input-bar input { flex:1; border:none; outline:none; font-size:14px; color:var(--text); background:transparent; }
+  .conv-input-bar input::placeholder { color:var(--text-tertiary); }
+  .conv-input-mic, .conv-input-send { width:38px; height:38px; border-radius:var(--radius-sm); border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:all var(--transition); }
+  .conv-input-mic { background:var(--primary-light); color:var(--primary); }
+  .conv-input-mic:hover { background:var(--primary); color:white; }
+  .conv-input-send { background:var(--primary); color:white; }
+  .conv-input-send:hover { background:var(--primary-hover); }
+
+  /* Right: Estimate Context Panel */
+  .context-panel { display:flex; flex-direction:column; gap:18px; }
+
+  .ctx-card { background:var(--white); border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow-sm); overflow:hidden; }
+  .ctx-card-header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .ctx-card-title { font-size:15px; font-weight:700; }
+  .ctx-status { display:flex; align-items:center; gap:5px; font-size:12px; font-weight:600; padding:3px 10px; border-radius:20px; }
+  .ctx-status.new-job { background:var(--green-light); color:var(--green); }
+  .ctx-status .dot { width:6px; height:6px; border-radius:50%; }
+  .ctx-status.new-job .dot { background:var(--green); }
+
+  .ctx-card-body { padding:18px 20px; }
+
+  /* Steps progress */
+  .steps { display:flex; align-items:center; gap:0; padding:18px 20px; }
+  .step { display:flex; align-items:center; gap:8px; flex:1; }
+  .step-num { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
+  .step.active .step-num { background:var(--primary); color:white; }
+  .step.done .step-num { background:var(--green-light); color:var(--green); }
+  .step.pending .step-num { background:var(--border-light); color:var(--text-tertiary); }
+  .step-label { font-size:12px; font-weight:500; }
+  .step.active .step-label { color:var(--primary); font-weight:600; }
+  .step.done .step-label { color:var(--green); }
+  .step.pending .step-label { color:var(--text-tertiary); }
+  .step-connector { flex:1; height:2px; background:var(--border); margin:0 -4px; }
+  .step-connector.done { background:var(--green); }
+
+  /* Info rows */
+  .info-row { display:flex; justify-content:space-between; padding:8px 0; font-size:13px; }
+  .info-row:not(:last-child) { border-bottom:1px solid var(--border-light); }
+  .info-label { color:var(--text-secondary); }
+  .info-value { color:var(--text); font-weight:500; }
+  .info-value.pending { color:var(--text-tertiary); font-style:italic; font-weight:400; }
+
+  /* ATB Blue branding card */
+  .atb-card { background:linear-gradient(135deg,var(--primary-light) 0%,#D4E4FC 100%); border-radius:var(--radius); border:1px solid var(--primary-border); padding:20px; }
+  .atb-header { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .atb-logo { width:36px; height:36px; border-radius:8px; background:var(--primary); display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:12px; }
+  .atb-name { font-size:14px; font-weight:700; color:var(--primary); }
+  .atb-sub { font-size:11px; color:#3730A3; }
+  .atb-flow { display:flex; flex-direction:column; gap:8px; }
+  .atb-step { display:flex; align-items:center; gap:10px; font-size:12px; color:#3730A3; }
+  .atb-step-num { width:22px; height:22px; border-radius:50%; background:rgba(0,75,234,0.1); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:10px; color:var(--primary); flex-shrink:0; }
+  .atb-step.current { font-weight:600; color:var(--primary); }
+  .atb-step.current .atb-step-num { background:var(--primary); color:white; }
+
+  /* Pricing card */
+  .pricing-card { background:var(--white); border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow-sm); padding:18px 20px; }
+  .pricing-title { font-size:14px; font-weight:700; color:var(--text); margin-bottom:12px; }
+  .pricing-row { display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-size:13px; }
+  .pricing-row:not(:last-child) { border-bottom:1px solid var(--border-light); }
+  .pricing-name { color:var(--text-secondary); }
+  .pricing-value { font-weight:600; color:var(--text); }
+  .pricing-value.highlight { color:var(--primary); }
+
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="sidebar-logo-icon">Q</div><div class="sidebar-logo-text">QXO</div></div>
+  <button class="sidebar-build-btn"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3v14M3 10h14" stroke-linecap="round"/></svg> BUILD</button>
+  <nav class="sidebar-nav">
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg> Dashboard</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h14M3 8h14M3 12h10M3 16h7" stroke-linecap="round"/></svg> Jobs <span class="nav-badge">12</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 10h6M7 14h3" stroke-linecap="round"/></svg> Proposals <span class="nav-badge">4</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h10v9H2z"/><path d="M12 8h4l2 3v2h-6V8z"/><circle cx="6" cy="15" r="2"/><circle cx="15" cy="15" r="2"/></svg> Deliveries <span class="nav-badge">3</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 9h6M7 12h4M12 15h2" stroke-linecap="round"/></svg> Invoices</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2L18 6v8l-8 4L2 14V6l8-4z"/><path d="M2 6l8 4m0 0l8-4m-8 4v8"/></svg> Products</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4l4 4-4 4M10 14h6" stroke-linecap="round"/></svg> Builds</div>
+    <div class="nav-section-label">Coming Soon</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="7" r="4"/><path d="M3 18c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg> CRM</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2l2.5 5.5L18 8.5l-4 4 1 5.5-5-3-5 3 1-5.5-4-4 5.5-1z"/></svg> Loyalty</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v2m0 12v2M2 10h2m12 0h2"/><circle cx="10" cy="10" r="4"/></svg> Storm Center</div>
+  </nav>
+  <div class="sidebar-user"><div class="sidebar-user-avatar">MR</div><div><div class="sidebar-user-name">Rivera Roofing</div><div class="sidebar-user-email">marcus@riveraroofing.com</div></div></div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="topbar-back"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div>
+        <h1>Build &mdash; New Estimate <span class="topbar-badge">ATB Blue</span></h1>
+        <div class="topbar-subtitle">Address to Bid &middot; Step 1 of 4</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="estimate-layout">
+
+      <!-- LEFT: Conversation -->
+      <div class="conv-panel">
+        <div class="conv-header">
+          <div class="conv-title">Estimate Conversation</div>
+        </div>
+
+        <div class="conv-messages">
+          <div style="text-align:center;padding:8px 0;">
+            <span style="font-size:12px;color:var(--text-tertiary);background:var(--border-light);padding:4px 14px;border-radius:20px;">New Estimate &middot; ATB Blue Flow</span>
+          </div>
+
+          <!-- User: address -->
+          <div class="msg user">
+            <div class="msg-avatar">MR</div>
+            <div>
+              <div class="msg-bubble">New estimate for 4215 Elm Street, Lakewood</div>
+              <div class="msg-time">10:42 AM &middot; Voice input</div>
+            </div>
+          </div>
+
+          <!-- AI: property found + measurement options -->
+          <div class="msg ai">
+            <div class="msg-avatar"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4l4 4-4 4M10 14h6" stroke-linecap="round"/></svg></div>
+            <div>
+              <div class="msg-bubble">
+                I found the property. Here's what I know:
+
+                <div class="property-card">
+                  <div class="property-card-map">
+                    <div class="property-pin">
+                      <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="2"><path d="M3 10l7-7 7 7M5 9v7a1 1 0 001 1h3v-4h2v4h3a1 1 0 001-1V9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                  </div>
+                  <div class="property-card-body">
+                    <div class="property-address">4215 Elm Street</div>
+                    <div class="property-detail">Lakewood, CO 80226 &middot; Jefferson County</div>
+                    <div class="property-tags">
+                      <span class="property-tag new">New Job</span>
+                      <span class="property-tag residential">Single Family</span>
+                    </div>
+                  </div>
+                </div>
+
+                No existing measurements on file. To build an accurate estimate, I'll need a roof measurement. Which report would you like?
+
+                <div class="measurement-options">
+                  <div class="meas-option recommended">
+                    <div class="meas-radio"></div>
+                    <div>
+                      <div class="meas-name">Bid Perfect <span class="meas-badge">Recommended</span></div>
+                      <div class="meas-desc">Fast satellite measurement — total area, pitch, and waste factor. Everything you need for a competitive bid.</div>
+                      <div class="meas-price">$20.00</div>
+                      <div class="meas-turnaround">Instant delivery (< 1 min)</div>
+                    </div>
+                  </div>
+                  <div class="meas-option">
+                    <div class="meas-radio"></div>
+                    <div>
+                      <div class="meas-name">Premium Full House</div>
+                      <div class="meas-desc">Detailed facet-level report — individual measurements, valleys, hips, ridges, penetrations. Includes siding, gutters, and windows for multi-trade estimates.</div>
+                      <div class="meas-price">$85.00</div>
+                      <div class="meas-turnaround">Delivery in 1–4 hours</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="meas-cta">
+                  <button class="meas-btn primary">Order Bid Perfect ($20)</button>
+                  <button class="meas-btn secondary">Skip — I have my own measurements</button>
+                </div>
+              </div>
+              <div class="msg-time">10:42 AM &middot; 0.8s response</div>
+            </div>
+          </div>
+
+          <!-- User: order measurement -->
+          <div class="msg user">
+            <div class="msg-avatar">MR</div>
+            <div>
+              <div class="msg-bubble">Order the Bid Perfect. Premium package, 45% margin.</div>
+              <div class="msg-time">10:43 AM</div>
+            </div>
+          </div>
+
+          <!-- AI: processing -->
+          <div class="msg ai">
+            <div class="msg-avatar"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4l4 4-4 4M10 14h6" stroke-linecap="round"/></svg></div>
+            <div>
+              <div class="msg-bubble">
+                Ordering Bid Perfect for 4215 Elm Street now. I'll build your good/better/best proposals with a 45% margin as soon as the measurements come back.
+                <br><br>
+                <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--primary-light);border-radius:var(--radius-sm);border:1px solid var(--primary-border);margin-top:8px;">
+                  <div style="width:24px;height:24px;border:3px solid var(--primary);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0;"></div>
+                  <div>
+                    <div style="font-size:13px;font-weight:600;color:var(--primary);">Ordering Bid Perfect measurement...</div>
+                    <div style="font-size:12px;color:#3730A3;">Results typically arrive in under 60 seconds</div>
+                  </div>
+                </div>
+                <style>@keyframes spin { to { transform:rotate(360deg); } }</style>
+              </div>
+              <div class="msg-time">10:43 AM</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="conv-input">
+          <div class="conv-input-bar">
+            <input type="text" placeholder="Add details or wait for measurement results...">
+            <button class="conv-input-mic"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="2" width="6" height="10" rx="3"/><path d="M4 10a6 6 0 0012 0M10 16v2" stroke-linecap="round"/></svg></button>
+            <button class="conv-input-send"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h12M10 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Context Panel -->
+      <div class="context-panel">
+
+        <!-- Progress Steps -->
+        <div class="ctx-card">
+          <div class="ctx-card-header">
+            <div class="ctx-card-title">Estimate Progress</div>
+            <div class="ctx-status new-job"><span class="dot"></span> New Job</div>
+          </div>
+          <div class="steps">
+            <div class="step done">
+              <div class="step-num"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="step-label">Address</div>
+            </div>
+            <div class="step-connector done"></div>
+            <div class="step active">
+              <div class="step-num">2</div>
+              <div class="step-label">Measure</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step pending">
+              <div class="step-num">3</div>
+              <div class="step-label">Build</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step pending">
+              <div class="step-num">4</div>
+              <div class="step-label">Propose</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Job Details -->
+        <div class="ctx-card">
+          <div class="ctx-card-header">
+            <div class="ctx-card-title">Job Details</div>
+          </div>
+          <div class="ctx-card-body">
+            <div class="info-row"><span class="info-label">Address</span><span class="info-value">4215 Elm Street, Lakewood, CO</span></div>
+            <div class="info-row"><span class="info-label">Homeowner</span><span class="info-value pending">Not yet entered</span></div>
+            <div class="info-row"><span class="info-label">Property Type</span><span class="info-value">Single Family Residential</span></div>
+            <div class="info-row"><span class="info-label">Project Type</span><span class="info-value">Roofing</span></div>
+            <div class="info-row"><span class="info-label">Measurement</span><span class="info-value" style="color:var(--primary);font-weight:600;">Ordering...</span></div>
+            <div class="info-row"><span class="info-label">Target Margin</span><span class="info-value">45%</span></div>
+            <div class="info-row"><span class="info-label">Package</span><span class="info-value">Premium (Best tier)</span></div>
+          </div>
+        </div>
+
+        <!-- ATB Blue Flow Guide -->
+        <div class="atb-card">
+          <div class="atb-header">
+            <div class="atb-logo">ATB</div>
+            <div>
+              <div class="atb-name">Address to Bid</div>
+              <div class="atb-sub">Powered by Bid Perfect</div>
+            </div>
+          </div>
+          <div class="atb-flow">
+            <div class="atb-step" style="text-decoration:line-through;opacity:0.5;"><div class="atb-step-num">1</div> Enter property address</div>
+            <div class="atb-step current"><div class="atb-step-num">2</div> Order roof measurement</div>
+            <div class="atb-step"><div class="atb-step-num">3</div> Build good/better/best packages</div>
+            <div class="atb-step"><div class="atb-step-num">4</div> Send proposal to homeowner</div>
+            <div class="atb-step"><div class="atb-step-num">5</div> Homeowner accepts &rarr; auto-order</div>
+          </div>
+        </div>
+
+        <!-- Pricing Preview -->
+        <div class="pricing-card">
+          <div class="pricing-title">Estimate Cost So Far</div>
+          <div class="pricing-row"><span class="pricing-name">Bid Perfect Measurement</span><span class="pricing-value">$20.00</span></div>
+          <div class="pricing-row"><span class="pricing-name">Materials</span><span class="pricing-value pending" style="color:var(--text-tertiary);font-style:italic;font-weight:400;">Pending measurement</span></div>
+          <div class="pricing-row" style="border-top:2px solid var(--border);margin-top:4px;padding-top:10px;"><span class="pricing-name" style="font-weight:600;">Running Total</span><span class="pricing-value highlight">$20.00</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

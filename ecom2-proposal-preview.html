@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>QXO Ecom 2.0 — Proposal Preview & Send (B-2C-05)</title>
+<style>
+  :root {
+    --primary: #004BEA; --primary-hover: #0040CC; --primary-light: #EBF0FF;
+    --primary-border: #B3CCFF; --primary-glow: rgba(0,75,234,0.12);
+    --bg: #F2F2F2; --white: #FFFFFF; --text: #111827;
+    --text-secondary: #6B7280; --text-tertiary: #9CA3AF;
+    --border: #E5E7EB; --border-light: #F3F4F6;
+    --green: #22C55E; --green-light: #F0FDF4; --green-border: #BBF7D0;
+    --red: #EF4444; --orange: #F59E0B; --orange-light: #FFFBEB; --orange-border: #FDE68A;
+    --purple: #8B5CF6; --purple-light: #F5F3FF; --purple-border: #DDD6FE;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04); --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.08); --shadow-xl: 0 8px 32px rgba(0,0,0,0.10);
+    --radius: 12px; --radius-sm: 8px; --radius-lg: 16px; --transition: 0.15s ease;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; line-height: 1.5; }
+
+  /* Sidebar */
+  .sidebar { position:fixed; left:0; top:0; width:240px; height:100vh; background:var(--white); border-right:1px solid var(--border); display:flex; flex-direction:column; z-index:10; box-shadow:1px 0 4px rgba(0,0,0,0.03); }
+  .sidebar-logo { padding:22px 20px 18px; display:flex; align-items:center; gap:10px; }
+  .sidebar-logo-icon { width:34px; height:34px; border-radius:10px; background:var(--primary); display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:15px; }
+  .sidebar-logo-text { font-weight:800; font-size:17px; color:var(--text); letter-spacing:-0.03em; }
+  .sidebar-build-btn { margin:0 14px 18px; padding:11px 16px; background:var(--primary); color:white; border:none; border-radius:var(--radius-sm); font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 2px 8px rgba(0,75,234,0.3); }
+  .sidebar-nav { flex:1; padding:0 10px; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:9px 14px; border-radius:var(--radius-sm); margin-bottom:2px; cursor:pointer; font-size:14px; color:var(--text-secondary); font-weight:450; transition:all var(--transition); }
+  .nav-item:hover { background:var(--border-light); color:var(--text); }
+  .nav-badge { margin-left:auto; font-size:11px; font-weight:600; padding:1px 8px; border-radius:10px; background:var(--border-light); color:var(--text-secondary); }
+  .nav-section-label { padding:18px 14px 6px; font-size:11px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.06em; }
+  .nav-item.coming { color:var(--text-tertiary); opacity:0.45; }
+  .sidebar-user { padding:16px 18px; border-top:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+  .sidebar-user-avatar { width:34px; height:34px; border-radius:50%; background:var(--bg); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--text-secondary); }
+  .sidebar-user-name { font-size:13px; font-weight:600; }
+  .sidebar-user-email { font-size:11px; color:var(--text-secondary); }
+
+  .main { margin-left:240px; min-height:100vh; }
+
+  .topbar { background:var(--white); border-bottom:1px solid var(--border); padding:16px 36px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:5; box-shadow:var(--shadow-sm); }
+  .topbar-left { display:flex; align-items:center; gap:16px; }
+  .topbar-back { width:36px; height:36px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--white); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-secondary); transition:all var(--transition); }
+  .topbar-back:hover { border-color:var(--primary-border); color:var(--primary); background:var(--primary-light); }
+  .topbar h1 { font-size:22px; font-weight:800; letter-spacing:-0.03em; }
+  .topbar-subtitle { font-size:13px; color:var(--text-secondary); }
+  .topbar-badge { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; background:var(--green-light); color:var(--green); margin-left:10px; }
+  .topbar-right { display:flex; align-items:center; gap:10px; }
+
+  .btn { padding:10px 22px; border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer; transition:all var(--transition); display:flex; align-items:center; gap:7px; border:none; }
+  .btn-primary { background:var(--primary); color:white; box-shadow:0 2px 8px rgba(0,75,234,0.25); }
+  .btn-primary:hover { background:var(--primary-hover); box-shadow:0 4px 14px rgba(0,75,234,0.35); transform:translateY(-1px); }
+  .btn-secondary { background:var(--white); color:var(--text-secondary); border:1px solid var(--border); }
+  .btn-secondary:hover { border-color:var(--primary-border); color:var(--primary); background:var(--primary-light); }
+  .btn-ghost { background:transparent; color:var(--text-secondary); }
+  .btn-ghost:hover { color:var(--primary); }
+  .btn-green { background:var(--green); color:white; box-shadow:0 2px 8px rgba(34,197,94,0.25); }
+  .btn-green:hover { background:#1DAE51; box-shadow:0 4px 14px rgba(34,197,94,0.35); transform:translateY(-1px); }
+
+  .content { padding:28px 36px; display:grid; grid-template-columns:1fr 360px; gap:28px; max-width:1320px; }
+
+  /* Preview panel (left) */
+  .preview-panel { }
+  .preview-label {
+    display:flex; align-items:center; gap:8px; margin-bottom:14px;
+    font-size:13px; font-weight:600; color:var(--text-secondary);
+  }
+  .preview-label-dot {
+    width:8px; height:8px; border-radius:50%; background:var(--green);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+  .preview-frame {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+  }
+
+  /* Simulated proposal (what homeowner sees) */
+  .proposal-header {
+    padding: 32px 36px 24px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  .proposal-header::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+  }
+  .proposal-branding {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .proposal-logo {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .proposal-logo-icon {
+    width: 48px; height: 48px; border-radius: var(--radius);
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 18px; color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .proposal-logo-name { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+  .proposal-logo-tagline { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 500; }
+  .proposal-badges {
+    display: flex; gap: 8px;
+  }
+  .proposal-badge {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600;
+    padding: 5px 12px; border-radius: 20px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .proposal-address-bar {
+    background: rgba(255,255,255,0.08);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .proposal-address-label { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 2px; }
+  .proposal-address { font-size: 17px; font-weight: 700; }
+  .proposal-date { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+  /* Proposal body */
+  .proposal-body { padding: 28px 36px; }
+
+  .proposal-intro {
+    font-size: 14px; color: var(--text-secondary); line-height: 1.6;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .proposal-intro strong { color: var(--text); }
+
+  .prop-tier-cards {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; margin-bottom: 24px;
+  }
+
+  .prop-tier {
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .prop-tier:hover { border-color: var(--primary-border); box-shadow: var(--shadow-md); }
+  .prop-tier.featured { border-color: var(--primary); }
+  .prop-tier.featured::before {
+    content: 'Most Popular';
+    position: absolute; top: 0; left: 0; right: 0;
+    background: var(--primary); color: white;
+    font-size: 10px; font-weight: 700;
+    text-align: center; padding: 4px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+
+  .prop-tier-head {
+    padding: 20px 16px 14px;
+    text-align: center;
+    background: var(--border-light);
+    border-bottom: 1px solid var(--border);
+  }
+  .prop-tier.featured .prop-tier-head { padding-top: 32px; }
+  .prop-tier-name { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); margin-bottom: 4px; }
+  .prop-tier.featured .prop-tier-name { color: var(--primary); }
+  .prop-tier-price { font-size: 28px; font-weight: 800; color: var(--text); letter-spacing: -0.03em; }
+
+  .prop-tier-features { padding: 14px 16px; }
+  .prop-tier-feature {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 6px 0; font-size: 13px; color: var(--text-secondary);
+  }
+  .prop-tier-check {
+    width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .prop-tier-check.yes { background: var(--green-light); color: var(--green); }
+  .prop-tier-check.no { background: var(--border-light); color: var(--text-tertiary); }
+
+  .prop-tier-cta {
+    padding: 14px 16px; border-top: 1px solid var(--border-light);
+    text-align: center;
+  }
+  .prop-tier-btn {
+    width: 100%; padding: 10px; border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 600; cursor: pointer; border: none;
+    transition: all var(--transition);
+  }
+  .prop-tier-btn.outline { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
+  .prop-tier-btn.outline:hover { border-color: var(--primary-border); color: var(--primary); }
+  .prop-tier-btn.filled { background: var(--primary); color: white; }
+  .prop-tier-btn.filled:hover { background: var(--primary-hover); }
+
+  /* What's included section */
+  .prop-section-title {
+    font-size: 15px; font-weight: 700; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .prop-included {
+    background: var(--border-light); border-radius: var(--radius);
+    padding: 16px 20px; margin-bottom: 24px;
+  }
+  .prop-included-row {
+    display: flex; justify-content: space-between;
+    padding: 7px 0; font-size: 13px;
+  }
+  .prop-included-row:not(:last-child) { border-bottom: 1px solid var(--border); }
+  .prop-included-name { color: var(--text); font-weight: 500; }
+  .prop-included-detail { color: var(--text-tertiary); font-size: 12px; }
+
+  /* Warranty badge */
+  .prop-warranty {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px; border-radius: var(--radius);
+    background: linear-gradient(135deg, var(--primary-light) 0%, #E0E8FF 100%);
+    border: 1px solid var(--primary-border);
+    margin-bottom: 24px;
+  }
+  .prop-warranty-icon {
+    width: 40px; height: 40px; border-radius: var(--radius-sm);
+    background: var(--primary); color: white;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .prop-warranty-title { font-size: 14px; font-weight: 700; color: var(--primary); }
+  .prop-warranty-text { font-size: 12px; color: var(--text-secondary); }
+
+  /* CTA area in proposal */
+  .prop-cta-section {
+    text-align: center; padding: 24px 0 8px;
+    border-top: 1px solid var(--border-light);
+  }
+  .prop-cta-text { font-size: 14px; color: var(--text-secondary); margin-bottom: 14px; }
+  .prop-cta-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 36px; border-radius: var(--radius); border: none;
+    background: var(--primary); color: white;
+    font-size: 16px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,75,234,0.3);
+  }
+  .prop-footer {
+    text-align: center; padding: 16px 0 0;
+    font-size: 12px; color: var(--text-tertiary);
+  }
+
+  /* Right panel — send controls */
+  .send-panel { display: flex; flex-direction: column; gap: 18px; }
+
+  .send-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .send-card-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .send-card-body { padding: 16px 20px; }
+
+  /* Send method options */
+  .send-method {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: var(--radius-sm);
+    border: 2px solid var(--border);
+    cursor: pointer; transition: all var(--transition);
+    margin-bottom: 10px;
+  }
+  .send-method:last-child { margin-bottom: 0; }
+  .send-method:hover { border-color: var(--primary-border); }
+  .send-method.selected { border-color: var(--primary); background: var(--primary-light); }
+  .send-method-radio {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all var(--transition);
+  }
+  .send-method.selected .send-method-radio { border-color: var(--primary); }
+  .send-method.selected .send-method-radio::after {
+    content: ''; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--primary);
+  }
+  .send-method-icon {
+    width: 36px; height: 36px; border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .send-method-icon.sms { background: var(--green-light); color: var(--green); }
+  .send-method-icon.email { background: var(--primary-light); color: var(--primary); }
+  .send-method-icon.link { background: var(--purple-light); color: var(--purple); }
+  .send-method-name { font-size: 14px; font-weight: 600; }
+  .send-method-desc { font-size: 12px; color: var(--text-tertiary); }
+
+  /* Recipient field */
+  .send-recipient {
+    margin-top: 14px; padding-top: 14px;
+    border-top: 1px solid var(--border-light);
+  }
+  .send-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+  .send-input {
+    width: 100%; padding: 10px 14px; border: 1px solid var(--border);
+    border-radius: 6px; font-size: 14px; color: var(--text);
+    transition: all var(--transition); outline: none; font-family: inherit;
+  }
+  .send-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+  .send-input-hint { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
+
+  /* Custom message */
+  .send-textarea {
+    width: 100%; padding: 10px 14px; border: 1px solid var(--border);
+    border-radius: 6px; font-size: 13px; color: var(--text);
+    resize: vertical; min-height: 72px; font-family: inherit;
+    transition: all var(--transition); outline: none; line-height: 1.5;
+  }
+  .send-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+
+  /* Proposal settings card */
+  .setting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0;
+  }
+  .setting-row:not(:last-child) { border-bottom: 1px solid var(--border-light); }
+  .setting-label { font-size: 13px; font-weight: 500; }
+  .setting-desc { font-size: 11px; color: var(--text-tertiary); }
+  .setting-toggle {
+    width: 40px; height: 22px; border-radius: 11px;
+    background: var(--border); position: relative;
+    cursor: pointer; transition: all var(--transition);
+  }
+  .setting-toggle.on { background: var(--primary); }
+  .setting-toggle::after {
+    content: ''; position: absolute;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: white; top: 2px; left: 2px;
+    transition: all var(--transition);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  }
+  .setting-toggle.on::after { left: 20px; }
+
+  /* Branding preview */
+  .branding-preview {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: var(--radius-sm);
+    background: var(--border-light); margin-bottom: 12px;
+  }
+  .branding-color {
+    width: 32px; height: 32px; border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, #1a1a2e, #0f3460);
+    border: 2px solid var(--white); box-shadow: var(--shadow-sm);
+  }
+  .branding-text { font-size: 13px; }
+  .branding-text strong { font-weight: 600; }
+  .branding-text div { font-size: 11px; color: var(--text-tertiary); }
+
+  /* Summary card */
+  .summary-row {
+    display: flex; justify-content: space-between;
+    padding: 8px 0; font-size: 13px;
+  }
+  .summary-row:not(:last-child) { border-bottom: 1px solid var(--border-light); }
+  .summary-label { color: var(--text-secondary); }
+  .summary-value { font-weight: 600; }
+  .summary-value.highlight { color: var(--primary); }
+  .summary-row.total { padding-top: 12px; margin-top: 4px; border-top: 2px solid var(--border); font-size: 15px; }
+  .summary-row.total .summary-label { font-weight: 700; color: var(--text); }
+  .summary-row.total .summary-value { font-weight: 800; color: var(--text); }
+
+  /* Send button (sticky) */
+  .send-actions {
+    padding: 16px 20px;
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+  }
+  .send-primary-btn {
+    width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm);
+    background: var(--green); color: white;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 3px 12px rgba(34,197,94,0.3);
+    transition: all var(--transition);
+  }
+  .send-primary-btn:hover { background: #1DAE51; box-shadow: 0 5px 18px rgba(34,197,94,0.4); transform: translateY(-1px); }
+  .send-hint { text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 8px; }
+
+  /* Progress indicator */
+  .progress-steps {
+    display: flex; align-items: center; gap: 0;
+    padding: 14px 20px;
+  }
+  .progress-step {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600;
+  }
+  .progress-step.done { color: var(--green); }
+  .progress-step.active { color: var(--primary); }
+  .progress-step.pending { color: var(--text-tertiary); }
+  .progress-dot {
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .progress-step.done .progress-dot { background: var(--green-light); color: var(--green); }
+  .progress-step.active .progress-dot { background: var(--primary-light); color: var(--primary); }
+  .progress-step.pending .progress-dot { background: var(--border-light); color: var(--text-tertiary); }
+  .progress-line {
+    flex: 1; height: 2px; margin: 0 8px;
+  }
+  .progress-line.done { background: var(--green); }
+  .progress-line.active { background: linear-gradient(90deg, var(--green) 0%, var(--primary) 100%); }
+  .progress-line.pending { background: var(--border); }
+
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="sidebar-logo-icon">Q</div><div class="sidebar-logo-text">QXO</div></div>
+  <button class="sidebar-build-btn"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3v14M3 10h14" stroke-linecap="round"/></svg> BUILD</button>
+  <nav class="sidebar-nav">
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg> Dashboard</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h14M3 8h14M3 12h10M3 16h7" stroke-linecap="round"/></svg> Jobs <span class="nav-badge">12</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 10h6M7 14h3" stroke-linecap="round"/></svg> Proposals <span class="nav-badge">4</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h10v9H2z"/><path d="M12 8h4l2 3v2h-6V8z"/><circle cx="6" cy="15" r="2"/><circle cx="15" cy="15" r="2"/></svg> Deliveries <span class="nav-badge">3</span></div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 9h6M7 12h4M12 15h2" stroke-linecap="round"/></svg> Invoices</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2L18 6v8l-8 4L2 14V6l8-4z"/><path d="M2 6l8 4m0 0l8-4m-8 4v8"/></svg> Products</div>
+    <div class="nav-item"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4l4 4-4 4M10 14h6" stroke-linecap="round"/></svg> Builds</div>
+    <div class="nav-section-label">Coming Soon</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="7" r="4"/><path d="M3 18c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg> CRM</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2l2.5 5.5L18 8.5l-4 4 1 5.5-5-3-5 3 1-5.5-4-4 5.5-1z"/></svg> Loyalty</div>
+    <div class="nav-item coming"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v2m0 12v2M2 10h2m12 0h2"/><circle cx="10" cy="10" r="4"/></svg> Storm Center</div>
+  </nav>
+  <div class="sidebar-user"><div class="sidebar-user-avatar">MR</div><div><div class="sidebar-user-name">Rivera Roofing</div><div class="sidebar-user-email">marcus@riveraroofing.com</div></div></div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="topbar-back"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div>
+        <h1>Proposal Preview <span class="topbar-badge">Ready to Send</span></h1>
+        <div class="topbar-subtitle">4215 Elm Street, Lakewood &middot; Step 4 of 4</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v4h4" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 6L10 2 4 8v6h6l4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Edit Proposal
+      </button>
+      <button class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12V3a1 1 0 011-1h6a1 1 0 011 1v9M2 12h12M4 14h8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Download PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- Progress Bar -->
+  <div style="background:var(--white); border-bottom:1px solid var(--border);">
+    <div class="progress-steps" style="max-width:600px; margin:0 auto;">
+      <div class="progress-step done">
+        <div class="progress-dot"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        Address
+      </div>
+      <div class="progress-line done"></div>
+      <div class="progress-step done">
+        <div class="progress-dot"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        Measure
+      </div>
+      <div class="progress-line done"></div>
+      <div class="progress-step done">
+        <div class="progress-dot"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        Build
+      </div>
+      <div class="progress-line active"></div>
+      <div class="progress-step active">
+        <div class="progress-dot">4</div>
+        Send
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- LEFT: Proposal Preview -->
+    <div class="preview-panel">
+      <div class="preview-label">
+        <div class="preview-label-dot"></div>
+        Live preview — this is what Jennifer will see
+      </div>
+
+      <div class="preview-frame">
+
+        <!-- Contractor branding header -->
+        <div class="proposal-header">
+          <div class="proposal-branding">
+            <div class="proposal-logo">
+              <div class="proposal-logo-icon">RR</div>
+              <div>
+                <div class="proposal-logo-name">Rivera Roofing</div>
+                <div class="proposal-logo-tagline">Licensed &amp; Insured &middot; Denver Metro</div>
+              </div>
+            </div>
+            <div class="proposal-badges">
+              <div class="proposal-badge">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2l2 3h3l-2.5 2.5 1 3.5L8 9l-3.5 2 1-3.5L3 5h3l2-3z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                GAF Certified
+              </div>
+              <div class="proposal-badge">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v14M1 8h14" stroke-linecap="round"/></svg>
+                A+ BBB
+              </div>
+            </div>
+          </div>
+          <div class="proposal-address-bar">
+            <div class="proposal-address-label">Roofing Proposal For</div>
+            <div class="proposal-address">4215 Elm Street, Lakewood, CO 80226</div>
+            <div class="proposal-date">Prepared February 23, 2026 &middot; Valid for 30 days</div>
+          </div>
+        </div>
+
+        <!-- Proposal body content -->
+        <div class="proposal-body">
+          <div class="proposal-intro">
+            Hi <strong>Jennifer</strong>, thank you for considering Rivera Roofing for your roofing project. Based on our professional measurement of your property, we've prepared three options for your new roof. Each package includes full tear-off, installation, and cleanup.
+          </div>
+
+          <!-- Three option cards (homeowner view) -->
+          <div class="prop-tier-cards">
+
+            <!-- Good -->
+            <div class="prop-tier">
+              <div class="prop-tier-head">
+                <div class="prop-tier-name">Good</div>
+                <div class="prop-tier-price">$8,950</div>
+              </div>
+              <div class="prop-tier-features">
+                <div class="prop-tier-feature">
+                  <div class="prop-tier-check yes"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  GAF Royal Sovereign 3-tab
+                </div>
+                <div class="prop-tier-feature">
+                  <div class="prop-tier-check yes"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  Synthetic underlayment
+                </div>
+                <div class="prop-tier-feature">
+                  <div class="prop-tier-check yes"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  Standard accessories
+                </div>
+                <div class="prop-tier-feature">
+                  <div class="prop-tier-check no"><svg width="8" height="8" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h8" stroke-linecap="round"/></svg></div>
+                  <span style="color:var(--text-tertiary)">Ice & water shield</span>
+                </div>
+                <div class="prop-tier-feature">
+                  <div class="prop-tier-check yes"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  25-year warranty
+                </div>
+              </div>
+              <div class="prop-tier-cta">
+                <button class="prop-tier-btn outline">Select Good</button>
+              </div>
+            </div>
+
+            <!-- Better (featured) -->
+            <div class="prop-tier featured">
+              <div class="prop-tier-head">
+                <div class="prop-tier-name">Better</div>
+                <div class="prop-tier-price">$12,400</div>
+              </div>
+              <div class="prop-tier-features">
+                <div class="prop-tier-feature">
+                  <div class="prop-tier-check yes"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  GAF Timberline HDZ architectural
+                </div>
+                <div class="prop-tier-feature">
+                  <div class="prop-tier-check yes"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  Synthetic underlayment
+                </div>
+                <div class="prop-tier-feature">
+                  <div class="prop-tier-check yes"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  Enhanced accessories + vent
+                </div>
+                <div class="prop-tier-feature">
+                  <div class="prop-tier-check yes"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  Ice & water shield at eaves
+                </div>
+                <div class="prop-tier-feature">
+                  <div class="prop-tier-check yes"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  Lifetime limited warranty
+                </div>
+              </div>
+              <div class="prop-tier-cta">
+                <button class="prop-tier-btn filled">Select Better</button>
+              </div>
+            </div>
+
+            <!-- Best -->
+            <div class="prop-tier">
+              <div class="prop-tier-head">
+                <div class="prop-tier-name">Best</div>
+                <div class="prop-tier-price">$16,800</div>
+              </div>
+              <div class="prop-tier-features">
+                <div class="prop-tier-feature">
+                  <div class="prop-tier-check yes"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  GAF Timberline UHDZ Ultra HD
+                </div>
+                <div class="prop-tier-feature">
+                  <div class="prop-tier-check yes"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  Premium breathable underlayment
+                </div>
+                <div class="prop-tier-feature">
+                  <div class="prop-tier-check yes"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  Full system accessories + flashing
+                </div>
+                <div class="prop-tier-feature">
+                  <div class="prop-tier-check yes"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  Full eave + valley ice shield
+                </div>
+                <div class="prop-tier-feature">
+                  <div class="prop-tier-check yes"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8l4 4 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  Golden Pledge lifetime warranty
+                </div>
+              </div>
+              <div class="prop-tier-cta">
+                <button class="prop-tier-btn outline">Select Best</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Warranty highlight -->
+          <div class="prop-warranty">
+            <div class="prop-warranty-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2l2.5 5H17l-4 3.5 1.5 5.5-4.5-3-4.5 3 1.5-5.5L3 7h4.5L10 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="prop-warranty-title">GAF Factory-Certified Installation</div>
+              <div class="prop-warranty-text">Rivera Roofing is a GAF Certified installer. All packages include manufacturer-backed warranty coverage.</div>
+            </div>
+          </div>
+
+          <!-- E-signature CTA area -->
+          <div class="prop-cta-section">
+            <div class="prop-cta-text">Ready to get started? Select your preferred package above to proceed.</div>
+            <button class="prop-cta-btn">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 3l-12 12M16 3h-5M16 3v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Accept & Sign Proposal
+            </button>
+            <div class="prop-footer">Powered by QXO &middot; Secure e-signature</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Send Controls -->
+    <div class="send-panel">
+
+      <!-- Delivery Method -->
+      <div class="send-card">
+        <div class="send-card-header">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4l6 4 6-4M2 4v8a1 1 0 001 1h10a1 1 0 001-1V4M2 4a1 1 0 011-1h10a1 1 0 011 1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Send Method
+        </div>
+        <div class="send-card-body">
+          <div class="send-method selected">
+            <div class="send-method-radio"></div>
+            <div class="send-method-icon sms">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h14a2 2 0 012 2v6a2 2 0 01-2 2H7l-4 3v-3H3a2 2 0 01-2-2V6a2 2 0 012-2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="send-method-name">Text Message</div>
+              <div class="send-method-desc">78% open rate &middot; Fastest response</div>
+            </div>
+          </div>
+          <div class="send-method">
+            <div class="send-method-radio"></div>
+            <div class="send-method-icon email">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4l8 5 8-5M2 4v12h16V4H2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="send-method-name">Email</div>
+              <div class="send-method-desc">Includes full proposal details</div>
+            </div>
+          </div>
+          <div class="send-method">
+            <div class="send-method-radio"></div>
+            <div class="send-method-icon link">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 12a4 4 0 005.5 0l3-3a4 4 0 00-5.5-5.5L9.5 5M12 8a4 4 0 00-5.5 0l-3 3a4 4 0 005.5 5.5l1.5-1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="send-method-name">Copy Link</div>
+              <div class="send-method-desc">Share via any channel</div>
+            </div>
+          </div>
+
+          <div class="send-recipient">
+            <div class="send-label">Send to</div>
+            <input class="send-input" type="tel" value="(303) 555-0147" style="font-weight:600;">
+            <div class="send-input-hint">Jennifer Walsh's mobile number</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Message -->
+      <div class="send-card">
+        <div class="send-card-header">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v4h4M14 6L10 2 4 8v6h6l4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Personal Message
+        </div>
+        <div class="send-card-body">
+          <textarea class="send-textarea">Hi Jennifer! Here's the roofing proposal we discussed for 4215 Elm Street. I've put together three options — take a look and let me know if you have any questions. — Marcus</textarea>
+          <div class="send-input-hint" style="margin-top:6px;">This message will appear before the proposal link</div>
+        </div>
+      </div>
+
+      <!-- Proposal Settings -->
+      <div class="send-card">
+        <div class="send-card-header">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.5 1.5M11.5 11.5L13 13M13 3l-1.5 1.5M4.5 11.5L3 13" stroke-linecap="round"/></svg>
+          Proposal Settings
+        </div>
+        <div class="send-card-body">
+          <div class="branding-preview">
+            <div class="branding-color"></div>
+            <div class="branding-text">
+              <strong>Rivera Roofing</strong>
+              <div>Custom branding applied</div>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div>
+              <div class="setting-label">E-signature</div>
+              <div class="setting-desc">Homeowner can sign digitally</div>
+            </div>
+            <div class="setting-toggle on"></div>
+          </div>
+          <div class="setting-row">
+            <div>
+              <div class="setting-label">Financing options</div>
+              <div class="setting-desc">Show monthly payment estimates</div>
+            </div>
+            <div class="setting-toggle on"></div>
+          </div>
+          <div class="setting-row">
+            <div>
+              <div class="setting-label">Expiration reminder</div>
+              <div class="setting-desc">Auto-remind 3 days before expiry</div>
+            </div>
+            <div class="setting-toggle on"></div>
+          </div>
+          <div class="setting-row">
+            <div>
+              <div class="setting-label">View notifications</div>
+              <div class="setting-desc">Alert when homeowner opens</div>
+            </div>
+            <div class="setting-toggle on"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="send-card">
+        <div class="send-card-header">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 6h6M5 8h6M5 10h4" stroke-linecap="round"/></svg>
+          Proposal Summary
+        </div>
+        <div class="send-card-body">
+          <div class="summary-row">
+            <span class="summary-label">Property</span>
+            <span class="summary-value">4215 Elm St</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Homeowner</span>
+            <span class="summary-value">Jennifer Walsh</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Tiers offered</span>
+            <span class="summary-value">3 options</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Price range</span>
+            <span class="summary-value highlight">$8,950 — $16,800</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Your margin</span>
+            <span class="summary-value" style="color:var(--green);">45% all tiers</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Measurement</span>
+            <span class="summary-value">Bid Perfect (24.8 sq)</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Valid until</span>
+            <span class="summary-value">March 25, 2026</span>
+          </div>
+          <div class="summary-row total">
+            <span class="summary-label">If "Better" selected</span>
+            <span class="summary-value">$5,580 profit</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Send Button -->
+      <div class="send-actions">
+        <button class="send-primary-btn">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 10l7 0M2 10l16-7-5 17-4-10m-7 0l7 0" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Send Proposal to Jennifer
+        </button>
+        <div class="send-hint">Jennifer will receive a text with a link to view and accept online</div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

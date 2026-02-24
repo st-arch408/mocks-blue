@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QXO Ecom 2.0 — Mockup Gallery</title>
+<style>
+  :root {
+    --primary: #004BEA; --primary-hover: #0040CC; --primary-light: #EBF0FF;
+    --primary-border: #B3CCFF;
+    --bg: #F2F2F2; --white: #FFFFFF; --text: #111827;
+    --text-secondary: #6B7280; --text-tertiary: #9CA3AF;
+    --border: #E5E7EB; --border-light: #F3F4F6;
+    --green: #22C55E; --green-light: #F0FDF4;
+    --purple: #8B5CF6; --purple-light: #F5F3FF;
+    --orange: #F59E0B; --orange-light: #FFFBEB;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04); --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+    --radius: 12px; --radius-sm: 8px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.5; }
+
+  .header {
+    background: linear-gradient(135deg, #0a0a1a 0%, #0f1a3e 50%, #0d2b6b 100%);
+    padding: 48px 40px 42px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute; top: -40%; right: -10%;
+    width: 500px; height: 500px; border-radius: 50%;
+    background: rgba(0,75,234,0.08);
+  }
+  .header-inner { max-width: 960px; margin: 0 auto; position: relative; }
+  .header-logo {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 20px;
+  }
+  .header-logo-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: var(--primary); display: flex; align-items: center;
+    justify-content: center; font-weight: 800; font-size: 17px;
+  }
+  .header-logo-text { font-weight: 800; font-size: 20px; letter-spacing: -0.03em; }
+  .header h1 {
+    font-size: 36px; font-weight: 800; letter-spacing: -0.04em;
+    margin-bottom: 8px; line-height: 1.1;
+  }
+  .header p {
+    font-size: 16px; color: rgba(255,255,255,0.6); max-width: 560px;
+    line-height: 1.6;
+  }
+  .header-meta {
+    display: flex; gap: 24px; margin-top: 20px;
+    font-size: 13px; color: rgba(255,255,255,0.4);
+  }
+  .header-meta-item { display: flex; align-items: center; gap: 6px; }
+  .header-meta-value { color: rgba(255,255,255,0.8); font-weight: 600; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 40px 60px; }
+
+  .section-title {
+    font-size: 13px; font-weight: 700; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 14px; margin-top: 36px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .section-title:first-child { margin-top: 0; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+
+  .card {
+    background: var(--white); border-radius: var(--radius);
+    border: 1px solid var(--border); overflow: hidden;
+    cursor: pointer; transition: all 0.2s ease;
+    text-decoration: none; color: inherit;
+    display: block;
+  }
+  .card:hover { border-color: var(--primary-border); box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+
+  .card-body { padding: 18px 20px; }
+
+  .card-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; font-weight: 700; padding: 3px 8px;
+    border-radius: 5px; text-transform: uppercase;
+    letter-spacing: 0.04em; margin-bottom: 8px;
+  }
+  .card-tag.core { background: var(--primary-light); color: var(--primary); }
+  .card-tag.atb { background: var(--green-light); color: var(--green); }
+  .card-tag.template { background: var(--purple-light); color: var(--purple); }
+  .card-tag.polish { background: var(--orange-light); color: var(--orange); }
+
+  .card-name { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .card-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+  .card-footer {
+    padding: 10px 20px; border-top: 1px solid var(--border-light);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; color: var(--text-tertiary);
+  }
+  .card-id { font-family: "SF Mono", "Fira Code", monospace; font-weight: 600; font-size: 11px; }
+  .card-arrow { color: var(--text-tertiary); transition: all 0.15s ease; }
+  .card:hover .card-arrow { color: var(--primary); transform: translateX(3px); }
+
+  .note {
+    background: var(--white); border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 18px 22px;
+    margin-top: 32px; font-size: 13px; color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .note strong { color: var(--text); }
+
+  @media (max-width: 700px) {
+    .card-grid { grid-template-columns: 1fr; }
+    .header { padding: 32px 20px; }
+    .header h1 { font-size: 28px; }
+    .container { padding: 24px 20px 40px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-logo">
+      <div class="header-logo-icon">Q</div>
+      <div class="header-logo-text">QXO Ecom 2.0</div>
+    </div>
+    <h1>Build Flow Mockup Gallery</h1>
+    <p>Static HTML mockups for the Ecom 2.0 platform — job-centric ordering with natural language input, structured forms, ATB Blue estimates, and proposal generation.</p>
+    <div class="header-meta">
+      <div class="header-meta-item"><span class="header-meta-value">12</span> screens</div>
+      <div class="header-meta-item"><span class="header-meta-value">4</span> Build paths</div>
+      <div class="header-meta-item"><span class="header-meta-value">2</span> input modes</div>
+      <div class="header-meta-item">Persona: <span class="header-meta-value">Marcus Rivera</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Dashboard -->
+  <div class="section-title">Foundation</div>
+  <div class="card-grid">
+    <a class="card" href="ecom2-dashboard-v2.html">
+      <div class="card-body">
+        <div class="card-tag core">Core</div>
+        <div class="card-name">Dashboard</div>
+        <div class="card-desc">Home screen with NL input bar, job table, alerts, deliveries, credit widget, and personalized greeting.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">V2</span>
+        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8M9 5l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+    <a class="card" href="ecom2-build-entry.html">
+      <div class="card-body">
+        <div class="card-tag core">Core</div>
+        <div class="card-name">Build Entry — Path Selector</div>
+        <div class="card-desc">Full-page selector showing 4 MVP paths (New Order, Estimate, Template, Reorder) plus future paths and recent drafts.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">B-00</span>
+        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8M9 5l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+  </div>
+
+  <!-- Path 1: New Order -->
+  <div class="section-title">Path 1 — New Order</div>
+  <div class="card-grid">
+    <a class="card" href="ecom2-nl-empty-state.html">
+      <div class="card-body">
+        <div class="card-tag polish">Polish</div>
+        <div class="card-name">NL Empty State</div>
+        <div class="card-desc">Clean starting point with welcome message, example prompts, mic button, and empty order summary panel.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">B-1C-01</span>
+        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8M9 5l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+    <a class="card" href="ecom2-nl-processing.html">
+      <div class="card-body">
+        <div class="card-tag polish">Polish</div>
+        <div class="card-name">NL Processing / Thinking</div>
+        <div class="card-desc">AI interpreting user input — shows pipeline steps (intent, profile, SKU mapping), partial streaming results, and skeleton loading.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">B-1C-02</span>
+        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8M9 5l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+    <a class="card" href="ecom2-build-flow.html">
+      <div class="card-body">
+        <div class="card-tag core">Core</div>
+        <div class="card-name">NL Conversational Flow</div>
+        <div class="card-desc">Mid-conversation state with AI interpretation card, smart suggestions (purple), gap detection (orange), and populated order summary.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">B-1C-03/04</span>
+        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8M9 5l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+    <a class="card" href="ecom2-build-structured.html">
+      <div class="card-body">
+        <div class="card-tag core">Core</div>
+        <div class="card-name">Structured Form Mode</div>
+        <div class="card-desc">Form-based counterpart — product search, category filters, line items with quantity steppers, inline AI suggestions.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">B-1S-01/03</span>
+        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8M9 5l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+    <a class="card" href="ecom2-order-confirmation.html">
+      <div class="card-body">
+        <div class="card-tag core">Core</div>
+        <div class="card-name">Order Confirmation</div>
+        <div class="card-desc">Shared success state — order number, delivery card, full receipt, credit impact, quick actions, and "What Happens Next" timeline.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">B-1C-06</span>
+        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8M9 5l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+  </div>
+
+  <!-- Path 2: ATB Blue Estimate -->
+  <div class="section-title">Path 2 — New Estimate (ATB Blue)</div>
+  <div class="card-grid">
+    <a class="card" href="ecom2-estimate-entry.html">
+      <div class="card-body">
+        <div class="card-tag atb">ATB Blue</div>
+        <div class="card-name">Estimate Entry — Address + Measure</div>
+        <div class="card-desc">Address input via NL, property card, Bid Perfect ($20) vs Premium ($85) measurement selection, processing state.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">B-2C-01/02</span>
+        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8M9 5l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+    <a class="card" href="ecom2-proposal-builder.html">
+      <div class="card-body">
+        <div class="card-tag atb">ATB Blue</div>
+        <div class="card-name">Proposal Builder — Good/Better/Best</div>
+        <div class="card-desc">Measurement results banner, detail grid, three-tier proposal cards with materials, margins, warranties, and homeowner pricing.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">B-2C-03/04</span>
+        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8M9 5l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+    <a class="card" href="ecom2-proposal-preview.html">
+      <div class="card-body">
+        <div class="card-tag atb">ATB Blue</div>
+        <div class="card-name">Proposal Preview & Send</div>
+        <div class="card-desc">Homeowner-facing preview with contractor branding, e-signature CTA. Send via SMS/email/link with settings and custom message.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">B-2C-05</span>
+        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8M9 5l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+  </div>
+
+  <!-- Path 3 & 4 -->
+  <div class="section-title">Paths 3 & 4 — Template & Reorder</div>
+  <div class="card-grid">
+    <a class="card" href="ecom2-template-selector.html">
+      <div class="card-body">
+        <div class="card-tag template">Template</div>
+        <div class="card-name">Template Selector</div>
+        <div class="card-desc">Grid of saved build templates (Standard GAF, Premium, Budget, Gutter) with brand/waste/margin tags, product previews, and usage stats.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">B-3-01</span>
+        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8M9 5l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+    <a class="card" href="ecom2-reorder-job.html">
+      <div class="card-body">
+        <div class="card-tag template">Reorder</div>
+        <div class="card-name">Reorder from Job</div>
+        <div class="card-desc">Completed job list with address, materials, order totals, and clone button. Price-change warning for stale items.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">B-4-01</span>
+        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8M9 5l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+  </div>
+
+  <div class="note">
+    <strong>Review Notes:</strong> All mockups are static HTML with inline CSS — hover states, transitions, and animations are live. Designed at 1440px viewport width. The persona throughout is Marcus Rivera of Rivera Roofing, Denver Metro. Design tokens: primary #004BEA, background #F2F2F2. AI suggestions appear in purple, gap detection in orange.
+  </div>
+
+</div>
+
+</body>
+</html>
