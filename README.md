@@ -18,6 +18,7 @@ Static HTML mockups for the QXO Ecom 2.0 platform. Job-centric ordering with nat
 | [Proposal Preview & Send](ecom2-proposal-preview.html) | ATB Blue | B-2C-05 |
 | [Template Selector](ecom2-template-selector.html) | Template | B-3-01 |
 | [Reorder from Job](ecom2-reorder-job.html) | Reorder | B-4-01 |
+| [Delivery Tracking Visual](walk-the-store/WTS-Delivery-Tracking-Visual.html) | Walk the Store | WTS-01 |
 
 ## Design Tokens
 
