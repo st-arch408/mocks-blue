@@ -16,13 +16,41 @@
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Segoe UI',-apple-system,sans-serif; background:#f8f9fa; color:var(--gray-dark); line-height:1.6; }
-  .header { background:linear-gradient(135deg,#1a237e 0%,#1565c0 100%); color:white; padding:32px 40px; }
-  .header h1 { font-size:28px; font-weight:700; margin-bottom:4px; }
-  .header .subtitle { font-size:15px; opacity:0.85; }
-  .header .persona-bar { display:flex; gap:24px; margin-top:16px; background:rgba(255,255,255,0.12); border-radius:8px; padding:12px 20px; flex-wrap:wrap; }
-  .header .persona-bar span { font-size:13px; }
-  .header .persona-bar strong { color:#bbdefb; }
+  .header { background:linear-gradient(135deg,#1a237e 0%,#1565c0 100%); color:white; padding:32px 40px 28px; }
+  .header h1 { font-size:26px; font-weight:700; margin-bottom:2px; }
+  .header .subtitle { font-size:14px; opacity:0.8; margin-bottom:18px; }
+  .persona-row { display:flex; gap:32px; flex-wrap:wrap; background:rgba(255,255,255,0.10); border-radius:8px; padding:14px 20px; margin-bottom:16px; }
+  .persona-row .item { font-size:13px; }
+  .persona-row .item strong { color:#bbdefb; }
+  .persona-row .item .val { color:white; }
+  .metrics-row { display:flex; gap:20px; flex-wrap:wrap; padding-top:14px; border-top:1px solid rgba(255,255,255,0.12); }
+  .metric-chip { display:flex; align-items:baseline; gap:8px; background:rgba(255,255,255,0.08); border-radius:6px; padding:8px 16px; }
+  .metric-chip .num { font-size:22px; font-weight:800; letter-spacing:-0.5px; }
+  .metric-chip .num.red { color:#ef9a9a; }
+  .metric-chip .num.amber { color:#ffe082; }
+  .metric-chip .lbl { font-size:11px; color:rgba(255,255,255,0.65); max-width:140px; line-height:1.3; }
   .container { max-width:1200px; margin:0 auto; padding:24px 20px; }
+
+  /* Status overview table */
+  .overview-section { background:white; border-radius:12px; padding:20px 24px; margin-bottom:28px; box-shadow:0 1px 3px rgba(0,0,0,0.08); }
+  .overview-section h3 { font-size:15px; font-weight:700; margin-bottom:14px; }
+  .overview-section .acct-line { font-size:12px; color:var(--gray); margin-bottom:14px; }
+  .status-overview { width:100%; border-collapse:collapse; font-size:13px; }
+  .status-overview th { background:var(--gray-light); padding:10px 14px; text-align:left; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; }
+  .status-overview td { padding:12px 14px; border-bottom:1px solid var(--gray-light); vertical-align:middle; }
+  .status-overview tr:last-child td { border-bottom:none; }
+  .status-dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:8px; vertical-align:middle; }
+  .status-dot.req { background:var(--orange); }
+  .status-dot.sch { background:var(--blue); }
+  .status-dot.ofd { background:var(--red); }
+  .status-dot.del { background:var(--green); }
+  .status-label { font-weight:600; }
+  .count-badge { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; font-size:13px; font-weight:700; color:white; }
+  .count-badge.req { background:var(--orange); }
+  .count-badge.sch { background:var(--blue); }
+  .count-badge.ofd { background:var(--red); }
+  .count-badge.del { background:var(--green); }
+  .note-text { font-size:12px; color:var(--gray); margin-top:12px; font-style:italic; padding-top:10px; border-top:1px solid var(--gray-light); }
 
   /* Section title */
   .section-title { font-size:18px; font-weight:700; margin-bottom:16px; }
@@ -126,29 +154,71 @@
 <div class="header">
   <h1>Walk the Store: Delivery Tracking Experience</h1>
   <div class="subtitle">QXO Digital Delivery Tracking — Visual Walkthrough</div>
-  <div class="persona-bar">
-    <span><strong>Persona:</strong> Philip Trask</span>
-    <span><strong>Type:</strong> Tier 2 Residential Roofing Contractor</span>
-    <span><strong>Revenue:</strong> Sub-$1M</span>
-    <span><strong>Volume:</strong> ~5 orders/week</span>
-    <span><strong>Context:</strong> 9:45 AM Tuesday, reviewing active orders from truck</span>
+
+  <div class="persona-row">
+    <div class="item"><strong>Persona:</strong> <span class="val">Philip Trask</span></div>
+    <div class="item"><strong>Type:</strong> <span class="val">Tier 2 Residential Roofing Contractor</span></div>
+    <div class="item"><strong>Account:</strong> <span class="val">Dalco Services LLC (362492)</span></div>
+    <div class="item"><strong>Revenue:</strong> <span class="val">Sub-$1M</span></div>
+    <div class="item"><strong>Volume:</strong> <span class="val">~5 orders/week</span></div>
+    <div class="item"><strong>Context:</strong> <span class="val">9:45 AM Tuesday, reviewing active orders from truck</span></div>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric-chip">
+      <span class="num amber">82%</span>
+      <span class="lbl">On-Time Delivery Rate</span>
+    </div>
+    <div class="metric-chip">
+      <span class="num red">0%</span>
+      <span class="lbl">Delay Notifications Sent</span>
+    </div>
+    <div class="metric-chip">
+      <span class="num red">0%</span>
+      <span class="lbl">Photo Geotag Compliance</span>
+    </div>
   </div>
 </div>
 
 <div class="container">
 
-  <!-- ─── PHILIP'S ACTIVE ORDERS (context) ────────────────────────────── -->
-  <div class="orders-section" style="margin-bottom:28px;">
-    <h3>Dalco Services LLC Account (362492) — Houston</h3>
-    <table class="order-table">
-      <tr><th>Order #</th><th>Jobsite / PO</th><th>Status</th><th>Delivery Detail</th></tr>
-      <tr><td>UA24216</td><td>154 Paul Pena Dr</td><td><span class="status-badge req">Requested</span></td><td>Sunday, PM window</td></tr>
-      <tr><td>UA18801</td><td>1009 Woodhaven Lakes Dr</td><td><span class="status-badge sch">Scheduled</span></td><td>02/26/2026, 1:00–2:00 PM</td></tr>
-      <tr><td>UA24137</td><td>ERIK</td><td><span class="status-badge ofd">Out for Delivery</span> <span style="font-size:11px;color:var(--gray);">(Scheduled)</span></td><td>02/26/2026, 1:00–2:00 PM</td></tr>
-      <tr><td>UA18788</td><td>1009 Woodhaven Lakes Dr</td><td><span class="status-badge del">Delivered</span></td><td>02/26/2026, 7:01 AM</td></tr>
-      <tr><td>TZ84631</td><td>26842 Vanilla Pearls Ln</td><td><span class="status-badge del">Delivered</span></td><td>02/25/2026, 10:36 AM</td></tr>
+  <!-- ─── DELIVERY STATUS OVERVIEW ─────────────────────────────────────── -->
+  <div class="overview-section">
+    <h3>Delivery Status Overview</h3>
+    <div class="acct-line">Dalco Services LLC — Account 362492 — Houston &nbsp;|&nbsp; 5 active orders observed on 02/26/2026</div>
+    <table class="status-overview">
+      <tr>
+        <th>Status</th>
+        <th style="text-align:center;">Orders</th>
+        <th>What Philip Sees</th>
+        <th>Context</th>
+      </tr>
+      <tr>
+        <td><span class="status-dot req"></span><span class="status-label">Requested</span></td>
+        <td style="text-align:center;"><span class="count-badge req">1</span></td>
+        <td>Order placed, awaiting branch confirmation</td>
+        <td>Branch must receive and confirm materials before moving to Scheduled</td>
+      </tr>
+      <tr>
+        <td><span class="status-dot sch"></span><span class="status-label">Scheduled</span></td>
+        <td style="text-align:center;"><span class="count-badge sch">1</span></td>
+        <td>Date confirmed, 1-hour delivery window shown</td>
+        <td>Dispatch assigns a delivery date. Time window can change up to the night before</td>
+      </tr>
+      <tr>
+        <td><span class="status-dot ofd"></span><span class="status-label">Out for Delivery</span></td>
+        <td style="text-align:center;"><span class="count-badge ofd">1</span></td>
+        <td>GPS truck pin on map, delivery window visible</td>
+        <td>Day-of status change — triggered only when a driver accepts the route</td>
+      </tr>
+      <tr>
+        <td><span class="status-dot del"></span><span class="status-label">Delivered</span></td>
+        <td style="text-align:center;"><span class="count-badge del">2</span></td>
+        <td>Timestamp recorded, photos may or may not be attached</td>
+        <td>Driver physically presses a button to mark as delivered</td>
+      </tr>
     </table>
-    <div style="font-size:12px;color:var(--gray);margin-top:12px;font-style:italic;">Supplemental: <strong>TZ89709</strong> (Anaheim Branch, separate account) — Observed for Out for Delivery truck tracking experience.</div>
+    <div class="note-text">Supplemental: <strong>TZ89709</strong> (Anaheim Branch, separate account) observed for Out for Delivery truck tracking experience. Photos appeared ~3 hours after delivery.</div>
   </div>
 
   <!-- ─── SCREENSHOT WALKTHROUGH ────────────────────────────────────── -->
