@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>QXO Ecom 2.0 — Jobs List (JL-01) Master-Detail</title>
+<style>
+  /* ============================================================
+     QXO Ecom 2.0 — Jobs List (JL-01)
+     Pattern: Master-Detail Split Panel (Option C)
+     Interactive tabs, scrollable job list, full detail panel
+     ============================================================ */
+
+  :root {
+    --primary: #004BEA; --primary-hover: #0040CC; --primary-light: #EBF0FF;
+    --primary-border: #B3CCFF; --primary-glow: rgba(0,75,234,0.12);
+    --bg: #F2F2F2; --white: #FFFFFF; --text: #111827;
+    --text-secondary: #6B7280; --text-tertiary: #9CA3AF;
+    --border: #E5E7EB; --border-light: #F3F4F6;
+    --green: #22C55E; --green-light: #F0FDF4; --green-border: #BBF7D0;
+    --red: #EF4444; --red-light: #FEF2F2; --red-border: #FECACA;
+    --orange: #F59E0B; --orange-light: #FFFBEB; --orange-border: #FDE68A;
+    --purple: #8B5CF6; --purple-light: #F5F3FF; --purple-border: #DDD6FE;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04); --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.08); --shadow-xl: 0 8px 32px rgba(0,0,0,0.10);
+    --radius: 12px; --radius-sm: 8px; --radius-lg: 16px; --transition: 0.15s ease;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; overflow:hidden; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.5; }
+
+  /* ---- Sidebar ---- */
+  .sidebar { position:fixed; left:0; top:0; width:240px; height:100vh; background:var(--white); border-right:1px solid var(--border); display:flex; flex-direction:column; z-index:10; box-shadow:1px 0 4px rgba(0,0,0,0.03); }
+  .sidebar-logo { padding:22px 20px 18px; display:flex; align-items:center; gap:10px; }
+  .sidebar-logo-icon { width:34px; height:34px; border-radius:10px; background:var(--primary); display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:15px; letter-spacing:-0.02em; }
+  .sidebar-logo-text { font-weight:800; font-size:17px; color:var(--text); letter-spacing:-0.03em; }
+  .sidebar-build-btn { margin:0 14px 18px; padding:11px 16px; background:var(--primary); color:white; border:none; border-radius:var(--radius-sm); font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 2px 8px rgba(0,75,234,0.3); position:relative; }
+  .sidebar-build-btn::after { content:''; position:absolute; inset:-2px; border:2px solid var(--primary); border-radius:10px; animation:build-pulse 2s infinite; opacity:0; }
+  @keyframes build-pulse { 0%,100%{opacity:0; transform:scale(1);} 50%{opacity:0.3; transform:scale(1.02);} }
+  .sidebar-nav { flex:1; padding:0 10px; overflow-y:auto; }
+  .nav-section-label { padding:18px 14px 6px; font-size:11px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.06em; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:9px 14px; border-radius:var(--radius-sm); margin-bottom:2px; cursor:pointer; font-size:14px; color:var(--text-secondary); font-weight:450; transition:all var(--transition); position:relative; text-decoration:none; }
+  .nav-item:hover { background:var(--border-light); color:var(--text); }
+  .nav-item svg { flex-shrink:0; }
+  .nav-item.active { background:var(--primary-light); color:var(--primary); font-weight:600; }
+  .nav-badge { margin-left:auto; font-size:11px; font-weight:600; padding:1px 8px; border-radius:10px; background:var(--border-light); color:var(--text-secondary); }
+  .nav-item.coming { color:var(--text-tertiary); opacity:0.45; cursor:default; }
+  .sidebar-user { padding:16px 18px; border-top:1px solid var(--border); display:flex; align-items:center; gap:10px; margin-top:auto; }
+  .sidebar-user-avatar { width:34px; height:34px; border-radius:50%; background:var(--bg); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--text-secondary); }
+  .sidebar-user-name { font-size:13px; font-weight:600; }
+  .sidebar-user-email { font-size:11px; color:var(--text-secondary); }
+
+  /* ---- Main layout ---- */
+  .main { margin-left:240px; height:100vh; display:flex; flex-direction:column; }
+
+  /* ---- Topbar ---- */
+  .topbar { background:var(--white); border-bottom:1px solid var(--border); padding:16px 28px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; box-shadow:var(--shadow-sm); }
+  .topbar-left { display:flex; align-items:center; gap:16px; }
+  .topbar h1 { font-size:22px; font-weight:800; letter-spacing:-0.03em; }
+  .topbar-subtitle { font-size:13px; color:var(--text-secondary); margin-top:1px; }
+  .topbar-right { display:flex; align-items:center; gap:10px; }
+  .btn { padding:10px 20px; border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer; transition:all var(--transition); display:inline-flex; align-items:center; gap:7px; border:none; }
+  .btn-primary { background:var(--primary); color:white; box-shadow:0 2px 8px rgba(0,75,234,0.25); }
+  .btn-primary:hover { background:var(--primary-hover); box-shadow:0 4px 14px rgba(0,75,234,0.35); transform:translateY(-1px); }
+  .btn-secondary { background:var(--white); color:var(--text-secondary); border:1px solid var(--border); }
+  .btn-secondary:hover { border-color:var(--primary-border); color:var(--primary); background:var(--primary-light); }
+
+  /* ---- Split layout ---- */
+  .split { flex:1; display:flex; overflow:hidden; }
+
+  /* ---- Left: Job List Panel ---- */
+  .list-panel { width:340px; flex-shrink:0; background:var(--white); border-right:1px solid var(--border); display:flex; flex-direction:column; }
+  .list-search { padding:14px 16px 10px; border-bottom:1px solid var(--border-light); }
+  .list-search input { width:100%; padding:9px 14px 9px 36px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13px; background:var(--bg); color:var(--text); transition:all var(--transition); }
+  .list-search input:focus { outline:none; border-color:var(--primary); background:var(--white); box-shadow:0 0 0 3px var(--primary-glow); }
+  .list-search-wrap { position:relative; }
+  .list-search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-tertiary); }
+
+  .list-filters { display:flex; gap:2px; padding:8px 12px; border-bottom:1px solid var(--border-light); background:var(--border-light); }
+  .filter-tab { padding:6px 12px; border-radius:6px; font-size:12px; font-weight:500; color:var(--text-secondary); cursor:pointer; transition:all var(--transition); border:none; background:transparent; display:flex; align-items:center; gap:4px; }
+  .filter-tab:hover { background:var(--white); color:var(--text); }
+  .filter-tab.active { background:var(--primary); color:white; font-weight:600; box-shadow:0 1px 3px rgba(0,75,234,0.2); }
+  .filter-count { font-size:10px; font-weight:700; opacity:0.7; }
+
+  .list-items { flex:1; overflow-y:auto; }
+  .job-item { padding:14px 16px; border-bottom:1px solid var(--border-light); cursor:pointer; transition:all var(--transition); }
+  .job-item:hover { background:var(--border-light); }
+  .job-item.selected { background:var(--primary-light); border-left:3px solid var(--primary); }
+  .job-item-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+  .job-item-addr { font-size:14px; font-weight:600; color:var(--text); }
+  .job-item-value { font-size:13px; font-weight:700; letter-spacing:-0.02em; }
+  .job-item-sub { font-size:12px; color:var(--text-secondary); margin-bottom:6px; }
+  .job-item-bottom { display:flex; align-items:center; gap:8px; }
+
+  /* Status badges */
+  .badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; }
+  .badge-dot { width:5px; height:5px; border-radius:50%; }
+  .badge-proposed { background:var(--orange-light); color:var(--orange); }
+  .badge-proposed .badge-dot { background:var(--orange); }
+  .badge-won { background:var(--green-light); color:var(--green); }
+  .badge-won .badge-dot { background:var(--green); }
+  .badge-active { background:var(--primary-light); color:var(--primary); }
+  .badge-active .badge-dot { background:var(--primary); animation:pulse 2s ease-in-out infinite; }
+  .badge-complete { background:var(--border-light); color:var(--text-tertiary); }
+  .badge-complete .badge-dot { background:var(--text-tertiary); }
+  .badge-declined { background:var(--red-light); color:var(--red); }
+  .badge-declined .badge-dot { background:var(--red); }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+  .job-item-date { font-size:11px; color:var(--text-tertiary); margin-left:auto; }
+
+  .list-footer { padding:12px 16px; border-top:1px solid var(--border); background:var(--border-light); font-size:12px; color:var(--text-secondary); flex-shrink:0; }
+
+  /* ---- Right: Detail Panel ---- */
+  .detail-panel { flex:1; overflow-y:auto; background:var(--bg); }
+  .detail-header { padding:24px 28px 20px; background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:flex-start; justify-content:space-between; }
+  .detail-addr { font-size:20px; font-weight:800; letter-spacing:-0.03em; }
+  .detail-sub { font-size:13px; color:var(--text-secondary); margin-top:2px; }
+  .detail-header-actions { display:flex; align-items:center; gap:8px; }
+
+  .detail-stats { padding:20px 28px; display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; background:var(--white); border-bottom:1px solid var(--border); }
+  .stat-card { padding:14px 16px; background:var(--bg); border-radius:var(--radius-sm); border:1px solid var(--border-light); }
+  .stat-label { font-size:11px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px; }
+  .stat-num { font-size:22px; font-weight:800; letter-spacing:-0.03em; line-height:1.1; }
+  .stat-sub { font-size:11px; color:var(--text-secondary); margin-top:3px; }
+
+  /* Detail tabs */
+  .detail-tabs { display:flex; gap:0; background:var(--white); border-bottom:1px solid var(--border); padding:0 28px; }
+  .detail-tab { padding:12px 20px; font-size:13px; font-weight:500; color:var(--text-secondary); cursor:pointer; border-bottom:2px solid transparent; transition:all var(--transition); }
+  .detail-tab:hover { color:var(--text); }
+  .detail-tab.active { color:var(--primary); font-weight:600; border-bottom-color:var(--primary); }
+
+  /* Tab content area */
+  .tab-content { padding:20px 28px 28px; display:none; }
+  .tab-content.active { display:block; }
+
+  /* Timeline tab */
+  .timeline { position:relative; }
+  .timeline::before { content:''; position:absolute; left:15px; top:0; bottom:0; width:2px; background:var(--border); }
+  .tl-item { display:flex; gap:16px; margin-bottom:20px; position:relative; }
+  .tl-dot { width:32px; height:32px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:13px; z-index:1; border:2px solid var(--white); }
+  .tl-dot-blue { background:var(--primary-light); color:var(--primary); }
+  .tl-dot-green { background:var(--green-light); color:var(--green); }
+  .tl-dot-orange { background:var(--orange-light); color:var(--orange); }
+  .tl-dot-gray { background:var(--border-light); color:var(--text-tertiary); }
+  .tl-dot-purple { background:var(--purple-light); color:var(--purple); }
+  .tl-body { flex:1; background:var(--white); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px 18px; }
+  .tl-title { font-size:14px; font-weight:600; margin-bottom:2px; }
+  .tl-desc { font-size:13px; color:var(--text-secondary); }
+  .tl-date { font-size:11px; color:var(--text-tertiary); margin-top:4px; }
+  .tl-item.future { opacity:0.45; }
+  .tl-item.future .tl-body { border-style:dashed; }
+
+  /* Proposal tab */
+  .proposal-summary { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:16px; }
+  .proposal-summary-header { padding:16px 20px; border-bottom:1px solid var(--border-light); display:flex; align-items:center; justify-content:space-between; }
+  .proposal-summary-header h3 { font-size:15px; font-weight:700; }
+  .proposal-tier-cards { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; padding:20px; }
+  .tier-card { border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; text-align:center; transition:all var(--transition); position:relative; }
+  .tier-card.selected { border-color:var(--primary); background:var(--primary-light); box-shadow:0 0 0 2px var(--primary-border); }
+  .tier-card.selected::after { content:'Selected'; position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--primary); color:white; font-size:10px; font-weight:700; padding:2px 10px; border-radius:10px; }
+  .tier-name { font-size:14px; font-weight:700; margin-bottom:4px; }
+  .tier-price { font-size:22px; font-weight:800; letter-spacing:-0.03em; }
+  .tier-margin { font-size:12px; color:var(--text-secondary); margin-top:4px; }
+  .tier-label { font-size:11px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px; }
+
+  .proposal-details { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+  .proposal-details h3 { font-size:15px; font-weight:700; margin-bottom:14px; }
+  .pd-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border-light); font-size:13px; }
+  .pd-row:last-child { border-bottom:none; }
+  .pd-label { color:var(--text-secondary); }
+  .pd-value { font-weight:600; }
+
+  /* Order tab */
+  .order-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:16px; }
+  .order-card-header { padding:16px 20px; border-bottom:1px solid var(--border-light); display:flex; align-items:center; justify-content:space-between; }
+  .order-card-header h3 { font-size:15px; font-weight:700; }
+  .order-table { width:100%; border-collapse:collapse; }
+  .order-table th { padding:10px 20px; font-size:11px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.06em; text-align:left; background:var(--border-light); border-bottom:1px solid var(--border); }
+  .order-table td { padding:12px 20px; font-size:13px; border-bottom:1px solid var(--border-light); }
+  .order-table tr:last-child td { border-bottom:none; }
+  .order-table .total-row td { font-weight:700; background:var(--border-light); border-top:2px solid var(--border); }
+
+  /* Delivery tab */
+  .delivery-tracker { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:24px; margin-bottom:16px; }
+  .delivery-tracker h3 { font-size:15px; font-weight:700; margin-bottom:20px; }
+  .delivery-steps { display:flex; justify-content:space-between; position:relative; margin-bottom:24px; }
+  .delivery-steps::before { content:''; position:absolute; top:18px; left:40px; right:40px; height:3px; background:var(--border); z-index:0; }
+  .delivery-steps::after { content:''; position:absolute; top:18px; left:40px; width:60%; height:3px; background:var(--primary); z-index:1; }
+  .delivery-step { text-align:center; position:relative; z-index:2; }
+  .ds-dot { width:36px; height:36px; border-radius:50%; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; font-size:14px; border:3px solid var(--white); }
+  .ds-dot.done { background:var(--primary); color:white; }
+  .ds-dot.current { background:var(--primary-light); color:var(--primary); border:3px solid var(--primary); animation:pulse 2s ease-in-out infinite; }
+  .ds-dot.pending { background:var(--border-light); color:var(--text-tertiary); }
+  .ds-label { font-size:12px; font-weight:600; color:var(--text); }
+  .ds-date { font-size:11px; color:var(--text-secondary); }
+
+  .delivery-details { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .dd-card { background:var(--bg); border:1px solid var(--border-light); border-radius:var(--radius-sm); padding:16px; }
+  .dd-label { font-size:11px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px; }
+  .dd-value { font-size:14px; font-weight:600; }
+  .dd-sub { font-size:12px; color:var(--text-secondary); margin-top:2px; }
+
+  /* Margin tab */
+  .margin-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:16px; }
+  .margin-header { padding:16px 20px; border-bottom:1px solid var(--border-light); display:flex; align-items:center; justify-content:space-between; }
+  .margin-header h3 { font-size:15px; font-weight:700; }
+  .margin-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:0; }
+  .margin-cell { padding:20px; text-align:center; border-right:1px solid var(--border-light); border-bottom:1px solid var(--border-light); }
+  .margin-cell:nth-child(3n) { border-right:none; }
+  .margin-cell-label { font-size:11px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px; }
+  .margin-cell-value { font-size:20px; font-weight:800; letter-spacing:-0.03em; }
+  .margin-cell-sub { font-size:11px; color:var(--text-secondary); margin-top:2px; }
+
+  .margin-comparison { padding:20px; }
+  .margin-comparison h4 { font-size:13px; font-weight:700; margin-bottom:12px; color:var(--text-secondary); }
+  .mc-row { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .mc-label { width:140px; font-size:13px; color:var(--text-secondary); flex-shrink:0; }
+  .mc-bar-wrap { flex:1; height:24px; background:var(--border-light); border-radius:4px; overflow:hidden; position:relative; }
+  .mc-bar { height:100%; border-radius:4px; transition:width 0.5s ease; }
+  .mc-bar-est { background:var(--primary-light); border:1px solid var(--primary-border); }
+  .mc-bar-act { background:var(--green-light); border:1px solid var(--green-border); }
+  .mc-value { width:80px; font-size:13px; font-weight:600; text-align:right; flex-shrink:0; }
+
+  /* Upsell banner */
+  .upsell-banner { background:linear-gradient(135deg, var(--purple-light) 0%, #F0E7FF 100%); border:1px solid var(--purple-border); border-radius:var(--radius); padding:16px 20px; display:flex; align-items:center; gap:14px; margin-top:16px; }
+  .upsell-icon { font-size:20px; }
+  .upsell-text { font-size:14px; font-weight:600; color:#6D28D9; }
+  .upsell-sub { font-size:12px; color:var(--text-secondary); }
+  .upsell-action { margin-left:auto; padding:7px 16px; background:var(--purple); color:white; border:none; border-radius:var(--radius-sm); font-size:12px; font-weight:600; cursor:pointer; transition:all var(--transition); }
+  .upsell-action:hover { background:#7C3AED; transform:translateY(-1px); }
+</style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR (canonical — matches ecom2-build-flow.html) ===== -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">Q</div>
+    <div class="sidebar-logo-text">QXO</div>
+  </div>
+
+  <button class="sidebar-build-btn">
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3v14M3 10h14" stroke-linecap="round"/></svg>
+    BUILD
+  </button>
+
+  <nav class="sidebar-nav">
+    <div class="nav-item">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item active">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h14M3 8h14M3 12h10M3 16h7" stroke-linecap="round"/></svg>
+      Jobs <span class="nav-badge">12</span>
+    </div>
+    <div class="nav-item">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 10h6M7 14h3" stroke-linecap="round"/></svg>
+      Proposals <span class="nav-badge">4</span>
+    </div>
+    <div class="nav-item">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h10v9H2z"/><path d="M12 8h4l2 3v2h-6V8z"/><circle cx="6" cy="15" r="2"/><circle cx="15" cy="15" r="2"/></svg>
+      Deliveries <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 9h6M7 12h4M12 15h2" stroke-linecap="round"/></svg>
+      Invoices
+    </div>
+    <div class="nav-item">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2L18 6v8l-8 4L2 14V6l8-4z"/><path d="M2 6l8 4m0 0l8-4m-8 4v8"/></svg>
+      Products
+    </div>
+    <div class="nav-item">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4l4 4-4 4M10 14h6" stroke-linecap="round"/></svg>
+      Builds
+    </div>
+
+    <div class="nav-section-label">Coming Soon</div>
+    <div class="nav-item coming">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="7" r="4"/><path d="M3 18c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg>
+      CRM
+    </div>
+    <div class="nav-item coming">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2l2.5 5.5L18 8.5l-4 4 1 5.5-5-3-5 3 1-5.5-4-4 5.5-1z"/></svg>
+      Loyalty
+    </div>
+    <div class="nav-item coming">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v2m0 12v2M2 10h2m12 0h2"/><circle cx="10" cy="10" r="4"/></svg>
+      Storm Center
+    </div>
+  </nav>
+
+  <div class="sidebar-user">
+    <div class="sidebar-user-avatar">MR</div>
+    <div>
+      <div class="sidebar-user-name">Rivera Roofing</div>
+      <div class="sidebar-user-email">marcus@riveraroofing.com</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div>
+        <h1>Jobs</h1>
+        <div class="topbar-subtitle">13 properties &middot; 4 active &middot; $142,850 pipeline</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-secondary">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 11l3 3 8-8"/></svg>
+        Export
+      </button>
+      <button class="btn btn-primary">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="7.5" y1="2" x2="7.5" y2="13"/><line x1="2" y1="7.5" x2="13" y2="7.5"/></svg>
+        New Estimate
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== SPLIT VIEW ===== -->
+  <div class="split">
+
+    <!-- LEFT: Job List -->
+    <div class="list-panel">
+      <div class="list-search">
+        <div class="list-search-wrap">
+          <svg class="list-search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="4.5"/><line x1="9.5" y1="9.5" x2="13" y2="13"/></svg>
+          <input type="text" placeholder="Search jobs...">
+        </div>
+      </div>
+      <div class="list-filters">
+        <button class="filter-tab active">All <span class="filter-count">13</span></button>
+        <button class="filter-tab">Proposed <span class="filter-count">3</span></button>
+        <button class="filter-tab">Won <span class="filter-count">2</span></button>
+        <button class="filter-tab">Active <span class="filter-count">4</span></button>
+        <button class="filter-tab">Complete <span class="filter-count">3</span></button>
+        <button class="filter-tab">Declined <span class="filter-count">1</span></button>
+      </div>
+      <div class="list-items">
+        <!-- Job 1: SELECTED -->
+        <div class="job-item selected" onclick="selectJob(0)">
+          <div class="job-item-top">
+            <div class="job-item-addr">445 Spruce Way</div>
+            <div class="job-item-value">$12,400</div>
+          </div>
+          <div class="job-item-sub">Tom Chen &middot; Residential re-roof</div>
+          <div class="job-item-bottom">
+            <span class="badge badge-active"><span class="badge-dot"></span> Active</span>
+            <div class="job-item-date">Mar 2</div>
+          </div>
+        </div>
+        <!-- Job 2 -->
+        <div class="job-item" onclick="selectJob(1)">
+          <div class="job-item-top">
+            <div class="job-item-addr">4215 Elm Street</div>
+            <div class="job-item-value">$15,200</div>
+          </div>
+          <div class="job-item-sub">Sarah Chen &middot; Residential re-roof</div>
+          <div class="job-item-bottom">
+            <span class="badge badge-won"><span class="badge-dot"></span> Won</span>
+            <div class="job-item-date">Feb 28</div>
+          </div>
+        </div>
+        <!-- Job 3 -->
+        <div class="job-item" onclick="selectJob(2)">
+          <div class="job-item-top">
+            <div class="job-item-addr">892 Maple Drive</div>
+            <div class="job-item-value">$9,875</div>
+          </div>
+          <div class="job-item-sub">James Wilson &middot; Roofing estimate</div>
+          <div class="job-item-bottom">
+            <span class="badge badge-proposed"><span class="badge-dot"></span> Proposed</span>
+            <div class="job-item-date">Mar 3</div>
+          </div>
+        </div>
+        <!-- Job 4 -->
+        <div class="job-item" onclick="selectJob(3)">
+          <div class="job-item-top">
+            <div class="job-item-addr">1100 Crestview Ct</div>
+            <div class="job-item-value">$18,750</div>
+          </div>
+          <div class="job-item-sub">Robert Torres &middot; Full re-roof</div>
+          <div class="job-item-bottom">
+            <span class="badge badge-active"><span class="badge-dot"></span> Active</span>
+            <div class="job-item-date">Feb 24</div>
+          </div>
+        </div>
+        <!-- Job 5 -->
+        <div class="job-item" onclick="selectJob(4)">
+          <div class="job-item-top">
+            <div class="job-item-addr">567 Birch Lane</div>
+            <div class="job-item-value">$14,200</div>
+          </div>
+          <div class="job-item-sub">Lisa Patel &middot; Estimate sent</div>
+          <div class="job-item-bottom">
+            <span class="badge badge-proposed"><span class="badge-dot"></span> Proposed</span>
+            <div class="job-item-date">Mar 4</div>
+          </div>
+        </div>
+        <!-- Job 6 -->
+        <div class="job-item" onclick="selectJob(5)">
+          <div class="job-item-top">
+            <div class="job-item-addr">321 Oakwood Dr</div>
+            <div class="job-item-value">$14,800</div>
+          </div>
+          <div class="job-item-sub">Amy Nguyen &middot; Completed re-roof</div>
+          <div class="job-item-bottom">
+            <span class="badge badge-complete"><span class="badge-dot"></span> Complete</span>
+            <div class="job-item-date">Feb 14</div>
+          </div>
+        </div>
+        <!-- Job 7 -->
+        <div class="job-item" onclick="selectJob(6)">
+          <div class="job-item-top">
+            <div class="job-item-addr">2100 Pine Ridge Rd</div>
+            <div class="job-item-value">$8,500</div>
+          </div>
+          <div class="job-item-sub">David Harris &middot; Repair estimate</div>
+          <div class="job-item-bottom">
+            <span class="badge badge-proposed"><span class="badge-dot"></span> Proposed</span>
+            <div class="job-item-date">Mar 4</div>
+          </div>
+        </div>
+        <!-- Job 8 -->
+        <div class="job-item" onclick="selectJob(7)">
+          <div class="job-item-top">
+            <div class="job-item-addr">750 Willow Creek Blvd</div>
+            <div class="job-item-value" style="color:var(--text-tertiary); text-decoration:line-through;">$10,350</div>
+          </div>
+          <div class="job-item-sub">Brian Martinez &middot; Expired proposal</div>
+          <div class="job-item-bottom">
+            <span class="badge badge-declined"><span class="badge-dot"></span> Declined</span>
+            <div class="job-item-date">Jan 15</div>
+          </div>
+        </div>
+        <!-- Job 9 -->
+        <div class="job-item" onclick="selectJob(8)">
+          <div class="job-item-top">
+            <div class="job-item-addr">1455 Summit Ave</div>
+            <div class="job-item-value">$16,200</div>
+          </div>
+          <div class="job-item-sub">Karen Park &middot; Full re-roof</div>
+          <div class="job-item-bottom">
+            <span class="badge badge-active"><span class="badge-dot"></span> Active</span>
+            <div class="job-item-date">Feb 20</div>
+          </div>
+        </div>
+        <!-- Job 10 -->
+        <div class="job-item" onclick="selectJob(9)">
+          <div class="job-item-top">
+            <div class="job-item-addr">88 Fox Hill Ln</div>
+            <div class="job-item-value">$11,900</div>
+          </div>
+          <div class="job-item-sub">Michael Ross &middot; Completed re-roof</div>
+          <div class="job-item-bottom">
+            <span class="badge badge-complete"><span class="badge-dot"></span> Complete</span>
+            <div class="job-item-date">Jan 28</div>
+          </div>
+        </div>
+        <!-- Job 11 -->
+        <div class="job-item" onclick="selectJob(10)">
+          <div class="job-item-top">
+            <div class="job-item-addr">3301 Cherry Blossom</div>
+            <div class="job-item-value">$7,200</div>
+          </div>
+          <div class="job-item-sub">Emily Foster &middot; Repair</div>
+          <div class="job-item-bottom">
+            <span class="badge badge-won"><span class="badge-dot"></span> Won</span>
+            <div class="job-item-date">Mar 1</div>
+          </div>
+        </div>
+        <!-- Job 12 -->
+        <div class="job-item" onclick="selectJob(11)">
+          <div class="job-item-top">
+            <div class="job-item-addr">925 Aspen Trail</div>
+            <div class="job-item-value">$13,475</div>
+          </div>
+          <div class="job-item-sub">Jason Lee &middot; Full re-roof</div>
+          <div class="job-item-bottom">
+            <span class="badge badge-active"><span class="badge-dot"></span> Active</span>
+            <div class="job-item-date">Feb 18</div>
+          </div>
+        </div>
+        <!-- Job 13 -->
+        <div class="job-item" onclick="selectJob(12)">
+          <div class="job-item-top">
+            <div class="job-item-addr">410 Meadow View</div>
+            <div class="job-item-value">$10,000</div>
+          </div>
+          <div class="job-item-sub">Sandra Kim &middot; Completed re-roof</div>
+          <div class="job-item-bottom">
+            <span class="badge badge-complete"><span class="badge-dot"></span> Complete</span>
+            <div class="job-item-date">Jan 10</div>
+          </div>
+        </div>
+      </div>
+      <div class="list-footer">
+        Showing 13 properties &middot; <strong>$142,850</strong> total pipeline
+      </div>
+    </div>
+
+    <!-- RIGHT: Detail Panel -->
+    <div class="detail-panel" id="detailPanel">
+
+      <div class="detail-header">
+        <div>
+          <div class="detail-addr">445 Spruce Way</div>
+          <div class="detail-sub">Tom Chen &middot; Residential re-roof &middot; Denver, CO 80211</div>
+        </div>
+        <div class="detail-header-actions">
+          <span class="badge badge-active" style="font-size:12px; padding:4px 12px;"><span class="badge-dot"></span> Active</span>
+          <button class="btn btn-secondary" style="padding:8px 14px; font-size:13px;">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6.5" cy="6.5" r="5"/><path d="M6.5 4v5M4 6.5h5"/></svg>
+            Actions
+          </button>
+        </div>
+      </div>
+
+      <div class="detail-stats">
+        <div class="stat-card">
+          <div class="stat-label">Total Value</div>
+          <div class="stat-num">$12,400</div>
+          <div class="stat-sub">Better tier accepted</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Est. Margin</div>
+          <div class="stat-num" style="color:var(--green);">42.0%</div>
+          <div class="stat-sub">$5,208 gross profit</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Order Status</div>
+          <div class="stat-num" style="font-size:18px; color:var(--primary);">In Transit</div>
+          <div class="stat-sub">QXO-2847 &middot; 8 items</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Est. Delivery</div>
+          <div class="stat-num" style="font-size:18px;">Mar 6</div>
+          <div class="stat-sub">Denver North branch</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="detail-tabs">
+        <div class="detail-tab active" onclick="switchTab('timeline')">Timeline</div>
+        <div class="detail-tab" onclick="switchTab('proposal')">Proposal</div>
+        <div class="detail-tab" onclick="switchTab('order')">Order</div>
+        <div class="detail-tab" onclick="switchTab('delivery')">Delivery</div>
+        <div class="detail-tab" onclick="switchTab('margin')">Margin</div>
+      </div>
+
+      <!-- TAB: Timeline -->
+      <div class="tab-content active" id="tab-timeline">
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot tl-dot-blue">&#9998;</div>
+            <div class="tl-body">
+              <div class="tl-title">Estimate Created</div>
+              <div class="tl-desc">ATB Blue &middot; Bid Perfect measurement purchased ($20)</div>
+              <div class="tl-date">Feb 26, 2026</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot tl-dot-green">&#10003;</div>
+            <div class="tl-body">
+              <div class="tl-title">Bid Perfect Results Ready</div>
+              <div class="tl-desc">24 squares, 6/12 pitch, moderate complexity, 8 facets</div>
+              <div class="tl-date">Feb 26, 2026 &middot; 4 min after request</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot tl-dot-blue">&#9993;</div>
+            <div class="tl-body">
+              <div class="tl-title">Proposal Sent</div>
+              <div class="tl-desc">3-tier proposal (Good $9,800 / Better $12,400 / Best $15,900) sent via SMS + email to Tom Chen</div>
+              <div class="tl-date">Feb 27, 2026</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot tl-dot-purple">&#9673;</div>
+            <div class="tl-body">
+              <div class="tl-title">Proposal Viewed</div>
+              <div class="tl-desc">Homeowner opened proposal link &middot; Viewed 3 times over 2 days</div>
+              <div class="tl-date">Feb 28, 2026</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot tl-dot-green">&#10003;</div>
+            <div class="tl-body">
+              <div class="tl-title">Proposal Accepted — Better Tier</div>
+              <div class="tl-desc">Tom Chen signed agreement + submitted 10% deposit ($1,240). Premium measurement auto-upgrade triggered.</div>
+              <div class="tl-date">Mar 1, 2026</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot tl-dot-green">&#10003;</div>
+            <div class="tl-body">
+              <div class="tl-title">Premium Measurement Complete</div>
+              <div class="tl-desc">Exact measurements applied. Waste factor refined from 12% → 9%. Auto-order triggered.</div>
+              <div class="tl-date">Mar 1, 2026</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot tl-dot-blue">&#9745;</div>
+            <div class="tl-body">
+              <div class="tl-title">Materials Ordered</div>
+              <div class="tl-desc">Order QXO-2847 &middot; 8 line items &middot; $7,192 COGS &middot; Denver North branch</div>
+              <div class="tl-date">Mar 2, 2026</div>
+            </div>
+          </div>
+          <div class="tl-item future">
+            <div class="tl-dot tl-dot-gray">&#9711;</div>
+            <div class="tl-body">
+              <div class="tl-title">Delivery Scheduled</div>
+              <div class="tl-desc">Estimated arrival at 445 Spruce Way &middot; Denver North branch</div>
+              <div class="tl-date">Mar 6, 2026 (estimated)</div>
+            </div>
+          </div>
+          <div class="tl-item future">
+            <div class="tl-dot tl-dot-gray">&#9711;</div>
+            <div class="tl-body">
+              <div class="tl-title">Job Completion</div>
+              <div class="tl-desc">Final margin calculation &middot; Contractor marks job complete</div>
+              <div class="tl-date">Pending</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="upsell-banner">
+          <div class="upsell-icon">&#10022;</div>
+          <div>
+            <div class="upsell-text">Cross-sell: Siding Opportunity</div>
+            <div class="upsell-sub">Adjacent property data suggests vinyl siding replacement. Est. $8,200 project value.</div>
+          </div>
+          <button class="upsell-action">Create Estimate</button>
+        </div>
+      </div>
+
+      <!-- TAB: Proposal -->
+      <div class="tab-content" id="tab-proposal">
+        <div class="proposal-summary">
+          <div class="proposal-summary-header">
+            <h3>Tier Pricing</h3>
+            <span class="badge badge-won" style="font-size:12px; padding:4px 12px;"><span class="badge-dot"></span> Better Accepted</span>
+          </div>
+          <div class="proposal-tier-cards">
+            <div class="tier-card">
+              <div class="tier-label">Good</div>
+              <div class="tier-name">Value Package</div>
+              <div class="tier-price">$9,800</div>
+              <div class="tier-margin">36% margin &middot; $3,528</div>
+            </div>
+            <div class="tier-card selected">
+              <div class="tier-label">Better</div>
+              <div class="tier-name">Standard Package</div>
+              <div class="tier-price">$12,400</div>
+              <div class="tier-margin">42% margin &middot; $5,208</div>
+            </div>
+            <div class="tier-card">
+              <div class="tier-label">Best</div>
+              <div class="tier-name">Premium Package</div>
+              <div class="tier-price">$15,900</div>
+              <div class="tier-margin">47% margin &middot; $7,473</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="proposal-details">
+          <h3>Proposal Details</h3>
+          <div class="pd-row"><span class="pd-label">Homeowner</span><span class="pd-value">Tom Chen</span></div>
+          <div class="pd-row"><span class="pd-label">Email</span><span class="pd-value">tom.chen@email.com</span></div>
+          <div class="pd-row"><span class="pd-label">Phone</span><span class="pd-value">(303) 555-0142</span></div>
+          <div class="pd-row"><span class="pd-label">Property</span><span class="pd-value">445 Spruce Way, Denver, CO 80211</span></div>
+          <div class="pd-row"><span class="pd-label">Measurement</span><span class="pd-value">24 sq &middot; 6/12 pitch &middot; 8 facets</span></div>
+          <div class="pd-row"><span class="pd-label">Sent via</span><span class="pd-value">SMS + Email</span></div>
+          <div class="pd-row"><span class="pd-label">Sent date</span><span class="pd-value">Feb 27, 2026</span></div>
+          <div class="pd-row"><span class="pd-label">Accepted date</span><span class="pd-value" style="color:var(--green);">Mar 1, 2026</span></div>
+          <div class="pd-row"><span class="pd-label">Deposit</span><span class="pd-value">$1,240 (10%) — Paid</span></div>
+          <div class="pd-row"><span class="pd-label">Remaining balance</span><span class="pd-value">$11,160</span></div>
+          <div class="pd-row"><span class="pd-label">Source</span><span class="pd-value" style="display:flex; align-items:center; gap:6px;"><span style="background:var(--green-light); color:var(--green); font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px;">ATB Blue</span></span></div>
+        </div>
+      </div>
+
+      <!-- TAB: Order -->
+      <div class="tab-content" id="tab-order">
+        <div class="order-card">
+          <div class="order-card-header">
+            <h3>Material Order &middot; QXO-2847</h3>
+            <span class="badge badge-active" style="font-size:12px; padding:4px 12px;"><span class="badge-dot"></span> In Transit</span>
+          </div>
+          <table class="order-table">
+            <thead>
+              <tr>
+                <th>Material</th>
+                <th>SKU</th>
+                <th>Qty</th>
+                <th>Unit Cost</th>
+                <th style="text-align:right;">Line Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600;">Owens Corning Duration — Onyx Black</td>
+                <td style="color:var(--text-secondary); font-size:12px;">OC-DUR-ONX-30</td>
+                <td>24 sq</td>
+                <td>$98.50</td>
+                <td style="text-align:right; font-weight:600;">$2,364.00</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Synthetic Underlayment — Tiger Paw</td>
+                <td style="color:var(--text-secondary); font-size:12px;">TP-UL-SYNTH-10</td>
+                <td>10 rolls</td>
+                <td>$85.00</td>
+                <td style="text-align:right; font-weight:600;">$850.00</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Ice & Water Shield</td>
+                <td style="color:var(--text-secondary); font-size:12px;">WG-IW-200</td>
+                <td>4 rolls</td>
+                <td>$145.00</td>
+                <td style="text-align:right; font-weight:600;">$580.00</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Ridge Vent — ShingleVent II</td>
+                <td style="color:var(--text-secondary); font-size:12px;">AV-SV2-4FT</td>
+                <td>42 ft</td>
+                <td>$4.25</td>
+                <td style="text-align:right; font-weight:600;">$178.50</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Hip & Ridge Shingles</td>
+                <td style="color:var(--text-secondary); font-size:12px;">OC-HR-ONX-BD</td>
+                <td>6 bdl</td>
+                <td>$62.00</td>
+                <td style="text-align:right; font-weight:600;">$372.00</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Drip Edge — Aluminum</td>
+                <td style="color:var(--text-secondary); font-size:12px;">DE-AL-BK-10</td>
+                <td>220 ft</td>
+                <td>$3.50</td>
+                <td style="text-align:right; font-weight:600;">$770.00</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Roofing Nails — Coil</td>
+                <td style="color:var(--text-secondary); font-size:12px;">NL-COIL-1.25</td>
+                <td>4 boxes</td>
+                <td>$58.00</td>
+                <td style="text-align:right; font-weight:600;">$232.00</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Starter Strip Shingles</td>
+                <td style="color:var(--text-secondary); font-size:12px;">OC-SS-UNI-BD</td>
+                <td>6 bdl</td>
+                <td>$47.75</td>
+                <td style="text-align:right; font-weight:600;">$286.50</td>
+              </tr>
+              <tr class="total-row">
+                <td colspan="4" style="text-align:right;">Material COGS Total</td>
+                <td style="text-align:right; font-size:15px;">$5,633.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div style="background:var(--white); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px;">
+            <div class="stat-label">Branch</div>
+            <div style="font-size:14px; font-weight:600; margin-top:4px;">Denver North</div>
+            <div style="font-size:12px; color:var(--text-secondary);">4501 Brighton Blvd, Denver CO 80216</div>
+          </div>
+          <div style="background:var(--white); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px;">
+            <div class="stat-label">Delivery Method</div>
+            <div style="font-size:14px; font-weight:600; margin-top:4px;">Job Site Delivery</div>
+            <div style="font-size:12px; color:var(--text-secondary);">445 Spruce Way, Denver CO 80211</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: Delivery -->
+      <div class="tab-content" id="tab-delivery">
+        <div class="delivery-tracker">
+          <h3>Delivery Tracking &middot; QXO-2847</h3>
+          <div class="delivery-steps">
+            <div class="delivery-step">
+              <div class="ds-dot done">&#10003;</div>
+              <div class="ds-label">Ordered</div>
+              <div class="ds-date">Mar 2</div>
+            </div>
+            <div class="delivery-step">
+              <div class="ds-dot done">&#10003;</div>
+              <div class="ds-label">Processing</div>
+              <div class="ds-date">Mar 3</div>
+            </div>
+            <div class="delivery-step">
+              <div class="ds-dot current">&#9679;</div>
+              <div class="ds-label">In Transit</div>
+              <div class="ds-date">Mar 5</div>
+            </div>
+            <div class="delivery-step">
+              <div class="ds-dot pending">&#9711;</div>
+              <div class="ds-label">Delivered</div>
+              <div class="ds-date">Mar 6 (est)</div>
+            </div>
+          </div>
+          <div class="delivery-details">
+            <div class="dd-card">
+              <div class="dd-label">Ship From</div>
+              <div class="dd-value">Denver North Branch</div>
+              <div class="dd-sub">4501 Brighton Blvd, Denver CO 80216</div>
+            </div>
+            <div class="dd-card">
+              <div class="dd-label">Deliver To</div>
+              <div class="dd-value">445 Spruce Way</div>
+              <div class="dd-sub">Denver, CO 80211 &middot; Job site</div>
+            </div>
+            <div class="dd-card">
+              <div class="dd-label">Delivery Window</div>
+              <div class="dd-value">7:00 AM — 12:00 PM</div>
+              <div class="dd-sub">Thursday, March 6, 2026</div>
+            </div>
+            <div class="dd-card">
+              <div class="dd-label">Total Weight</div>
+              <div class="dd-value">4,860 lbs</div>
+              <div class="dd-sub">Boom truck required</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:20px;">
+          <h3 style="font-size:15px; font-weight:700; margin-bottom:14px;">Delivery Notes</h3>
+          <div style="font-size:13px; color:var(--text-secondary); line-height:1.7;">
+            Place materials on driveway, left side of garage. Homeowner has been notified. Gate code: 4521. Dogs will be inside. Boom truck access from Spruce Way — no overhead lines on west side approach.
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: Margin -->
+      <div class="tab-content" id="tab-margin">
+        <div class="margin-card">
+          <div class="margin-header">
+            <h3>Margin Analysis</h3>
+            <span class="badge badge-active" style="font-size:12px; padding:4px 12px;"><span class="badge-dot"></span> In Progress</span>
+          </div>
+          <div class="margin-grid">
+            <div class="margin-cell">
+              <div class="margin-cell-label">Revenue</div>
+              <div class="margin-cell-value">$12,400</div>
+              <div class="margin-cell-sub">Better tier</div>
+            </div>
+            <div class="margin-cell">
+              <div class="margin-cell-label">Material COGS</div>
+              <div class="margin-cell-value">$5,633</div>
+              <div class="margin-cell-sub">8 line items</div>
+            </div>
+            <div class="margin-cell">
+              <div class="margin-cell-label">Labor Cost</div>
+              <div class="margin-cell-value">$1,920</div>
+              <div class="margin-cell-sub">$80/sq × 24 sq</div>
+            </div>
+            <div class="margin-cell">
+              <div class="margin-cell-label">Gross Profit</div>
+              <div class="margin-cell-value" style="color:var(--green);">$4,847</div>
+              <div class="margin-cell-sub">Revenue − COGS − Labor</div>
+            </div>
+            <div class="margin-cell">
+              <div class="margin-cell-label">Gross Margin</div>
+              <div class="margin-cell-value" style="color:var(--green);">39.1%</div>
+              <div class="margin-cell-sub">Target: 40%</div>
+            </div>
+            <div class="margin-cell">
+              <div class="margin-cell-label">Waste Factor</div>
+              <div class="margin-cell-value">9%</div>
+              <div class="margin-cell-sub">Est. 12% → Actual 9%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="margin-card">
+          <div class="margin-header">
+            <h3>Estimated vs Actual</h3>
+          </div>
+          <div class="margin-comparison">
+            <h4>Cost Breakdown</h4>
+            <div class="mc-row">
+              <div class="mc-label">Material COGS</div>
+              <div class="mc-bar-wrap">
+                <div class="mc-bar mc-bar-est" style="width:78%;"></div>
+              </div>
+              <div class="mc-value" style="color:var(--text-secondary);">$5,900 est</div>
+            </div>
+            <div class="mc-row">
+              <div class="mc-label"></div>
+              <div class="mc-bar-wrap">
+                <div class="mc-bar mc-bar-act" style="width:74%;"></div>
+              </div>
+              <div class="mc-value" style="color:var(--green);">$5,633 act</div>
+            </div>
+            <div style="height:16px;"></div>
+            <div class="mc-row">
+              <div class="mc-label">Labor</div>
+              <div class="mc-bar-wrap">
+                <div class="mc-bar mc-bar-est" style="width:26%;"></div>
+              </div>
+              <div class="mc-value" style="color:var(--text-secondary);">$1,920 est</div>
+            </div>
+            <div class="mc-row">
+              <div class="mc-label"></div>
+              <div class="mc-bar-wrap">
+                <div class="mc-bar mc-bar-act" style="width:26%;"></div>
+              </div>
+              <div class="mc-value">$1,920 act</div>
+            </div>
+            <div style="height:16px;"></div>
+            <div class="mc-row">
+              <div class="mc-label">Waste</div>
+              <div class="mc-bar-wrap">
+                <div class="mc-bar mc-bar-est" style="width:12%;"></div>
+              </div>
+              <div class="mc-value" style="color:var(--text-secondary);">12% est</div>
+            </div>
+            <div class="mc-row">
+              <div class="mc-label"></div>
+              <div class="mc-bar-wrap">
+                <div class="mc-bar mc-bar-act" style="width:9%;"></div>
+              </div>
+              <div class="mc-value" style="color:var(--green);">9% act</div>
+            </div>
+          </div>
+          <div style="padding:0 20px 20px; font-size:13px; color:var(--text-secondary);">
+            <strong style="color:var(--green);">Savings: $267</strong> — Premium measurement reduced waste factor from 12% to 9%, saving approximately 3 squares of material. Actual margin tracking at <strong>39.1%</strong> vs <strong>42.0%</strong> estimated (labor slightly higher than Build profile default).
+          </div>
+        </div>
+
+        <div class="upsell-banner">
+          <div class="upsell-icon">&#10022;</div>
+          <div>
+            <div class="upsell-text">Margin Insight</div>
+            <div class="upsell-sub">Your labor rate of $80/sq is below the Denver average of $92/sq. Adjusting your Builds profile could increase margin by ~4 points on future jobs.</div>
+          </div>
+          <button class="upsell-action">Update Builds</button>
+        </div>
+      </div>
+
+    </div><!-- /detail-panel -->
+  </div><!-- /split -->
+</div><!-- /main -->
+
+<script>
+// Tab switching
+function switchTab(tabId) {
+  document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tabId).classList.add('active');
+  event.target.classList.add('active');
+  document.getElementById('detailPanel').scrollTop = 0;
+}
+
+// Job selection (visual only — highlights selected item)
+function selectJob(index) {
+  document.querySelectorAll('.job-item').forEach(item => item.classList.remove('selected'));
+  document.querySelectorAll('.job-item')[index].classList.add('selected');
+}
+</script>
+
+</body>
+</html>

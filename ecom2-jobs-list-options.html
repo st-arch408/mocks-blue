@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>QXO Ecom 2.0 — Jobs List: Layout Options Comparison</title>
+<style>
+  :root {
+    --primary: #004BEA;
+    --primary-hover: #0040CC;
+    --primary-light: #EBF0FF;
+    --primary-border: #B3CCFF;
+    --bg: #F2F2F2;
+    --white: #FFFFFF;
+    --text: #111827;
+    --text-secondary: #6B7280;
+    --text-tertiary: #9CA3AF;
+    --border: #E5E7EB;
+    --border-light: #F3F4F6;
+    --green: #22C55E;
+    --green-light: #F0FDF4;
+    --green-border: #BBF7D0;
+    --red: #EF4444;
+    --red-light: #FEF2F2;
+    --orange: #F59E0B;
+    --orange-light: #FFFBEB;
+    --orange-border: #FDE68A;
+    --purple: #8B5CF6;
+    --purple-light: #F5F3FF;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+    --shadow-xl: 0 8px 30px rgba(0,0,0,0.10);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-lg: 16px;
+    --transition: 0.15s ease;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    -webkit-font-smoothing: antialiased; line-height: 1.5;
+  }
+
+  /* ---- Doc Header ---- */
+  .doc-header {
+    background: var(--white);
+    border-bottom: 2px solid var(--primary);
+    padding: 40px 60px 32px;
+    margin-bottom: 40px;
+  }
+  .doc-header h1 {
+    font-size: 28px; font-weight: 800; letter-spacing: -0.03em;
+    margin-bottom: 6px;
+  }
+  .doc-header p { font-size: 15px; color: var(--text-secondary); max-width: 700px; line-height: 1.7; }
+  .doc-meta {
+    display: flex; gap: 24px; margin-top: 16px; font-size: 13px; color: var(--text-secondary);
+  }
+  .doc-meta span { display: flex; align-items: center; gap: 6px; }
+  .doc-meta strong { color: var(--text); font-weight: 600; }
+
+  /* ---- Section ---- */
+  .option-section {
+    max-width: 1320px; margin: 0 auto 60px; padding: 0 40px;
+  }
+  .option-label {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--primary);
+    background: var(--primary-light); padding: 5px 14px;
+    border-radius: 20px; margin-bottom: 12px;
+  }
+  .option-title {
+    font-size: 22px; font-weight: 800; letter-spacing: -0.03em;
+    margin-bottom: 6px;
+  }
+  .option-desc {
+    font-size: 14px; color: var(--text-secondary); max-width: 600px;
+    margin-bottom: 8px; line-height: 1.7;
+  }
+  .option-pros-cons {
+    display: flex; gap: 24px; margin-bottom: 24px; font-size: 13px;
+  }
+  .pros, .cons { display: flex; align-items: flex-start; gap: 6px; }
+  .pros { color: var(--green); }
+  .cons { color: var(--orange); }
+
+  /* ---- Shared mock frame ---- */
+  .mock-frame {
+    background: var(--bg);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* ---- Shared sidebar (miniature) ---- */
+  .mini-sidebar {
+    width: 200px; background: var(--white);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    flex-shrink: 0;
+  }
+  .mini-sidebar-logo {
+    padding: 16px 14px 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .mini-logo-icon {
+    width: 28px; height: 28px; border-radius: 8px; background: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 800; font-size: 12px;
+  }
+  .mini-logo-text { font-weight: 800; font-size: 14px; }
+  .mini-build-btn {
+    margin: 0 10px 12px; padding: 8px 12px;
+    background: var(--primary); color: white; border: none;
+    border-radius: 6px; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .mini-nav-item {
+    padding: 7px 14px; font-size: 12px; color: var(--text-secondary);
+    display: flex; align-items: center; gap: 8px; cursor: default;
+  }
+  .mini-nav-item.active {
+    background: var(--primary-light); color: var(--primary);
+    font-weight: 600; margin: 0 6px; border-radius: 6px;
+  }
+  .mini-nav-badge {
+    margin-left: auto; font-size: 10px; font-weight: 600;
+    padding: 1px 6px; border-radius: 8px;
+    background: var(--primary-light); color: var(--primary);
+  }
+
+  /* ---- Shared topbar ---- */
+  .mini-topbar {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 12px 24px; display: flex; align-items: center;
+    justify-content: space-between;
+  }
+  .mini-topbar h2 { font-size: 18px; font-weight: 800; letter-spacing: -0.03em; }
+  .mini-topbar-sub { font-size: 11px; color: var(--text-secondary); }
+  .mini-topbar-actions { display: flex; gap: 8px; align-items: center; }
+  .mini-btn-primary {
+    padding: 7px 14px; background: var(--primary); color: white;
+    border: none; border-radius: 6px; font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; gap: 5px; cursor: default;
+  }
+  .mini-btn-secondary {
+    padding: 7px 14px; background: var(--white); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px;
+    font-size: 12px; font-weight: 500; cursor: default;
+  }
+
+  /* ---- Shared filter tabs ---- */
+  .filter-tabs {
+    display: flex; gap: 2px; padding: 0 24px; background: var(--white);
+    border-bottom: 1px solid var(--border);
+  }
+  .filter-tab {
+    padding: 10px 14px; font-size: 12px; font-weight: 500;
+    color: var(--text-secondary); border-bottom: 2px solid transparent;
+    cursor: default;
+  }
+  .filter-tab.active {
+    color: var(--primary); font-weight: 600;
+    border-bottom-color: var(--primary);
+  }
+  .filter-tab .count {
+    font-size: 10px; font-weight: 600; padding: 1px 6px;
+    border-radius: 8px; background: var(--border-light);
+    color: var(--text-tertiary); margin-left: 4px;
+  }
+  .filter-tab.active .count {
+    background: var(--primary-light); color: var(--primary);
+  }
+
+  /* ---- Status badges ---- */
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; padding: 2px 8px;
+    border-radius: 20px;
+  }
+  .status-dot { width: 5px; height: 5px; border-radius: 50%; }
+  .status-active { background: var(--primary-light); color: var(--primary); }
+  .status-active .status-dot { background: var(--primary); }
+  .status-proposed { background: var(--orange-light); color: var(--orange); }
+  .status-proposed .status-dot { background: var(--orange); }
+  .status-won { background: var(--green-light); color: var(--green); }
+  .status-won .status-dot { background: var(--green); }
+  .status-complete { background: var(--border-light); color: var(--text-secondary); }
+  .status-complete .status-dot { background: var(--text-tertiary); }
+  .status-delivered { background: var(--green-light); color: var(--green); }
+  .status-delivered .status-dot { background: var(--green); }
+
+  /* ---- Upsell tag ---- */
+  .upsell-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; font-weight: 600; padding: 2px 8px;
+    border-radius: 4px; background: var(--purple-light); color: var(--purple);
+  }
+
+  /* ===========================
+     OPTION A: Cards → Detail Page
+     =========================== */
+  .option-a-layout {
+    display: flex; min-height: 560px;
+  }
+  .option-a-content { flex: 1; padding: 20px 24px; }
+  .cards-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .job-card {
+    background: var(--white); border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 18px;
+    cursor: default; transition: all var(--transition);
+  }
+  .job-card:hover {
+    border-color: var(--primary-border);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  .job-card-top {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .job-card-address { font-size: 14px; font-weight: 700; }
+  .job-card-owner { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
+  .job-card-meta {
+    display: flex; flex-direction: column; gap: 6px;
+    padding-top: 10px; border-top: 1px solid var(--border-light);
+  }
+  .job-card-meta-row {
+    display: flex; justify-content: space-between; font-size: 12px;
+  }
+  .job-card-meta-label { color: var(--text-secondary); }
+  .job-card-meta-value { font-weight: 600; }
+  .job-card-progress {
+    height: 4px; border-radius: 2px; background: var(--border-light);
+    margin-top: 10px; overflow: hidden;
+  }
+  .job-card-progress-fill { height: 100%; border-radius: 2px; }
+  .progress-75 { width: 75%; background: var(--primary); }
+  .progress-40 { width: 40%; background: var(--green); }
+  .progress-20 { width: 20%; background: var(--orange); }
+  .progress-100 { width: 100%; background: var(--green); }
+  .progress-60 { width: 60%; background: var(--primary); }
+  .progress-10 { width: 10%; background: var(--orange); }
+
+  .job-card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 10px;
+  }
+  .job-card-date { font-size: 11px; color: var(--text-tertiary); }
+  .job-card-arrow {
+    font-size: 12px; color: var(--primary); font-weight: 600;
+    display: flex; align-items: center; gap: 3px; opacity: 0;
+    transition: opacity var(--transition);
+  }
+  .job-card:hover .job-card-arrow { opacity: 1; }
+
+  /* ===========================
+     OPTION B: Cards + Inline Expand
+     =========================== */
+  .option-b-layout {
+    display: flex; min-height: 620px;
+  }
+  .option-b-content { flex: 1; padding: 20px 24px; }
+  .cards-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .job-card-expand {
+    background: var(--white); border-radius: var(--radius);
+    border: 1px solid var(--border); overflow: hidden;
+    cursor: default; transition: all var(--transition);
+  }
+  .job-card-expand:hover { border-color: var(--primary-border); box-shadow: var(--shadow-md); }
+  .job-card-expand.expanded {
+    border-color: var(--primary-border);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .expand-header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px 20px;
+  }
+  .expand-header-address { flex: 1; }
+  .expand-header-address .addr { font-size: 14px; font-weight: 700; }
+  .expand-header-address .owner { font-size: 12px; color: var(--text-secondary); }
+  .expand-header-stats {
+    display: flex; gap: 20px; align-items: center;
+  }
+  .expand-stat { text-align: right; }
+  .expand-stat-value { font-size: 14px; font-weight: 700; }
+  .expand-stat-label { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; }
+  .expand-chevron {
+    width: 28px; height: 28px; border-radius: 6px;
+    border: 1px solid var(--border); display: flex;
+    align-items: center; justify-content: center;
+    color: var(--text-tertiary); flex-shrink: 0;
+    font-size: 12px;
+  }
+
+  .expand-body {
+    border-top: 1px solid var(--border); padding: 16px 20px;
+    background: var(--border-light);
+  }
+  .expand-body-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 14px;
+  }
+  .expand-detail-card {
+    background: var(--white); border-radius: var(--radius-sm);
+    border: 1px solid var(--border); padding: 12px 14px;
+  }
+  .expand-detail-label { font-size: 10px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .expand-detail-value { font-size: 13px; font-weight: 600; }
+  .expand-detail-sub { font-size: 11px; color: var(--text-secondary); }
+  .expand-actions {
+    display: flex; gap: 8px;
+  }
+
+  /* ===========================
+     OPTION C: Master-Detail Split
+     =========================== */
+  .option-c-layout {
+    display: flex; min-height: 580px;
+  }
+  .option-c-list {
+    width: 320px; background: var(--white);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    flex-shrink: 0;
+  }
+  .option-c-list-header {
+    padding: 14px 16px; border-bottom: 1px solid var(--border);
+  }
+  .option-c-search {
+    width: 100%; padding: 8px 12px; border: 1px solid var(--border);
+    border-radius: 6px; font-size: 12px; outline: none; background: var(--border-light);
+    color: var(--text-secondary);
+  }
+  .option-c-items { flex: 1; overflow-y: auto; }
+  .option-c-item {
+    padding: 14px 16px; border-bottom: 1px solid var(--border-light);
+    cursor: default; transition: background var(--transition);
+  }
+  .option-c-item:hover { background: var(--border-light); }
+  .option-c-item.selected {
+    background: var(--primary-light);
+    border-left: 3px solid var(--primary);
+  }
+  .option-c-item-addr { font-size: 13px; font-weight: 600; }
+  .option-c-item-sub { font-size: 11px; color: var(--text-secondary); }
+  .option-c-item-bottom {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 6px;
+  }
+  .option-c-item-value { font-size: 12px; font-weight: 700; }
+
+  .option-c-detail { flex: 1; padding: 20px 24px; overflow-y: auto; }
+  .detail-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .detail-addr { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; }
+  .detail-sub { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+  .detail-tabs {
+    display: flex; gap: 2px; margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-tab {
+    padding: 8px 14px; font-size: 12px; font-weight: 500;
+    color: var(--text-secondary); border-bottom: 2px solid transparent;
+  }
+  .detail-tab.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+
+  .detail-stat-row {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; margin-bottom: 16px;
+  }
+  .detail-stat-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px;
+  }
+  .detail-stat-label { font-size: 10px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
+  .detail-stat-num { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; margin-top: 2px; }
+  .detail-stat-sub { font-size: 11px; color: var(--text-secondary); }
+
+  .detail-table {
+    width: 100%; background: var(--white);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .detail-table-header {
+    display: flex; padding: 10px 16px; background: var(--border-light);
+    font-size: 11px; font-weight: 600; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .detail-table-row {
+    display: flex; padding: 12px 16px; border-top: 1px solid var(--border-light);
+    font-size: 13px; align-items: center;
+  }
+  .detail-table-row:hover { background: var(--border-light); }
+  .dt-col1 { flex: 2; }
+  .dt-col2 { flex: 1.5; }
+  .dt-col3 { flex: 1; }
+  .dt-col4 { flex: 1; text-align: right; }
+
+  .detail-upsell {
+    margin-top: 16px; padding: 14px 18px;
+    background: var(--purple-light); border: 1px solid var(--purple);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .detail-upsell-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--purple); color: white;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 16px;
+  }
+  .detail-upsell-text { font-size: 13px; font-weight: 600; color: var(--purple); }
+  .detail-upsell-sub { font-size: 12px; color: var(--text-secondary); }
+
+  /* Divider */
+  .section-divider {
+    max-width: 1320px; margin: 0 auto;
+    padding: 0 40px;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 48px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ================ DOC HEADER ================ -->
+<div class="doc-header">
+  <h1>Jobs List — Layout Options</h1>
+  <p>Three interaction patterns for the Jobs List screen (JL-01). The Jobs List is the central hub of the platform's "job-centric" identity — every property address Marcus works on lives here. The right pattern needs to balance scannability across 12+ jobs with rich, contextual detail for each one.</p>
+  <div class="doc-meta">
+    <span><strong>Screen ID:</strong> JL-01</span>
+    <span><strong>Date:</strong> March 5, 2026</span>
+    <span><strong>Status:</strong> UX Decision Required</span>
+    <span><strong>Persona:</strong> Marcus Rivera, Tier 3 Solo Operator</span>
+  </div>
+</div>
+
+<!-- =========================================================
+     OPTION A: Cards → Separate Detail Page
+     ========================================================= -->
+<div class="option-section">
+  <div class="option-label">Option A</div>
+  <div class="option-title">Property Cards → Separate Detail Page</div>
+  <div class="option-desc">Each job is a visual card grouped by property address. Cards show aggregate status, progress, and key metrics. Clicking navigates to a full Job Detail page with tabbed sub-views (Proposals, Orders, Deliveries, Margin). Clean level separation — list view is purely for scanning and selection.</div>
+  <div class="option-pros-cons">
+    <div class="pros">+ Visual, scannable, feels job-centric</div>
+    <div class="pros">+ Room for upsell/cross-sell tags</div>
+    <div class="cons">⚠ Requires page navigation to see detail</div>
+    <div class="cons">⚠ Cards take more vertical space</div>
+  </div>
+
+  <div class="mock-frame">
+    <div class="option-a-layout">
+      <!-- Mini Sidebar -->
+      <div class="mini-sidebar">
+        <div class="mini-sidebar-logo">
+          <div class="mini-logo-icon">Q</div>
+          <div class="mini-logo-text">QXO</div>
+        </div>
+        <button class="mini-build-btn">+ BUILD</button>
+        <div class="mini-nav-item">Dashboard</div>
+        <div class="mini-nav-item active">Jobs <span class="mini-nav-badge">12</span></div>
+        <div class="mini-nav-item">Proposals</div>
+        <div class="mini-nav-item">Deliveries</div>
+        <div class="mini-nav-item">Invoices</div>
+        <div class="mini-nav-item">Products</div>
+        <div class="mini-nav-item">Builds</div>
+      </div>
+
+      <!-- Main Content -->
+      <div style="flex:1; display:flex; flex-direction:column;">
+        <div class="mini-topbar">
+          <div>
+            <h2>Jobs</h2>
+            <div class="mini-topbar-sub">12 properties · 4 active · $87,400 pipeline</div>
+          </div>
+          <div class="mini-topbar-actions">
+            <div class="mini-btn-secondary">Search</div>
+            <div class="mini-btn-primary">+ New Job</div>
+          </div>
+        </div>
+        <div class="filter-tabs">
+          <div class="filter-tab active">All<span class="count">12</span></div>
+          <div class="filter-tab">Proposed<span class="count">3</span></div>
+          <div class="filter-tab">Won<span class="count">2</span></div>
+          <div class="filter-tab">Active<span class="count">4</span></div>
+          <div class="filter-tab">Completed<span class="count">3</span></div>
+        </div>
+        <div class="option-a-content">
+          <div class="cards-grid">
+            <!-- Card 1: Active -->
+            <div class="job-card">
+              <div class="job-card-top">
+                <div class="job-card-address">445 Spruce Way</div>
+                <span class="status-badge status-active"><span class="status-dot"></span>Active</span>
+              </div>
+              <div class="job-card-owner">Tom Chen · Residential re-roof</div>
+              <div class="job-card-meta">
+                <div class="job-card-meta-row">
+                  <span class="job-card-meta-label">Proposals</span>
+                  <span class="job-card-meta-value">1 accepted</span>
+                </div>
+                <div class="job-card-meta-row">
+                  <span class="job-card-meta-label">Orders</span>
+                  <span class="job-card-meta-value">1 in transit</span>
+                </div>
+                <div class="job-card-meta-row">
+                  <span class="job-card-meta-label">Value</span>
+                  <span class="job-card-meta-value">$12,400</span>
+                </div>
+              </div>
+              <div class="job-card-progress"><div class="job-card-progress-fill progress-75"></div></div>
+              <div class="job-card-footer">
+                <span class="job-card-date">Updated Mar 2</span>
+                <span class="job-card-arrow">View →</span>
+              </div>
+            </div>
+
+            <!-- Card 2: Won -->
+            <div class="job-card">
+              <div class="job-card-top">
+                <div class="job-card-address">4215 Elm Street</div>
+                <span class="status-badge status-won"><span class="status-dot"></span>Won</span>
+              </div>
+              <div class="job-card-owner">Sarah Johnson · Residential re-roof</div>
+              <div class="job-card-meta">
+                <div class="job-card-meta-row">
+                  <span class="job-card-meta-label">Proposals</span>
+                  <span class="job-card-meta-value">1 accepted</span>
+                </div>
+                <div class="job-card-meta-row">
+                  <span class="job-card-meta-label">Orders</span>
+                  <span class="job-card-meta-value">Pending</span>
+                </div>
+                <div class="job-card-meta-row">
+                  <span class="job-card-meta-label">Value</span>
+                  <span class="job-card-meta-value">$15,200</span>
+                </div>
+              </div>
+              <div class="job-card-progress"><div class="job-card-progress-fill progress-40"></div></div>
+              <div class="job-card-footer">
+                <span class="job-card-date">Updated Mar 1</span>
+                <span class="job-card-arrow">View →</span>
+              </div>
+            </div>
+
+            <!-- Card 3: Proposed -->
+            <div class="job-card">
+              <div class="job-card-top">
+                <div class="job-card-address">892 Maple Drive</div>
+                <span class="status-badge status-proposed"><span class="status-dot"></span>Proposed</span>
+              </div>
+              <div class="job-card-owner">James Wilson · Roofing estimate</div>
+              <div class="job-card-meta">
+                <div class="job-card-meta-row">
+                  <span class="job-card-meta-label">Proposals</span>
+                  <span class="job-card-meta-value">1 sent</span>
+                </div>
+                <div class="job-card-meta-row">
+                  <span class="job-card-meta-label">Sent</span>
+                  <span class="job-card-meta-value">2 days ago</span>
+                </div>
+                <div class="job-card-meta-row">
+                  <span class="job-card-meta-label">Value</span>
+                  <span class="job-card-meta-value">$12,400</span>
+                </div>
+              </div>
+              <div class="job-card-progress"><div class="job-card-progress-fill progress-20"></div></div>
+              <div class="job-card-footer">
+                <span class="job-card-date">Updated Feb 28</span>
+                <span class="job-card-arrow">View →</span>
+              </div>
+            </div>
+
+            <!-- Card 4: Completed with upsell -->
+            <div class="job-card">
+              <div class="job-card-top">
+                <div class="job-card-address">321 Oakwood Drive</div>
+                <span class="status-badge status-complete"><span class="status-dot"></span>Complete</span>
+              </div>
+              <div class="job-card-owner">Maria Garcia · Completed re-roof</div>
+              <div class="job-card-meta">
+                <div class="job-card-meta-row">
+                  <span class="job-card-meta-label">Margin</span>
+                  <span class="job-card-meta-value" style="color:var(--green);">42.3%</span>
+                </div>
+                <div class="job-card-meta-row">
+                  <span class="job-card-meta-label">Value</span>
+                  <span class="job-card-meta-value">$14,800</span>
+                </div>
+              </div>
+              <div style="margin-top:10px;">
+                <span class="upsell-tag">✦ Siding opportunity</span>
+              </div>
+              <div class="job-card-progress"><div class="job-card-progress-fill progress-100"></div></div>
+              <div class="job-card-footer">
+                <span class="job-card-date">Completed Feb 15</span>
+                <span class="job-card-arrow">View →</span>
+              </div>
+            </div>
+
+            <!-- Card 5: Active -->
+            <div class="job-card">
+              <div class="job-card-top">
+                <div class="job-card-address">1100 Crestview Ct</div>
+                <span class="status-badge status-active"><span class="status-dot"></span>Active</span>
+              </div>
+              <div class="job-card-owner">David Park · Residential re-roof</div>
+              <div class="job-card-meta">
+                <div class="job-card-meta-row">
+                  <span class="job-card-meta-label">Orders</span>
+                  <span class="job-card-meta-value">Delivered</span>
+                </div>
+                <div class="job-card-meta-row">
+                  <span class="job-card-meta-label">Value</span>
+                  <span class="job-card-meta-value">$16,200</span>
+                </div>
+              </div>
+              <div class="job-card-progress"><div class="job-card-progress-fill progress-60"></div></div>
+              <div class="job-card-footer">
+                <span class="job-card-date">Updated Feb 25</span>
+                <span class="job-card-arrow">View →</span>
+              </div>
+            </div>
+
+            <!-- Card 6: Proposed/New -->
+            <div class="job-card">
+              <div class="job-card-top">
+                <div class="job-card-address">567 Birch Lane</div>
+                <span class="status-badge status-proposed"><span class="status-dot"></span>Proposed</span>
+              </div>
+              <div class="job-card-owner">New lead · Estimate started</div>
+              <div class="job-card-meta">
+                <div class="job-card-meta-row">
+                  <span class="job-card-meta-label">Status</span>
+                  <span class="job-card-meta-value">Measurement pending</span>
+                </div>
+                <div class="job-card-meta-row">
+                  <span class="job-card-meta-label">Value</span>
+                  <span class="job-card-meta-value" style="color:var(--text-tertiary);">—</span>
+                </div>
+              </div>
+              <div class="job-card-progress"><div class="job-card-progress-fill progress-10"></div></div>
+              <div class="job-card-footer">
+                <span class="job-card-date">Created yesterday</span>
+                <span class="job-card-arrow">View →</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- =========================================================
+     OPTION B: Cards with Inline Expand
+     ========================================================= -->
+<div class="option-section">
+  <div class="option-label">Option B</div>
+  <div class="option-title">Expandable Cards — Inline Detail</div>
+  <div class="option-desc">Compact card rows with key data visible at a glance. Clicking a card expands it in-place to reveal a detail panel with proposal status, order progress, delivery info, and margin data. No page navigation needed for quick checks. Full Job Detail page still available via "View Full Detail" button.</div>
+  <div class="option-pros-cons">
+    <div class="pros">+ Quick access to detail without navigation</div>
+    <div class="pros">+ Compact list for scanning</div>
+    <div class="cons">⚠ Can get crowded with multiple expanded</div>
+    <div class="cons">⚠ Limited space for complex detail</div>
+  </div>
+
+  <div class="mock-frame">
+    <div class="option-b-layout">
+      <!-- Mini Sidebar -->
+      <div class="mini-sidebar">
+        <div class="mini-sidebar-logo">
+          <div class="mini-logo-icon">Q</div>
+          <div class="mini-logo-text">QXO</div>
+        </div>
+        <button class="mini-build-btn">+ BUILD</button>
+        <div class="mini-nav-item">Dashboard</div>
+        <div class="mini-nav-item active">Jobs <span class="mini-nav-badge">12</span></div>
+        <div class="mini-nav-item">Proposals</div>
+        <div class="mini-nav-item">Deliveries</div>
+        <div class="mini-nav-item">Invoices</div>
+        <div class="mini-nav-item">Products</div>
+        <div class="mini-nav-item">Builds</div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column;">
+        <div class="mini-topbar">
+          <div>
+            <h2>Jobs</h2>
+            <div class="mini-topbar-sub">12 properties · 4 active · $87,400 pipeline</div>
+          </div>
+          <div class="mini-topbar-actions">
+            <div class="mini-btn-secondary">Search</div>
+            <div class="mini-btn-primary">+ New Job</div>
+          </div>
+        </div>
+        <div class="filter-tabs">
+          <div class="filter-tab active">All<span class="count">12</span></div>
+          <div class="filter-tab">Proposed<span class="count">3</span></div>
+          <div class="filter-tab">Won<span class="count">2</span></div>
+          <div class="filter-tab">Active<span class="count">4</span></div>
+          <div class="filter-tab">Completed<span class="count">3</span></div>
+        </div>
+        <div class="option-b-content">
+          <div class="cards-list">
+
+            <!-- Expanded card -->
+            <div class="job-card-expand expanded">
+              <div class="expand-header">
+                <div style="width:36px;height:36px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;color:var(--primary);flex-shrink:0;">
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l7-8 7 8M5 10v7a1 1 0 001 1h8a1 1 0 001-1v-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="expand-header-address">
+                  <div class="addr">445 Spruce Way, Denver</div>
+                  <div class="owner">Tom Chen · Residential re-roof</div>
+                </div>
+                <span class="status-badge status-active"><span class="status-dot"></span>Active</span>
+                <div class="expand-header-stats">
+                  <div class="expand-stat">
+                    <div class="expand-stat-value">$12,400</div>
+                    <div class="expand-stat-label">Value</div>
+                  </div>
+                  <div class="expand-stat">
+                    <div class="expand-stat-value" style="color:var(--green);">42%</div>
+                    <div class="expand-stat-label">Est. Margin</div>
+                  </div>
+                </div>
+                <div class="expand-chevron">▴</div>
+              </div>
+              <div class="expand-body">
+                <div class="expand-body-grid">
+                  <div class="expand-detail-card">
+                    <div class="expand-detail-label">Proposal</div>
+                    <div class="expand-detail-value" style="color:var(--green);">Accepted</div>
+                    <div class="expand-detail-sub">Better tier · Mar 1</div>
+                  </div>
+                  <div class="expand-detail-card">
+                    <div class="expand-detail-label">Order</div>
+                    <div class="expand-detail-value" style="color:var(--primary);">In Transit</div>
+                    <div class="expand-detail-sub">QXO-2847 · 8 items</div>
+                  </div>
+                  <div class="expand-detail-card">
+                    <div class="expand-detail-label">Delivery</div>
+                    <div class="expand-detail-value">Mar 4</div>
+                    <div class="expand-detail-sub">Denver North branch</div>
+                  </div>
+                  <div class="expand-detail-card">
+                    <div class="expand-detail-label">Margin</div>
+                    <div class="expand-detail-value" style="color:var(--green);">$5,208</div>
+                    <div class="expand-detail-sub">42.0% gross</div>
+                  </div>
+                </div>
+                <div class="expand-actions">
+                  <div class="mini-btn-primary">View Full Detail →</div>
+                  <div class="mini-btn-secondary">Track Delivery</div>
+                  <div style="margin-left:auto;">
+                    <span class="upsell-tag">✦ Siding opportunity detected</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsed card -->
+            <div class="job-card-expand">
+              <div class="expand-header">
+                <div style="width:36px;height:36px;border-radius:8px;background:var(--green-light);display:flex;align-items:center;justify-content:center;color:var(--green);flex-shrink:0;">
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l7-8 7 8M5 10v7a1 1 0 001 1h8a1 1 0 001-1v-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="expand-header-address">
+                  <div class="addr">4215 Elm Street</div>
+                  <div class="owner">Sarah Johnson · Residential re-roof</div>
+                </div>
+                <span class="status-badge status-won"><span class="status-dot"></span>Won</span>
+                <div class="expand-header-stats">
+                  <div class="expand-stat">
+                    <div class="expand-stat-value">$15,200</div>
+                    <div class="expand-stat-label">Value</div>
+                  </div>
+                  <div class="expand-stat">
+                    <div class="expand-stat-value" style="color:var(--green);">38%</div>
+                    <div class="expand-stat-label">Est. Margin</div>
+                  </div>
+                </div>
+                <div class="expand-chevron">▾</div>
+              </div>
+            </div>
+
+            <!-- Collapsed card -->
+            <div class="job-card-expand">
+              <div class="expand-header">
+                <div style="width:36px;height:36px;border-radius:8px;background:var(--orange-light);display:flex;align-items:center;justify-content:center;color:var(--orange);flex-shrink:0;">
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l7-8 7 8M5 10v7a1 1 0 001 1h8a1 1 0 001-1v-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="expand-header-address">
+                  <div class="addr">892 Maple Drive</div>
+                  <div class="owner">James Wilson · Roofing estimate</div>
+                </div>
+                <span class="status-badge status-proposed"><span class="status-dot"></span>Proposed</span>
+                <div class="expand-header-stats">
+                  <div class="expand-stat">
+                    <div class="expand-stat-value">$12,400</div>
+                    <div class="expand-stat-label">Value</div>
+                  </div>
+                  <div class="expand-stat">
+                    <div class="expand-stat-value" style="color:var(--text-tertiary);">—</div>
+                    <div class="expand-stat-label">Margin</div>
+                  </div>
+                </div>
+                <div class="expand-chevron">▾</div>
+              </div>
+            </div>
+
+            <!-- Collapsed card -->
+            <div class="job-card-expand">
+              <div class="expand-header">
+                <div style="width:36px;height:36px;border-radius:8px;background:var(--border-light);display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);flex-shrink:0;">
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l7-8 7 8M5 10v7a1 1 0 001 1h8a1 1 0 001-1v-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="expand-header-address">
+                  <div class="addr">321 Oakwood Drive</div>
+                  <div class="owner">Maria Garcia · Completed re-roof</div>
+                </div>
+                <span class="status-badge status-complete"><span class="status-dot"></span>Complete</span>
+                <div class="expand-header-stats">
+                  <div class="expand-stat">
+                    <div class="expand-stat-value">$14,800</div>
+                    <div class="expand-stat-label">Value</div>
+                  </div>
+                  <div class="expand-stat">
+                    <div class="expand-stat-value" style="color:var(--green);">42%</div>
+                    <div class="expand-stat-label">Margin</div>
+                  </div>
+                </div>
+                <div class="expand-chevron">▾</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- =========================================================
+     OPTION C: Master-Detail Split Panel
+     ========================================================= -->
+<div class="option-section">
+  <div class="option-label">Option C</div>
+  <div class="option-title">Master-Detail Split Panel</div>
+  <div class="option-desc">Persistent list on the left, detail panel on the right. Clicking a job in the list instantly loads its full context — proposals, orders, deliveries, margin data, and upsell opportunities — without page navigation. The list stays visible so Marcus can quickly jump between jobs. Mirrors the email client pattern (Outlook, Gmail) that contractors already know.</div>
+  <div class="option-pros-cons">
+    <div class="pros">+ Instant context switching, no page loads</div>
+    <div class="pros">+ Rich detail always visible</div>
+    <div class="cons">⚠ List panel is narrow — less data per row</div>
+    <div class="cons">⚠ Complex on mobile (needs adaptive layout)</div>
+  </div>
+
+  <div class="mock-frame">
+    <div class="option-c-layout">
+      <!-- Mini Sidebar -->
+      <div class="mini-sidebar">
+        <div class="mini-sidebar-logo">
+          <div class="mini-logo-icon">Q</div>
+          <div class="mini-logo-text">QXO</div>
+        </div>
+        <button class="mini-build-btn">+ BUILD</button>
+        <div class="mini-nav-item">Dashboard</div>
+        <div class="mini-nav-item active">Jobs <span class="mini-nav-badge">12</span></div>
+        <div class="mini-nav-item">Proposals</div>
+        <div class="mini-nav-item">Deliveries</div>
+        <div class="mini-nav-item">Invoices</div>
+        <div class="mini-nav-item">Products</div>
+        <div class="mini-nav-item">Builds</div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column;">
+        <div class="mini-topbar">
+          <div>
+            <h2>Jobs</h2>
+            <div class="mini-topbar-sub">12 properties · 4 active</div>
+          </div>
+          <div class="mini-topbar-actions">
+            <div class="mini-btn-primary">+ New Job</div>
+          </div>
+        </div>
+        <div style="flex:1; display:flex;">
+          <!-- Left: Job List -->
+          <div class="option-c-list">
+            <div class="option-c-list-header">
+              <input class="option-c-search" type="text" placeholder="Search jobs..." value="">
+            </div>
+            <div class="filter-tabs" style="padding: 0 12px;">
+              <div class="filter-tab active" style="padding:8px 10px; font-size:11px;">All</div>
+              <div class="filter-tab" style="padding:8px 10px; font-size:11px;">Active</div>
+              <div class="filter-tab" style="padding:8px 10px; font-size:11px;">Won</div>
+              <div class="filter-tab" style="padding:8px 10px; font-size:11px;">Done</div>
+            </div>
+            <div class="option-c-items">
+              <div class="option-c-item selected">
+                <div class="option-c-item-addr">445 Spruce Way</div>
+                <div class="option-c-item-sub">Tom Chen · Re-roof</div>
+                <div class="option-c-item-bottom">
+                  <span class="status-badge status-active" style="font-size:10px; padding:1px 6px;"><span class="status-dot"></span>Active</span>
+                  <span class="option-c-item-value">$12,400</span>
+                </div>
+              </div>
+              <div class="option-c-item">
+                <div class="option-c-item-addr">4215 Elm Street</div>
+                <div class="option-c-item-sub">Sarah Johnson · Re-roof</div>
+                <div class="option-c-item-bottom">
+                  <span class="status-badge status-won" style="font-size:10px; padding:1px 6px;"><span class="status-dot"></span>Won</span>
+                  <span class="option-c-item-value">$15,200</span>
+                </div>
+              </div>
+              <div class="option-c-item">
+                <div class="option-c-item-addr">892 Maple Drive</div>
+                <div class="option-c-item-sub">James Wilson · Estimate</div>
+                <div class="option-c-item-bottom">
+                  <span class="status-badge status-proposed" style="font-size:10px; padding:1px 6px;"><span class="status-dot"></span>Proposed</span>
+                  <span class="option-c-item-value">$12,400</span>
+                </div>
+              </div>
+              <div class="option-c-item">
+                <div class="option-c-item-addr">321 Oakwood Drive</div>
+                <div class="option-c-item-sub">Maria Garcia · Complete</div>
+                <div class="option-c-item-bottom">
+                  <span class="status-badge status-complete" style="font-size:10px; padding:1px 6px;"><span class="status-dot"></span>Done</span>
+                  <span class="option-c-item-value">$14,800</span>
+                </div>
+              </div>
+              <div class="option-c-item">
+                <div class="option-c-item-addr">1100 Crestview Ct</div>
+                <div class="option-c-item-sub">David Park · Re-roof</div>
+                <div class="option-c-item-bottom">
+                  <span class="status-badge status-active" style="font-size:10px; padding:1px 6px;"><span class="status-dot"></span>Active</span>
+                  <span class="option-c-item-value">$16,200</span>
+                </div>
+              </div>
+              <div class="option-c-item">
+                <div class="option-c-item-addr">567 Birch Lane</div>
+                <div class="option-c-item-sub">New lead · Estimate</div>
+                <div class="option-c-item-bottom">
+                  <span class="status-badge status-proposed" style="font-size:10px; padding:1px 6px;"><span class="status-dot"></span>Proposed</span>
+                  <span class="option-c-item-value" style="color:var(--text-tertiary);">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Detail Panel -->
+          <div class="option-c-detail">
+            <div class="detail-header">
+              <div>
+                <div class="detail-addr">445 Spruce Way</div>
+                <div class="detail-sub">Tom Chen · Residential re-roof · Denver, CO 80211</div>
+              </div>
+              <span class="status-badge status-active" style="font-size:12px; padding:4px 12px;"><span class="status-dot"></span>Active</span>
+            </div>
+
+            <div class="detail-stat-row">
+              <div class="detail-stat-card">
+                <div class="detail-stat-label">Total Value</div>
+                <div class="detail-stat-num">$12,400</div>
+                <div class="detail-stat-sub">Better tier</div>
+              </div>
+              <div class="detail-stat-card">
+                <div class="detail-stat-label">Est. Margin</div>
+                <div class="detail-stat-num" style="color:var(--green);">42.0%</div>
+                <div class="detail-stat-sub">$5,208 profit</div>
+              </div>
+              <div class="detail-stat-card">
+                <div class="detail-stat-label">Order Status</div>
+                <div class="detail-stat-num" style="font-size:16px; color:var(--primary);">In Transit</div>
+                <div class="detail-stat-sub">QXO-2847</div>
+              </div>
+              <div class="detail-stat-card">
+                <div class="detail-stat-label">Delivery</div>
+                <div class="detail-stat-num" style="font-size:16px;">Mar 4</div>
+                <div class="detail-stat-sub">Denver North</div>
+              </div>
+            </div>
+
+            <div class="detail-tabs">
+              <div class="detail-tab active">Timeline</div>
+              <div class="detail-tab">Proposal</div>
+              <div class="detail-tab">Order</div>
+              <div class="detail-tab">Delivery</div>
+              <div class="detail-tab">Margin</div>
+            </div>
+
+            <div class="detail-table">
+              <div class="detail-table-header">
+                <div class="dt-col1">Event</div>
+                <div class="dt-col2">Details</div>
+                <div class="dt-col3">Status</div>
+                <div class="dt-col4">Date</div>
+              </div>
+              <div class="detail-table-row">
+                <div class="dt-col1" style="font-weight:600;">Proposal Sent</div>
+                <div class="dt-col2">Better tier · $12,400</div>
+                <div class="dt-col3"><span class="status-badge status-won" style="font-size:10px;padding:1px 6px;"><span class="status-dot"></span>Accepted</span></div>
+                <div class="dt-col4" style="color:var(--text-secondary);">Feb 28</div>
+              </div>
+              <div class="detail-table-row">
+                <div class="dt-col1" style="font-weight:600;">Premium Upgrade</div>
+                <div class="dt-col2">Exact measurements applied</div>
+                <div class="dt-col3"><span class="status-badge status-won" style="font-size:10px;padding:1px 6px;"><span class="status-dot"></span>Complete</span></div>
+                <div class="dt-col4" style="color:var(--text-secondary);">Mar 1</div>
+              </div>
+              <div class="detail-table-row">
+                <div class="dt-col1" style="font-weight:600;">Materials Ordered</div>
+                <div class="dt-col2">QXO-2847 · 8 line items</div>
+                <div class="dt-col3"><span class="status-badge status-active" style="font-size:10px;padding:1px 6px;"><span class="status-dot"></span>In Transit</span></div>
+                <div class="dt-col4" style="color:var(--text-secondary);">Mar 2</div>
+              </div>
+              <div class="detail-table-row" style="opacity:0.5;">
+                <div class="dt-col1" style="font-weight:600;">Delivery</div>
+                <div class="dt-col2">Est. arrival at job site</div>
+                <div class="dt-col3" style="font-size:11px; color:var(--text-tertiary);">Upcoming</div>
+                <div class="dt-col4" style="color:var(--text-tertiary);">Mar 4</div>
+              </div>
+              <div class="detail-table-row" style="opacity:0.35;">
+                <div class="dt-col1" style="font-weight:600;">Job Complete</div>
+                <div class="dt-col2">Final margin calculation</div>
+                <div class="dt-col3" style="font-size:11px; color:var(--text-tertiary);">Pending</div>
+                <div class="dt-col4" style="color:var(--text-tertiary);">—</div>
+              </div>
+            </div>
+
+            <div class="detail-upsell">
+              <div class="detail-upsell-icon">✦</div>
+              <div>
+                <div class="detail-upsell-text">Cross-sell Opportunity: Siding</div>
+                <div class="detail-upsell-sub">Adjacent property data suggests vinyl siding replacement. Estimated $8,200 project value.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     FOOTER NOTES
+     ========================================================= -->
+<div style="max-width:1320px; margin:0 auto 60px; padding:0 40px;">
+  <div style="background:var(--white); border-radius:var(--radius); border:1px solid var(--border); padding:24px 28px;">
+    <div style="font-size:16px; font-weight:700; margin-bottom:12px;">Design Considerations</div>
+    <div style="font-size:14px; color:var(--text-secondary); line-height:1.8;">
+      <strong style="color:var(--text);">All options share:</strong> Status filter tabs, + New Job action, same status badge system, same sidebar/topbar chrome, same persona data (Marcus Rivera, Rivera Roofing).<br><br>
+      <strong style="color:var(--text);">Mobile consideration:</strong> Options A and B adapt naturally to single-column. Option C requires collapsing the split panel into a list → detail navigation on mobile (similar to iOS Mail).<br><br>
+      <strong style="color:var(--text);">Job entity alignment:</strong> All three options treat the Job as a property-level container (per the Platform Overview doc). The "job" is the address, not a single order. Multiple proposals, orders, and deliveries can live under one Job.<br><br>
+      <strong style="color:var(--text);">Cross-sell signals:</strong> All options surface the platform's future multi-trade upsell capability. Completed roofing jobs with detected siding, painting, or gutter opportunities show a purple "opportunity" indicator.<br><br>
+      <strong style="color:var(--text);">Decision needed:</strong> Which pattern becomes the standard for all list views (Jobs, Proposals, Deliveries, Invoices)? Or should different sections use different patterns based on information density?
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

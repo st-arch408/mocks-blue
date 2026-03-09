@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>Job Detail - QXO</title>
+  <style>
+    :root {
+      --primary: #004BEA;
+      --primary-hover: #0040CC;
+      --primary-light: #EBF0FF;
+      --primary-border: #B3CCFF;
+      --primary-glow: rgba(0,75,234,0.12);
+      --bg: #F2F2F2;
+      --white: #FFFFFF;
+      --text: #111827;
+      --text-secondary: #6B7280;
+      --text-tertiary: #9CA3AF;
+      --border: #E5E7EB;
+      --border-light: #F3F4F6;
+      --green: #22C55E;
+      --green-light: #F0FDF4;
+      --green-border: #BBF7D0;
+      --red: #EF4444;
+      --red-light: #FEF2F2;
+      --red-border: #FECACA;
+      --orange: #F59E0B;
+      --orange-light: #FFFBEB;
+      --orange-border: #FDE68A;
+      --purple: #8B5CF6;
+      --purple-light: #F5F3FF;
+      --purple-border: #DDD6FE;
+      --blue-light: #3B82F6;
+      --blue-light-bg: #EFF6FF;
+      --blue-light-border: #BFDBFE;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+      --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-lg: 16px;
+      --transition: 0.15s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 240px;
+      height: 100vh;
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      box-shadow: 1px 0 4px rgba(0,0,0,0.03);
+    }
+
+    .sidebar-logo {
+      padding: 22px 20px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-logo-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .sidebar-logo-text {
+      font-weight: 800;
+      font-size: 17px;
+      color: var(--text);
+      letter-spacing: -0.03em;
+    }
+
+    .sidebar-build-btn {
+      margin: 0 14px 18px;
+      padding: 11px 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0,75,234,0.3);
+      transition: all var(--transition);
+    }
+
+    .sidebar-build-btn:hover {
+      background: var(--primary-hover);
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 0 10px;
+      overflow-y: auto;
+    }
+
+    .sidebar-nav::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    .nav-section-label {
+      padding: 18px 14px 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 2px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 450;
+      transition: all var(--transition);
+    }
+
+    .nav-item:hover {
+      background: var(--border-light);
+      color: var(--text);
+    }
+
+    .nav-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 8px;
+      border-radius: 10px;
+      background: var(--border-light);
+      color: var(--text-secondary);
+    }
+
+    .nav-item.coming {
+      color: var(--text-tertiary);
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    .sidebar-user {
+      padding: 16px 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .sidebar-user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .sidebar-user-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .sidebar-user-email {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    /* Main layout */
+    .main-container {
+      margin-left: 240px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .back-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color var(--transition);
+    }
+
+    .back-link:hover {
+      color: var(--text);
+    }
+
+    .topbar-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+    }
+
+    .page-header {
+      flex: 1;
+    }
+
+    .page-title-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-green {
+      background: var(--green-light);
+      color: var(--green);
+      border: 1px solid var(--green-border);
+    }
+
+    .badge-blue {
+      background: var(--blue-light-bg);
+      color: var(--blue-light);
+      border: 1px solid var(--blue-light-border);
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .content-scroll {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--bg);
+    }
+
+    .content-scroll::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .content-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .content-scroll::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    .content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 40px;
+    }
+
+    /* Premium banner */
+    .premium-banner {
+      background: linear-gradient(135deg, var(--blue-light-bg) 0%, #F0F9FF 100%);
+      border: 1px solid var(--blue-light-border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .banner-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--blue-light-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--blue-light);
+    }
+
+    .banner-content {
+      flex: 1;
+    }
+
+    .banner-title-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .banner-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .banner-description {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Comparison cards */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .comparison-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .comparison-card.premium {
+      border: 2px solid var(--blue-light);
+      position: relative;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .card-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-gray {
+      background: #E5E7EB;
+      color: #374151;
+      border: 1px solid #D1D5DB;
+    }
+
+    .card-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .card-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-row-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .card-row-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .variance-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--orange);
+      background: var(--orange-light);
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--orange-border);
+    }
+
+    /* Variance alert */
+    .variance-alert {
+      background: linear-gradient(135deg, var(--orange-light) 0%, #FFFBEB 100%);
+      border: 1px solid var(--orange-border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .alert-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #FEF3C7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--orange);
+    }
+
+    .alert-content {
+      flex: 1;
+    }
+
+    .alert-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .alert-description {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* CTA Section */
+    .cta-section {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+
+    .cta-button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--transition);
+      box-shadow: 0 2px 8px rgba(0,75,234,0.3);
+    }
+
+    .cta-button:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 4px 12px rgba(0,75,234,0.4);
+    }
+
+    .cta-button:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">Q</div>
+      <div class="sidebar-logo-text">QXO</div>
+    </div>
+    <button class="sidebar-build-btn">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10 3v14M3 10h14" stroke-linecap="round"/>
+      </svg>
+      BUILD
+    </button>
+    <nav class="sidebar-nav">
+      <div class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="2" width="7" height="7" rx="1.5"/>
+          <rect x="11" y="2" width="7" height="7" rx="1.5"/>
+          <rect x="2" y="11" width="7" height="7" rx="1.5"/>
+          <rect x="11" y="11" width="7" height="7" rx="1.5"/>
+        </svg>
+        Dashboard
+      </div>
+      <div class="nav-item active">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M3 4h14M3 8h14M3 12h10M3 16h7" stroke-linecap="round"/>
+        </svg>
+        Jobs
+        <span class="nav-badge">12</span>
+      </div>
+      <div class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="2" width="14" height="16" rx="2"/>
+          <path d="M7 6h6M7 10h6M7 14h3" stroke-linecap="round"/>
+        </svg>
+        Proposals
+        <span class="nav-badge">8</span>
+      </div>
+      <div class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 4h10v9H2z"/>
+          <path d="M12 8h4l2 3v2h-6V8z"/>
+          <circle cx="6" cy="15" r="2"/>
+          <circle cx="15" cy="15" r="2"/>
+        </svg>
+        Deliveries
+        <span class="nav-badge">3</span>
+      </div>
+      <div class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="2" width="14" height="16" rx="2"/>
+          <path d="M7 6h6M7 9h6M7 12h4M12 15h2" stroke-linecap="round"/>
+        </svg>
+        Invoices
+      </div>
+      <div class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M10 2L18 6v8l-8 4L2 14V6l8-4z"/>
+          <path d="M2 6l8 4m0 0l8-4m-8 4v8"/>
+        </svg>
+        Products
+      </div>
+      <div class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M4 4l4 4-4 4M10 14h6" stroke-linecap="round"/>
+        </svg>
+        Builds
+      </div>
+      <div class="nav-section-label">Coming Soon</div>
+      <div class="nav-item coming">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="10" cy="7" r="4"/>
+          <path d="M3 18c0-3.9 3.1-7 7-7s7 3.1 7 7"/>
+        </svg>
+        CRM
+      </div>
+      <div class="nav-item coming">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M10 2l2.5 5.5L18 8.5l-4 4 1 5.5-5-3-5 3 1-5.5-4-4 5.5-1z"/>
+        </svg>
+        Loyalty
+      </div>
+      <div class="nav-item coming">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M10 2v2m0 12v2M2 10h2m12 0h2"/>
+          <circle cx="10" cy="10" r="4"/>
+        </svg>
+        Storm Center
+      </div>
+    </nav>
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar">MR</div>
+      <div>
+        <div class="sidebar-user-name">Rivera Roofing</div>
+        <div class="sidebar-user-email">marcus@riveraroofing.com</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main container -->
+  <div class="main-container">
+    <!-- Topbar -->
+    <div class="topbar">
+      <a class="back-link" href="#">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 10H5M5 10l5-5M5 10l5 5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to Dashboard
+      </a>
+      <div class="topbar-divider"></div>
+      <div class="page-header">
+        <div class="page-title-section">
+          <h1 class="page-title">Job Detail</h1>
+          <span class="badge badge-green">Accepted</span>
+        </div>
+        <p class="page-subtitle">1247 Elm Street, Arvada, CO 80002</p>
+      </div>
+    </div>
+
+    <!-- Scrollable content -->
+    <div class="content-scroll">
+      <div class="content">
+        <!-- Premium Banner -->
+        <div class="premium-banner">
+          <div class="banner-icon">
+            <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="10" cy="3" r="1"/>
+              <circle cx="15" cy="5" r="1"/>
+              <circle cx="17" cy="10" r="1"/>
+              <circle cx="15" cy="15" r="1"/>
+              <circle cx="10" cy="17" r="1"/>
+              <circle cx="5" cy="15" r="1"/>
+              <circle cx="3" cy="10" r="1"/>
+              <circle cx="5" cy="5" r="1"/>
+              <circle cx="10" cy="10" r="1.5"/>
+            </svg>
+          </div>
+          <div class="banner-content">
+            <div class="banner-title-section">
+              <h2 class="banner-title">Premium Data Available</h2>
+              <span class="badge badge-blue">Free Upgrade</span>
+            </div>
+            <p class="banner-description">Exact linear measurements are now available for this job. Get precise roof dimensions including ridge, hip, valley, eave, and rake lengths for more accurate material ordering.</p>
+          </div>
+        </div>
+
+        <!-- Comparison Grid -->
+        <div class="comparison-grid">
+          <!-- Bid Perfect Card -->
+          <div class="comparison-card">
+            <div class="card-header">
+              <span class="card-badge badge-gray">Bid Perfect</span>
+            </div>
+            <div class="card-label">Original estimate</div>
+            <div class="card-rows">
+              <div class="card-row">
+                <span class="card-row-label">Total Squares</span>
+                <span class="card-row-value">32</span>
+              </div>
+              <div class="card-row">
+                <span class="card-row-label">Pitch</span>
+                <span class="card-row-value">6/12</span>
+              </div>
+              <div class="card-row">
+                <span class="card-row-label">Facets</span>
+                <span class="card-row-value">8</span>
+              </div>
+              <div class="card-row">
+                <span class="card-row-label">Complexity</span>
+                <span class="card-row-value">Moderate</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Premium Card -->
+          <div class="comparison-card premium">
+            <div class="card-header">
+              <span class="card-badge badge-blue">Premium</span>
+            </div>
+            <div class="card-label">Exact measurements</div>
+            <div class="card-rows">
+              <div class="card-row">
+                <span class="card-row-label">Total Squares</span>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                  <span class="card-row-value">34</span>
+                  <span class="variance-indicator">
+                    <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M10 5v10M5 10h10" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    +6% (34 sq)
+                  </span>
+                </div>
+              </div>
+              <div class="card-row">
+                <span class="card-row-label">Ridge Length</span>
+                <span class="card-row-value">142 ft</span>
+              </div>
+              <div class="card-row">
+                <span class="card-row-label">Hip Length</span>
+                <span class="card-row-value">68 ft</span>
+              </div>
+              <div class="card-row">
+                <span class="card-row-label">Valley Length</span>
+                <span class="card-row-value">24 ft</span>
+              </div>
+              <div class="card-row">
+                <span class="card-row-label">Eave Length</span>
+                <span class="card-row-value">186 ft</span>
+              </div>
+              <div class="card-row">
+                <span class="card-row-label">Rake Length</span>
+                <span class="card-row-value">94 ft</span>
+              </div>
+              <div class="card-row">
+                <span class="card-row-label">Waste Factor</span>
+                <span class="card-row-value">12%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variance Alert -->
+        <div class="variance-alert">
+          <div class="alert-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 1L2 18h16L10 1z"/>
+              <path d="M10 8v4M10 14v0.01" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="alert-content">
+            <div class="alert-title">Quantity Variance Detected</div>
+            <p class="alert-description">The premium measurement shows more squares than originally estimated. Your material order has been adjusted to match exact quantities.</p>
+          </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+          <button class="cta-button">
+            Review Material Order
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 10h10M10 5l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
