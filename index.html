@@ -73,6 +73,16 @@
   }
   .section-title:first-child { margin-top: 0; }
 
+  .section-subtitle {
+    font-size: 11px; font-weight: 600; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    margin-bottom: 10px; margin-top: 18px;
+    padding-left: 2px;
+  }
+  .section-subtitle:first-of-type { margin-top: 0; }
+
+  .card-tag.mobile { background: #FDF4FF; color: #A855F7; }
+
   .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
 
   .card {
@@ -148,28 +158,58 @@
 
 <div class="container">
 
-  <!-- Prototype -->
-  <div class="section-title">Prototype</div>
+  <!-- Prototypes -->
+  <div class="section-title">Prototypes</div>
+
+  <!-- Desktop -->
+  <div class="section-subtitle">Desktop</div>
   <div class="card-grid">
     <a class="card" href="https://atb-blue.vercel.app" target="_blank" rel="noopener">
       <div class="card-body">
         <div class="card-tag atb">ATB Blue</div>
-        <div class="card-name">ATB Blue Prototype</div>
+        <div class="card-name">ATB Blue — Contractor</div>
         <div class="card-desc">Live Next.js prototype — full contractor flow with dashboard, estimate entry, proposal builder, job detail, and premium data comparison.</div>
       </div>
       <div class="card-footer">
-        <span class="card-id">PROTO</span>
-        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h8M8 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="card-id">PROTO-DESK</span>
+        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3H3v10h10v-3M9 2h5v5M14 2L7 9" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
     </a>
     <a class="card" href="https://atb-blue.vercel.app/proposal/demo" target="_blank" rel="noopener">
       <div class="card-body">
         <div class="card-tag atb">ATB Blue</div>
-        <div class="card-name">Homeowner Proposal</div>
+        <div class="card-name">ATB Blue — Homeowner</div>
         <div class="card-desc">Homeowner-facing proposal experience — three-tier package selection, detailed scope review, e-signature, deposit payment, and confirmation.</div>
       </div>
       <div class="card-footer">
-        <span class="card-id">PROTO-HO</span>
+        <span class="card-id">PROTO-DESK-HO</span>
+        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3H3v10h10v-3M9 2h5v5M14 2L7 9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+  </div>
+
+  <!-- Mobile -->
+  <div class="section-subtitle">Mobile</div>
+  <div class="card-grid">
+    <a class="card" href="https://atb-blue-mobile.vercel.app" target="_blank" rel="noopener">
+      <div class="card-body">
+        <div class="card-tag mobile">Mobile</div>
+        <div class="card-name">ATB Blue Mobile — Contractor</div>
+        <div class="card-desc">Mobile-optimized contractor flow — bottom tab nav, touch-sized CTAs, collapsible panels, sticky actions. Built for iPhone viewport (375×812).</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">PROTO-MOB</span>
+        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3H3v10h10v-3M9 2h5v5M14 2L7 9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+    <a class="card" href="https://atb-blue-mobile.vercel.app/proposal/demo" target="_blank" rel="noopener">
+      <div class="card-body">
+        <div class="card-tag mobile">Mobile</div>
+        <div class="card-name">ATB Blue Mobile — Homeowner</div>
+        <div class="card-desc">Mobile homeowner proposal — stacked tier cards, tap-to-call, signature, deposit, and confirmation. Optimized for touch with 44px+ targets.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">PROTO-MOB-HO</span>
         <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3H3v10h10v-3M9 2h5v5M14 2L7 9" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
     </a>
