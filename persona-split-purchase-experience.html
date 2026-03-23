@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QXO Contractor Lifecycle Journey Map</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1724;
+    --bg-card: #1e293b;
+    --bg-card-hover: #263348;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --border: #334155;
+    --cyan: #06b6d4;
+    --purple: #a78bfa;
+    --orange: #f59e0b;
+    --blue: #3b82f6;
+    --green: #22c55e;
+    --red: #ef4444;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding: 24px;
+    overflow-x: auto;
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; margin-bottom: 20px; }
+  .header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 3px; }
+  .header h1 span { color: #004BEA; }
+  .header p { font-size: 0.78rem; color: var(--text-dim); }
+
+  /* ── Legend ── */
+  .legend { display: flex; justify-content: center; gap: 18px; margin-bottom: 20px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; color: var(--text-dim); }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .legend-item.skip .legend-dot { border: 2px dashed var(--red); background: transparent; border-radius: 3px; }
+
+  /* ── Grid: X=stages (cols), Y=personas (rows) ── */
+  .map-container { position: relative; }
+  .grid {
+    display: grid;
+    grid-template-columns: 170px repeat(12, minmax(90px, 1fr));
+    gap: 4px;
+    min-width: 1350px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ── Stage Column Headers ── */
+  .stage-header { text-align: center; padding: 8px 4px 12px; }
+  .stage-header .sh-num { font-size: 0.6rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+  .stage-header .sh-name { font-size: 0.68rem; font-weight: 600; color: var(--text); line-height: 1.25; }
+
+  /* ── Persona Row Labels ── */
+  .persona-label {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 10px; min-height: 50px;
+  }
+  .persona-label .pl-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .persona-label .pl-type { font-size: 0.74rem; font-weight: 600; line-height: 1.25; }
+  .persona-label .pl-name { font-size: 0.6rem; color: var(--text-dim); margin-top: 1px; }
+
+  /* ── Cells ── */
+  .cell {
+    border-radius: 7px;
+    padding: 5px 6px;
+    text-align: center;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 50px;
+    transition: transform 0.1s, border-color 0.12s, background 0.12s;
+    cursor: pointer;
+    position: relative;
+  }
+  .cell:hover { transform: scale(1.04); z-index: 10; }
+  .cell.selected { outline: 2px solid var(--text); outline-offset: 1px; }
+
+  .cell.core { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); }
+  .cell.core .core-text { font-size: 0.58rem; font-weight: 500; line-height: 1.25; opacity: 0.7; }
+  .cell.core:hover { border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.04); }
+
+  .cell.variant { border: 1.5px solid; background: rgba(255,255,255,0.02); }
+  .cell.variant .variant-text { font-size: 0.58rem; font-weight: 500; line-height: 1.25; }
+  .cell.variant:hover { background: rgba(255,255,255,0.05); }
+
+  .cell.skip { border: 1.5px dashed var(--red); background: rgba(239,68,68,0.03); }
+  .cell.skip .skip-text { font-size: 0.56rem; color: var(--red); opacity: 0.55; font-weight: 500; }
+  .cell.skip:hover { background: rgba(239,68,68,0.06); }
+
+  /* Finished persona emphasis */
+  .cell.core.finished .core-text { color: #ffffff; font-weight: 600; opacity: 1; }
+  .cell.core.finished { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.10); }
+  .cell.variant.finished .variant-text { font-weight: 600; }
+
+  /* Draft persona de-emphasis */
+  .cell.core.draft .core-text { opacity: 0.45; }
+  .cell.variant.draft .variant-text { opacity: 0.45; }
+  .cell.draft:not(.skip) { background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.04); }
+
+  /* Color variants */
+  .col-cyan .cell.variant { border-color: var(--cyan); }
+  .col-cyan .cell.variant .variant-text { color: #67e8f9; }
+  .col-cyan .cell.core .core-text { color: #67e8f9; }
+  .col-purple .cell.variant { border-color: var(--purple); }
+  .col-purple .cell.variant .variant-text { color: #c4b5fd; }
+  .col-purple .cell.core .core-text { color: #c4b5fd; }
+  .col-orange .cell.variant { border-color: var(--orange); }
+  .col-orange .cell.variant .variant-text { color: #fcd34d; }
+  .col-orange .cell.core .core-text { color: #fcd34d; }
+  .col-blue .cell.variant { border-color: var(--blue); }
+  .col-blue .cell.variant .variant-text { color: #93c5fd; }
+  .col-blue .cell.core .core-text { color: #93c5fd; }
+  .col-green .cell.variant { border-color: var(--green); }
+  .col-green .cell.variant .variant-text { color: #86efac; }
+  .col-green .cell.core .core-text { color: #86efac; }
+
+  /* ── SVG Lines ── */
+  .svg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+
+  /* ── Detail Panel ── */
+  .panel-overlay {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: 380px; background: #141d2b;
+    border-left: 3px solid var(--border);
+    z-index: 50; transform: translateX(100%);
+    transition: transform 0.2s ease;
+    display: flex; flex-direction: column;
+    box-shadow: -8px 0 32px rgba(0,0,0,0.5);
+  }
+  .panel-overlay.open { transform: translateX(0); }
+
+  .panel-header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .panel-close {
+    position: absolute; top: 14px; right: 14px;
+    background: none; border: 1px solid var(--border); color: var(--text-dim);
+    width: 28px; height: 28px; border-radius: 6px;
+    cursor: pointer; font-size: 0.8rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.1s;
+  }
+  .panel-close:hover { background: var(--bg-card); color: var(--text); }
+  .panel-stage { font-size: 0.62rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .panel-persona { font-size: 1rem; font-weight: 700; margin-bottom: 2px; }
+  .panel-persona-name { font-size: 0.7rem; color: var(--text-dim); }
+
+  .panel-body { padding: 20px; overflow-y: auto; flex: 1; }
+  .panel-emotion { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .panel-emoji { font-size: 1.3rem; }
+  .panel-state { font-size: 0.76rem; color: var(--text-dim); }
+  .panel-skip-badge {
+    font-size: 0.62rem; font-weight: 600; text-transform: uppercase;
+    color: var(--red); background: rgba(239,68,68,0.1);
+    padding: 3px 10px; border-radius: 8px; display: inline-block; margin-bottom: 12px;
+  }
+  .panel-narrative {
+    font-size: 0.8rem; line-height: 1.65; color: var(--text);
+  }
+  .panel-narrative.skip-text { font-style: italic; opacity: 0.75; }
+
+  .panel-nav {
+    display: flex; gap: 8px; padding: 14px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .panel-nav button {
+    flex: 1; padding: 8px; border-radius: 6px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    color: var(--text-dim); font-size: 0.7rem; cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+  }
+  .panel-nav button:hover:not(:disabled) { background: var(--bg-card-hover); color: var(--text); }
+  .panel-nav button:disabled { opacity: 0.3; cursor: default; }
+
+  /* ── Tooltip ── */
+  .tooltip {
+    position: fixed; background: #1a2332; border: 1px solid var(--border);
+    border-radius: 7px; padding: 7px 11px; font-size: 0.68rem; color: var(--text);
+    z-index: 40; pointer-events: none; opacity: 0; transition: opacity 0.1s;
+    max-width: 190px; line-height: 1.4; box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  }
+  .tooltip.visible { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span>QXO</span> Contractor Lifecycle Journey Map</h1>
+  <p>7 Persona Paths Across 12 Stages &mdash; Click any card to preview the user story</p>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--cyan)"></div>Tier 3 / Tier 2 / Tier 1</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Emerging Contractor</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>Insurance Restoration</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Commercial</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>New Construction</div>
+  <div class="legend-item skip"><div class="legend-dot"></div>Skipped</div>
+</div>
+
+<div class="map-container">
+  <svg class="svg-overlay" id="svg-lines"></svg>
+  <div class="grid" id="grid"></div>
+</div>
+
+<!-- Detail Panel -->
+<div class="panel-overlay" id="panel">
+  <div class="panel-header">
+    <button class="panel-close" id="panel-close">&times;</button>
+    <div class="panel-stage" id="p-stage"></div>
+    <div class="panel-persona" id="p-persona"></div>
+    <div class="panel-persona-name" id="p-name"></div>
+  </div>
+  <div class="panel-body" id="p-body"></div>
+  <div class="panel-nav">
+    <button id="p-prev">&larr; Prev Stage</button>
+    <button id="p-next">Next Stage &rarr;</button>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const stages = [
+  { num: '0', name: 'First Contact' },
+  { num: '1', name: 'Awareness & Lead' },
+  { num: '2', name: 'Job Creation' },
+  { num: '3', name: 'Estimation' },
+  { num: '4', name: 'Template & Build' },
+  { num: '5', name: 'Quoting' },
+  { num: '6', name: 'Acceptance & Order' },
+  { num: '7', name: 'Delivery' },
+  { num: '7.5', name: 'Jobsite & Supplemental' },
+  { num: '8', name: 'Payment' },
+  { num: '9', name: 'Job Close' },
+  { num: '10', name: 'Portfolio Intelligence' },
+];
+
+const personas = [
+  { type: 'Tier 3 Solo', name: '(Marcus)', colorClass: 'col-cyan', colorHex: '#06b6d4',
+    pathColors: ['#00ffff', '#00ff88', '#ff6fff'],
+    paths: [
+      { label: 'Path A: ATB Proposal', key: 'marcus_a',
+        tracks: [{t:'shared'},{t:'shared'},{t:'shared'},{t:'core'},{t:'skip'},{t:'skip'},{t:'core'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'}] },
+      { label: 'Path B: Standard Order', key: 'marcus_b',
+        tracks: [{t:'shared'},{t:'shared'},{t:'shared'},{t:'skip'},{t:'core'},{t:'skip'},{t:'core'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'}] },
+      { label: 'Path C: Special Pricing', key: 'marcus_c',
+        tracks: [{t:'shared'},{t:'shared'},{t:'shared'},{t:'skip'},{t:'core'},{t:'core'},{t:'core'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'}] },
+    ] },
+  { type: 'Tier 2 Mid-Market', name: '(Philip)', colorClass: 'col-cyan', colorHex: '#06b6d4',
+    pathColors: ['#00ffff', '#00ff88', '#ff6fff'],
+    paths: [
+      { label: 'ATB Proposal', key: 'philip_a',
+        tracks: [{t:'shared'},{t:'shared'},{t:'shared'},{t:'core'},{t:'skip'},{t:'skip'},{t:'core'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'}] },
+      { label: 'Standard Order', key: 'philip_b',
+        tracks: [{t:'shared'},{t:'shared'},{t:'shared'},{t:'skip'},{t:'core'},{t:'skip'},{t:'core'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'}] },
+      { label: 'Special Pricing', key: 'philip_c',
+        tracks: [{t:'shared'},{t:'shared'},{t:'shared'},{t:'core'},{t:'core'},{t:'core'},{t:'core'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'}] },
+    ] },
+  { type: 'Tier 1 Enterprise', name: '(Elena)', colorClass: 'col-cyan', colorHex: '#06b6d4',
+    pathColors: ['#00ffff', '#00ff88', '#ff6fff'],
+    paths: [
+      { label: 'ATB Proposal', key: 'elena_a',
+        tracks: [{t:'shared'},{t:'shared'},{t:'shared'},{t:'core'},{t:'skip'},{t:'skip'},{t:'core'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'}] },
+      { label: 'Standard Order', key: 'elena_b',
+        tracks: [{t:'shared'},{t:'shared'},{t:'shared'},{t:'skip'},{t:'core'},{t:'skip'},{t:'core'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'}] },
+      { label: 'Custom / Negotiated', key: 'elena_c',
+        tracks: [{t:'shared'},{t:'shared'},{t:'shared'},{t:'core'},{t:'core'},{t:'core'},{t:'core'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'},{t:'shared'}] },
+    ] },
+  { type: 'Emerging Contractor', name: '(Diego)', colorClass: 'col-purple', colorHex: '#bf5fff', key: 'diego',
+    tracks: [{t:'variant',label:'Breaking Retail Barrier'},{t:'core'},{t:'core'},{t:'core'},{t:'core'},{t:'core'},{t:'core'},{t:'core'},{t:'core'},{t:'core'},{t:'core'},{t:'core'}] },
+  { type: 'Insurance Restoration', name: '', colorClass: 'col-orange', colorHex: '#ffaa00', key: 'insurance',
+    tracks: [{t:'variant',label:'Storm Market Entry'},{t:'variant',label:'Storm Intelligence Lead'},{t:'variant',label:'Claim-Linked Job'},{t:'variant',label:'Xactimate Estimation'},{t:'variant',label:'Claim-Constrained Build'},{t:'variant',label:'Claim Scope + Upgrade'},{t:'variant',label:'Claims Authorization'},{t:'core'},{t:'variant',label:'Supplement Documentation'},{t:'variant',label:'Insurance Payment Cycle'},{t:'core'},{t:'core'}] },
+  { type: 'Commercial', name: '', colorClass: 'col-blue', colorHex: '#4d8fff', key: 'commercial',
+    tracks: [{t:'variant',label:'Capability Match'},{t:'variant',label:'Bid Invitation'},{t:'variant',label:'Project Entity'},{t:'variant',label:'Bid from Drawings'},{t:'variant',label:'Spec-Driven Build'},{t:'variant',label:'Competitive Bid'},{t:'variant',label:'Contract Award'},{t:'variant',label:'Phased Delivery'},{t:'core'},{t:'variant',label:'Milestone Invoicing'},{t:'core'},{t:'core'}] },
+  { type: 'New Construction', name: '', colorClass: 'col-green', colorHex: '#00ff55', key: 'newconstruction',
+    tracks: [{t:'variant',label:'Builder-Mediated'},{t:'skip'},{t:'variant',label:'Development-Scale Setup'},{t:'skip'},{t:'variant',label:'Builder-Locked Build'},{t:'skip'},{t:'skip'},{t:'variant',label:'Construction-Schedule Delivery'},{t:'core'},{t:'variant',label:'Construction Draw Cycle'},{t:'core'},{t:'core'}] },
+];
+
+// Narrative data (extracted from journey-stages.ts)
+const narratives = {
+  marcus_a: [
+    { emoji: '\u{1F937}', cellLabel: 'Branch walk-in, OSR visit, or referral', state: 'Curious but cautious', text: 'Marcus walks into the nearest QXO branch because it\'s close to his jobsite. Victor (ISR) at the counter treats him well, remembers his name after the second visit. Jake (OSR) stops by a jobsite a few weeks later and introduces himself. First contact can also happen the other way \u2014 Jake cold-calls Marcus after spotting his truck in a neighborhood, or Marcus gets referred by another contractor who buys at the branch. However it starts, the branch team makes Marcus feel welcome and earns the first order. That personal connection is what brings him back before the platform ever matters.' },
+    { emoji: '\u{1F525}', cellLabel: 'Lead comes in \u2014 needs to bid fast', state: 'Urgently optimistic', text: 'Marcus gets a call from a homeowner, spots storm damage while driving his territory, or picks up a referral through word-of-mouth. He needs to move fast \u2014 homeowners get 3+ bids, and the contractor who responds first usually wins. Marcus has a QXO account with his pricing profile loaded, but he\'s not working from a CRM \u2014 leads come in through his phone, his network, and his own hustle. He\'s energized but impatient. Every minute he\'s not acting is a minute a competitor could swoop in.' },
+    { emoji: '\u{1F3AF}', cellLabel: 'Creates Job entity \u2014 online or in-branch', state: 'Focused', text: 'Marcus creates a new Job Entity anchored to the property address. This can happen on his phone, on the QXO website, or at the branch counter with Victor (ISR) \u2014 it doesn\'t matter where. The omnichannel experience means every touchpoint sees the same record instantly. If Marcus requests an EagleView report at the branch, the digital service record appears on his online account and app immediately. If he starts online, the branch team can see it when he walks in. The Job Entity is the persistent thread connecting every estimate, order, delivery, and invoice for this project. Under 2 minutes or he loses patience.' },
+    { emoji: '\u{1F680}', cellLabel: 'ATB: measure \u2192 propose \u2192 send in one step', state: 'Empowered', text: 'This is the ATB fast lane. Marcus enters the property address and Address-to-Bid pulls measurements, generates a full Good/Better/Best proposal using his saved templates, preferred materials (GAF HDZ), markup, and Rivera Roofing branding \u2014 all in one step. Template selection, material configuration, and proposal formatting are bundled into the ATB flow. Marcus tweaks markup per tier based on neighborhood intel, then sends the branded proposal to the homeowner via SMS. Under 15 minutes from address entry to a professional bid in the homeowner\'s hand. This is the fastest path from lead to bid \u2014 stages 4 and 5 are rolled in.' },
+    { emoji: '\u23ED\uFE0F', cellLabel: 'Skip \u2014 rolled into ATB', state: 'N/A', text: 'ATB bundles template selection, material configuration, and Build assembly into the estimation step. There\'s no separate Template & Build stage needed \u2014 the proposal was generated with Marcus\'s saved configurations in one flow.' },
+    { emoji: '\u23ED\uFE0F', cellLabel: 'Skip \u2014 rolled into ATB', state: 'N/A', text: 'The homeowner-facing proposal was generated and sent as part of the ATB estimation flow. There\'s no separate quoting step \u2014 the bid is already in the homeowner\'s hand.' },
+    { emoji: '\u{1F389}', cellLabel: 'Homeowner accepts, auto-order fires', state: 'Relieved', text: 'Homeowner views the three tiers, selects Better (GAF HDZ). E-signs the proposal. Submits deposit via credit card. Three simultaneous events trigger: sold proposal locks pricing, Premium upgrade activates automatically, materials order fires to branch. Marcus gets a push notification: \'Order placed for 123 Oak Street.\' He didn\'t have to do anything. The system closed the loop.' },
+    { emoji: '\u{1F69B}', cellLabel: 'GPS-tracked delivery to jobsite', state: 'Trusting', text: 'Marcus\'s dashboard shows \'Thursday 8 AM delivery\' for 123 Oak Street. GPS tracking is live. Driver photographs materials being loaded. Thursday morning, Marcus checks the app: delivery on track, truck 2 miles away. Driver arrives, offloads to the roof, Marcus verifies against the order. Done. The delivery experience is simple, visible, and reliable \u2014 or it\'s the moment QXO loses Marcus\'s trust.' },
+    { emoji: '\u{1F528}', cellLabel: 'Finds damage, orders more from Job', state: 'Problem-solving', text: 'Marcus is on the roof. Mid-tear-off, he discovers the decking underneath is more damaged than expected \u2014 he needs 3 extra bundles of HDZ and an additional roll of ice & water shield. He pulls out his phone. If the platform lets him tap the existing Job, hit \'Need More,\' select the items from his Build, and confirm delivery for tomorrow AM \u2014 that\'s a moment of delight. The supplemental order inherits the original order\'s pricing, delivery address, and account terms.' },
+    { emoji: '\u2705', cellLabel: 'Invoice auto-matches, net-30 applied', state: 'Satisfied', text: 'Invoice auto-matches to the PO created at order placement. Net-30 terms automatically applied based on Marcus\'s credit history. No manual reconciliation needed. Invoice appears in the QXO dashboard. Marcus forwards to his accountant. Frictionless. The job record shows estimated margin ($980) vs. actual cost, giving Marcus his first visibility into job-level profitability.' },
+    { emoji: '\u{1F3C1}', cellLabel: 'Full lifecycle record, margin visibility', state: 'Accomplished', text: 'Job complete. Full lifecycle record visible in one view: estimate \u2192 proposal \u2192 order \u2192 delivery \u2192 supplemental \u2192 payment. Dashboard shows estimated margin ($980) vs. actual margin ($1,120). He over-performed by 12% due to waste efficiency. Build profile gets smarter \u2014 next time the system will predict his actual waste factor, not the default. The data loop is closed.' },
+    { emoji: '\u{1F3E0}', cellLabel: 'Margin trends, waste calibration, rebate', state: 'Loyal', text: 'Marcus sees his margin dashboard across completed jobs. Over time, he notices his margins improving as the platform calibrates his waste factors. Loyalty rebate is accruing \u2014 2% of QXO volume, visible in real-time. He doesn\'t actively \'use\' portfolio intelligence as a feature \u2014 it happens around him passively. But the insight that \'QXO knows my business better than I do\' is what keeps him on the platform.' },
+  ],
+  marcus_b: [
+    null,
+    null,
+    null,
+    { emoji: '\u23ED\uFE0F', cellLabel: 'Skip \u2014 knows what he needs', state: 'N/A', text: 'Marcus already won this job and knows what materials he needs from experience. No estimation or measurement step required. He moves straight to loading his Build template.' },
+    { emoji: '\u{1F6D2}', cellLabel: 'Loads template, orders at profile pricing', state: 'Efficient', text: 'This is the most common digital ordering path. Marcus loads a saved Build via \'From Template\' or \'Reorder from Job\' and adjusts quantities for this specific property. Three-tiered intelligence powers everything: Layer 1 branch defaults \u2014 curated templates, promotional deals, and high stock availability \u2192 Layer 2 his explicit preferences \u2192 Layer 3 AI from his history. He sees his standard profile pricing and is ready to order. Whether he started this Job at the branch counter or on his phone, the same pricing and templates apply \u2014 the omnichannel experience means his Build looks identical regardless of where he\'s working.' },
+    { emoji: '\u23ED\uFE0F', cellLabel: 'Skip \u2014 orders at profile pricing', state: 'N/A', text: 'Marcus is ordering at his standard profile pricing. No special quote needed \u2014 he sees the price, he\'s ready to buy. This is a typical ecommerce flow.' },
+    { emoji: '\u2705', cellLabel: 'Places order at standard pricing', state: 'Decided', text: 'Marcus confirms his Build order at standard profile pricing. Order fires to the branch. This is the cleanest path \u2014 no proposal, no negotiation, just a contractor ordering materials he needs for a job he already has. Whether he placed this order on his phone, on the website, or asked Victor (ISR) to enter it at the counter, the Job entity, pricing, and delivery details are the same record across every touchpoint.' },
+    null, null, null, null, null,
+  ],
+  marcus_c: [
+    null,
+    null,
+    null,
+    { emoji: '\u23ED\uFE0F', cellLabel: 'Skip \u2014 knows what he needs', state: 'N/A', text: 'Marcus already won this job and knows what materials he needs. No estimation or measurement step required.' },
+    { emoji: '\u{1F527}', cellLabel: 'Loads template, identifies materials', state: 'Preparing', text: 'Marcus loads a saved Build via \'From Template\' or \'Reorder from Job\' and configures his materials list. Same three-tiered intelligence applies. But for this job \u2014 maybe an HOA contract or a competitive situation \u2014 Marcus knows he needs better-than-profile pricing to make the margins work. He identifies what he needs before reaching out to the branch for a special quote.' },
+    { emoji: '\u{1F4B0}', cellLabel: 'Requests special pricing from branch', state: 'Negotiating', text: 'This is less common but critical when it happens. Marcus needs special pricing \u2014 most likely for an HOA job or a situation where a competitor is undercutting on materials cost. He talks to Jake (OSR) or Victor (ISR), either in person at the branch or over the phone. The branch team quotes special pricing tied to his digital Job entity. This is the omnichannel moment: the conversation happens face-to-face or by phone, but the quoted pricing appears on Marcus\'s digital account instantly. The branch and the app are looking at the same record.' },
+    { emoji: '\u{1F91D}', cellLabel: 'Accepts special pricing, places order', state: 'Decided', text: 'Marcus sees the special pricing QXO quoted \u2014 whether he\'s checking on his phone after leaving the branch or Victor is showing him at the counter. He accepts and places the order. The in-branch conversation and the digital order are the same record. QXO wins his spend on this job because the branch relationship and the platform worked together.' },
+    null, null, null, null, null,
+  ],
+  philip_a: [
+    { emoji: '\u2696\uFE0F', cellLabel: 'Split-wallet eval vs. ABC \u2014 branch relationship drives it', state: 'Evaluating', text: 'Philip already knows the distribution landscape. He evaluates QXO against ABC Supply based on pricing, branch proximity, rep relationship, and whether the digital tools genuinely save his team time. His office manager might be the one who tries the platform first \u2014 placing a test order to compare the experience against ABC\'s ordering flow. But Philip is also starting to pick up small commercial jobs \u2014 waterproofing, flat roof sections on mixed-use buildings, small commercial reroofs \u2014 work that Marcus would never touch. These jobs raise the stakes on the branch relationship: Philip needs Victor (ISR) and Jake (OSR) to help him spec unfamiliar commercial systems, not just ring up shingle orders. Philip already has his operations dialed in \u2014 AccuLynx CRM, QuickBooks, an office manager running the back office \u2014 so QXO has a higher bar to clear. The platform has to integrate with what Philip already has and surface value he can\'t get from his existing stack. Every Philip is a split-wallet opportunity from day one.' },
+    { emoji: '\u{1F914}', cellLabel: 'Lead from AccuLynx \u2014 residential or commercial, QXO vs. ABC', state: 'Calculating', text: 'Philip gets leads from his AccuLynx CRM. Most are residential, but increasingly some are small commercial \u2014 a flat roof on a strip mall, a waterproofing job on a mixed-use building. For residential, he\'s comparing QXO vs. ABC pricing before deciding where to source. For commercial leads, the split-wallet question shifts: it\'s not just \'who has the better price?\' but \'can QXO support this job type?\' Does the branch carry TPO or modified bitumen? Can Jake help him spec a system he hasn\'t installed before? His office manager may receive the lead first and triage it to the right crew based on workload. Philip is juggling 5+ active jobs, so speed and delegation matter more than they do for Marcus.' },
+    { emoji: '\u26A1', cellLabel: 'Job created online or in-branch \u2014 platform is the shared record', state: 'Efficient', text: 'Philip or his office manager creates a new Job Entity. For routine residential work, this happens online \u2014 \'From Template\' or \'Reorder from Job\' for repeat specs. For commercial or unfamiliar job types, it\'s more likely to start in-branch with Victor or during a site visit with Jake, where the conversation about materials and scope happens face-to-face. Either way, the platform is the persistent record \u2014 the branch companion that keeps Philip\'s whole team aligned after the in-person conversation ends. His office manager can initiate Jobs on his behalf. He needs a multi-job dashboard view because he\'s juggling 5+ active jobs at once, and the mix of residential and commercial makes that dashboard essential.' },
+    { emoji: '\u{1F680}', cellLabel: 'ATB Blue for residential \u2014 commercial jobs go through branch', state: 'Precise', text: 'This is Philip\'s ATB path for residential work. He runs ATB Blue for larger or more complex residential jobs where he needs a professional Good/Better/Best proposal for the homeowner. For a complex hip roof on a historic home, he overrides the default waste factor from 12% to 18%. For multi-trade jobs, estimation runs per trade within the same Job entity. ATB bundles measurement, template selection, material configuration, and proposal formatting into one flow \u2014 stages 4 and 5 are rolled in. Philip reviews and tweaks tier pricing before sending, but the heavy lifting is done. Commercial jobs don\'t go through ATB \u2014 they require custom quoting with Victor or Jake at the branch, where the platform serves as the branch companion capturing what gets decided in person.' },
+    { emoji: '\u23ED\uFE0F', cellLabel: 'Skip \u2014 rolled into ATB', state: 'N/A', text: 'ATB bundles template selection, material configuration, and Build assembly into the estimation step. Philip\'s saved templates and three-tiered intelligence (branch defaults \u2192 his explicit preferences \u2192 AI from history) power the proposal automatically. There\'s no separate Template & Build stage needed.' },
+    { emoji: '\u23ED\uFE0F', cellLabel: 'Skip \u2014 rolled into ATB', state: 'N/A', text: 'The homeowner-facing proposal was generated and sent as part of the ATB estimation flow. Philip emails it to the homeowner CC\'ing his project manager and office manager. There\'s no separate quoting step \u2014 the G/B/B bid is already out.' },
+    { emoji: '\u{1F389}', cellLabel: 'Office manager monitors acceptances, auto-order fires', state: 'Scaling', text: 'Homeowner accepts a tier and e-signs. Auto-order fires to the branch. At Philip\'s volume, his office manager monitors multiple acceptances in a dashboard view \u2014 not Philip himself. Auto-order is a game-changer: no manual entry per job. For high-value orders (>$20K), Philip has set an approval gate that requires his sign-off before the order fires. The system handles the routine; Philip only intervenes on exceptions.' },
+    { emoji: '\u{1F5D3}\uFE0F', cellLabel: 'Coordinates 5+ deliveries \u2014 commercial jobs may need GC scheduling', state: 'Coordinating', text: 'Philip coordinates deliveries across 5+ active jobsites simultaneously. He needs all delivery tracking in one view, not per-job. GPS tracking across all active deliveries. A late delivery cascades \u2014 his crew arrives at 7 AM, delivery window is 8\u201312, actual arrival is 1 PM. That\'s 6 hours of crew wages ($600+) lost to waiting. For commercial jobs, delivery timing may need to coordinate with a GC\'s site schedule or other trades \u2014 the platform needs to surface that context. Whether Philip scheduled this delivery at the branch counter or online, the tracking and ETAs are the same record. The branch companion role continues: if Jake promised a delivery window in person, it shows up on Philip\'s dashboard.' },
+    { emoji: '\u{1F624}', cellLabel: 'Foreman \u2192 Philip \u2192 office manager \u2192 branch relay', state: 'Frustrated', text: 'Philip\'s foreman texts: \'short 3 bundles on the Oak Street job.\' Philip forwards to his office manager. Office manager calls the branch. This is a multi-person relay for what should be a 2-minute task. The platform should let the foreman \u2014 or anyone on Philip\'s team with job access \u2014 place the supplemental order directly from the Job record. The supplemental inherits original pricing, delivery address, and account terms. Multi-user job access is the unlock here.' },
+    { emoji: '\u{1F4D2}', cellLabel: 'QuickBooks auto-sync, job-level cost tracking', state: 'Organized', text: 'Philip\'s office manager handles payments. QuickBooks integration is critical \u2014 invoices sync automatically, matching to POs and updating A/P aging. Philip needs job-level cost tracking for profitability analysis across his portfolio. Invoice auto-matches just like Marcus\'s, but the downstream accounting integration is what makes it work at Philip\'s scale. Without QuickBooks sync, his office manager is manually entering every invoice.' },
+    { emoji: '\u{1F4CA}', cellLabel: 'Margin by job type \u2014 residential vs. commercial tracked separately', state: 'Analytical', text: 'Philip reviews this job\'s margin alongside his portfolio, and the residential vs. commercial split matters. His residential margins are well-understood after years of experience. His commercial margins are still being calibrated \u2014 waste factors are different, labor hours are less predictable, material systems are unfamiliar. The platform tracks both separately so Philip can see where he\'s profitable and where he\'s still learning. Multi-user visibility lets his office manager see cost data and his crew leads see their own job margins. CRM write-back to AccuLynx is essential \u2014 the job record flows back into Philip\'s CRM so he has a complete picture without re-entering data. Every closed job with clean data makes Philip\'s business harder to run without QXO.' },
+    { emoji: '\u{1F4C8}', cellLabel: 'Crew performance, commercial growth data, QXO as growth partner', state: 'Strategic', text: 'Philip reviews his portfolio monthly. He compares job margins across his crews \u2014 which crew is most efficient on hip roofs vs. gable roofs? He tracks residential vs. commercial profitability trends. His office manager pulls reports for QuickBooks reconciliation. Philip is actively managing his business by the numbers \u2014 he already has his operations dialed in, so the platform has to surface insights he can\'t get from AccuLynx or QuickBooks alone. This is where QXO becomes a growth partner, not just a supplier. The platform can see that Philip\'s waste efficiency and job margins on small commercial work are strong enough to compete on larger commercial jobs. Jake (OSR) uses that data in a branch conversation: \'Philip, contractors like you in this market are winning commercial waterproofing jobs. Your margins say you\'re ready.\' QXO surfaces the opportunity; Philip decides whether to pursue it. The rebate accrues in the background, but Philip doesn\'t track wallet share \u2014 that\'s QXO\'s metric. Philip\'s question is simpler: \'Am I better off because I use QXO?\' If the answer is obviously yes \u2014 margin visibility, crew performance data, commercial opportunity intelligence, waste calibration \u2014 the wallet share takes care of itself.' },
+  ],
+  philip_b: [
+    null,
+    null,
+    null,
+    { emoji: '\u23ED\uFE0F', cellLabel: 'Skip \u2014 office manager knows what\'s needed', state: 'N/A', text: 'Philip\'s office manager already knows what materials this job requires from experience and the project scope. No estimation or measurement step needed. She moves straight to loading a Build template.' },
+    { emoji: '\u{1F6D2}', cellLabel: 'Office manager loads template, adjusts quantities', state: 'Systematic', text: 'This is the most common ordering path at Philip\'s scale. His office manager loads a saved Build via \'From Template\' or \'Reorder from Job\' and adjusts quantities for this specific property. Philip\'s office manager maintains 5+ templates using the master/instance model \u2014 standardized Builds that individual crew members can customize per job. Three-tiered intelligence powers everything: Layer 1 branch defaults \u2192 Layer 2 Philip\'s explicit preferences \u2192 Layer 3 AI from order history. Override tracking tells Philip when templates are drifting and need updating. Whether the office manager started this from the branch counter or the website, the same templates and pricing apply.' },
+    { emoji: '\u23ED\uFE0F', cellLabel: 'Skip \u2014 procurement at profile pricing', state: 'N/A', text: 'This is a procurement order, not a homeowner-facing bid. Philip\'s team is ordering materials at standard profile pricing. No proposal or quote needed \u2014 they see the price, they\'re ready to buy.' },
+    { emoji: '\u2705', cellLabel: 'Places order at standard pricing, approval gate if >$20K', state: 'Decided', text: 'Philip\'s office manager confirms the Build order at standard profile pricing. Order fires to the branch. For routine orders, this flows automatically. For high-value orders exceeding $20K, Philip\'s approval gate triggers \u2014 he reviews and confirms before the order fires. This is the cleanest path: no proposal, no negotiation, just a team ordering materials for a job they already have. The omnichannel experience means the office manager can place this at the counter, on the phone, or online \u2014 same record, same pricing.' },
+    null, null, null, null, null,
+  ],
+  philip_c: [
+    null,
+    null,
+    null,
+    { emoji: '\u{1F3D7}\uFE0F', cellLabel: 'In-branch estimation \u2014 Victor/Jake help spec unfamiliar systems', state: 'Learning', text: 'This is where Philip\'s emerging commercial work changes the estimation dynamic entirely. For residential special pricing \u2014 an HOA contract or competitive situation \u2014 Philip already knows his materials and this step is straightforward. But for commercial jobs like waterproofing or flat roof systems, Philip doesn\'t have repeatable item lists. There\'s no template for TPO or modified bitumen in his library. He sits down with Victor at the branch counter or walks the jobsite with Jake, and they scope the job together \u2014 what system fits this building, what accessories are required, what are the quantities. The branch team has the product knowledge Philip is still developing on commercial systems. This is estimation in the truest sense: figuring out what the job actually needs. The platform captures everything decided in that conversation as the branch companion \u2014 the persistent digital record that Philip\'s office manager can see and act on after the in-person work is done.' },
+    { emoji: '\u{1F527}', cellLabel: 'Custom Build from estimation \u2014 no template, built from scratch', state: 'Assembling', text: 'The materials list from the estimation conversation gets assembled into a formal Build. For residential special pricing, Philip loads an existing template and flags the items that need a better price \u2014 this step is fast. For commercial work, there is no template to load. The Build is constructed from scratch based on what Philip and the branch team scoped together in Stage 3. This is a one-off configuration: the specific TPO system, the accessories, the quantities, the waste factors for a flat roof Philip hasn\'t done before. Philip\'s office manager can see the Build digitally, verify quantities, and track it alongside his other active jobs. Over time, if Philip does more commercial work, this Build becomes reusable reference \u2014 the template that didn\'t exist before gets created through doing the work.' },
+    { emoji: '\u{1F4B0}', cellLabel: 'Iterative quoting \u2014 back-and-forth with owner or architect', state: 'Negotiating', text: 'Philip is creating a competitive quote to win the commercial job from the building owner or architect. Unlike residential where it\'s a one-shot G/B/B proposal, commercial quoting is iterative. The first quote goes out. The building owner comes back: \'Can you value-engineer this? What if we use a 45-mil TPO instead of 60-mil?\' Philip takes it back to Victor or Jake, they revise the Build, a new quote version gets generated. This back-and-forth might take days or weeks. The platform tracks quote revisions so Philip and his office manager aren\'t losing track of which version is current. For residential special pricing, this stage is simpler \u2014 it\'s negotiating volume pricing for an HOA or competitive situation, and Victor or Jake work the numbers in person. Either way, the platform\'s role is branch companion: whatever gets quoted in the offline conversation appears on Philip\'s digital record instantly. His office manager can see it, verify it, and act on it without Philip being in the loop.' },
+    { emoji: '\u{1F91D}', cellLabel: 'Accepts negotiated pricing \u2014 commercial may involve GC PO', state: 'Decided', text: 'Philip or his office manager sees the pricing QXO quoted \u2014 whether checking online after the branch conversation or reviewing at the counter. For residential special pricing, acceptance works like any other order. For commercial jobs, acceptance may involve a PO from a general contractor rather than a homeowner e-sign \u2014 the branch captures that authorization and the platform records it. For orders exceeding $20K, Philip\'s approval gate still applies. QXO wins this job\'s spend because the branch relationship and the platform worked together \u2014 and at Philip\'s volume, winning one commercial job builds the track record that wins the next one.' },
+    null, null, null, null, null,
+  ],
+  elena_a: [
+    { emoji: '\u{1F3AF}', cellLabel: 'Contract pricing, API integration, KAM relationship \u2014 not branch walk-ins', state: 'Strategic', text: 'Elena\'s relationship with QXO is either historical or it\'s a competitive win from another distributor. Stage 0 for Elena is about integration depth, contract pricing, and service commitments \u2014 not branch walk-ins. Her procurement team evaluates QXO\'s API capabilities, CRM integration options (ServiceTitan), and multi-branch account structure before committing volume. Elena has a dedicated Key Account Manager (KAM) and potentially a National Account Rep who manage the overall relationship, pricing agreements, and service-level commitments. This is the white-glove experience. Elena knows her volume gives her leverage \u2014 she can pit QXO against ABC and SRS for the most favorable pricing. QXO can\'t win on price alone at this scale. It wins on integration depth, delivery reliability, and the operational cost of switching.' },
+    { emoji: '\u{1F4CB}', cellLabel: 'Leads from ServiceTitan \u2014 20+ concurrent projects, multi-trade', state: 'Managerial', text: 'Elena gets leads from her enterprise CRM (ServiceTitan). Large projects often involve multiple trades. Her project managers triage leads by project type and complexity. Elena sees the lead as part of a portfolio, not an isolated job \u2014 she\'s thinking about resource allocation across 20+ concurrent projects. At her scale, the \'lead\' may also be a standing contract with a property management company or a builder relationship that generates recurring work. The KAM may surface opportunities proactively: \'We\'re seeing a surge in multi-family reroofs in your market \u2014 do you have capacity?\'' },
+    { emoji: '\u{1F3BC}', cellLabel: 'PMs create Jobs via API or platform \u2014 role-based access, Elena approves', state: 'Orchestrating', text: 'Elena\'s project managers create Jobs, often with multiple Builds per Job. She needs role-based access \u2014 PM creates, Elena approves. She needs an organizational hierarchy: company \u2192 project \u2192 job \u2192 build. At her scale, Job creation may happen through API integration with ServiceTitan rather than through the QXO platform UI directly. The platform\'s value is the data layer and integration \u2014 not necessarily the interface. Whether a PM creates a Job in ServiceTitan and it syncs to QXO, or creates it directly in the QXO platform, the record is the same. She\'s thinking in phases and portfolios, not individual jobs.' },
+    { emoji: '\u{1F680}', cellLabel: 'PMs run ATB for residential \u2014 Elena retains approval authority', state: 'Delegating', text: 'Elena delegates ATB to her project managers for the residential side of her portfolio. She retains approval authority on tier composition and pricing for quality control, but she doesn\'t touch ATB herself. For a standard residential reroof, the PM runs ATB Blue, the proposal generates with Elena\'s company branding and saved templates, and Elena reviews only if the job exceeds a threshold. ATB bundles measurement, template selection, material configuration, and proposal formatting into one flow \u2014 stages 4 and 5 are rolled in. At Elena\'s volume, this automation is table stakes. She may bypass ATB Blue entirely for large commercial projects, which follow the Custom / Negotiated path instead.' },
+    { emoji: '\u23ED\uFE0F', cellLabel: 'Skip \u2014 rolled into ATB', state: 'N/A', text: 'ATB bundles template selection, material configuration, and Build assembly into the estimation step. Elena\'s extensive template library \u2014 managed by her operations team with version control and approval workflows \u2014 powers the proposal automatically. Multi-trade templates bundle roofing + siding. Her standardized Builds are intellectual property. There\'s no separate Template & Build stage needed for ATB proposals.' },
+    { emoji: '\u23ED\uFE0F', cellLabel: 'Skip \u2014 rolled into ATB', state: 'N/A', text: 'The homeowner-facing proposal was generated as part of the ATB flow. Elena\'s dedicated estimating team reviews every quote before it goes to the homeowner \u2014 bulk proposal management handles the 20+ active bids she may have at any time. There\'s no separate quoting step for ATB proposals.' },
+    { emoji: '\u{1F441}\uFE0F', cellLabel: 'PM processes acceptance \u2014 auto-order or $50K approval gate', state: 'Oversight', text: 'Elena\'s project manager processes acceptances. For standard residential projects, auto-order triggers instantly \u2014 no manual intervention. For large projects exceeding $50K, the order needs Elena\'s manual review before it fires. She needs portfolio-level acceptance tracking across all 20+ active projects. At her scale, auto-order isn\'t a convenience feature \u2014 it\'s operational necessity. Without it, her procurement team would spend hours per day on manual order entry.' },
+    { emoji: '\u{1F4CA}', cellLabel: 'Delivery is operational infrastructure \u2014 API to ServiceTitan, KAM owns SLAs', state: 'Managing', text: 'At Elena\'s scale, delivery isn\'t a feature \u2014 it\'s operational infrastructure. Her logistics coordinator manages deliveries across 20+ active jobsites. She needs routing optimization, integration with her crew scheduling system, and a multi-site delivery dashboard. But Elena is less likely to use the QXO platform UI for tracking \u2014 she wants delivery data pushed via API to ServiceTitan or her internal systems so her team works from one screen. A single late delivery is an inconvenience. A pattern of late deliveries is an operational problem that her KAM needs to address in a QBR. The KAM owns delivery SLAs and is accountable when the branch falls short. This is where QXO either proves it can operate at enterprise scale or loses credibility.' },
+    { emoji: '\u2699\uFE0F', cellLabel: 'Daily supplementals across 20+ sites \u2014 batch ordering, inherited pricing', state: 'Operational', text: 'At Elena\'s scale, supplemental orders happen daily across 20+ active jobsites. Her procurement team needs a streamlined flow: \'add to existing job\' that inherits original contract pricing and terms. Batch supplemental ordering across multiple jobsites in a single session is essential \u2014 her procurement coordinator shouldn\'t have to open 20 separate jobs to add materials. The supplemental flow should be API-accessible so it can be triggered from ServiceTitan. Every friction point in supplemental ordering multiplied by 20+ active jobs becomes an operational burden that makes Elena question whether QXO is making her life easier than ABC would.' },
+    { emoji: '\u{1F3DB}\uFE0F', cellLabel: 'NetSuite integration, lien waivers, contract pricing enforcement', state: 'Systematic', text: 'Elena\'s AP department processes payments across multiple invoices for 20+ active projects simultaneously. She needs deep integration with enterprise accounting systems (NetSuite) \u2014 not QuickBooks like Philip. Lien waiver management is required for every project. Contract pricing must be enforced consistently across every invoice \u2014 if a single order bills at list price instead of Elena\'s negotiated contract rate, it erodes trust in the system. The KAM is accountable for pricing accuracy. At this scale, payment isn\'t about convenience \u2014 it\'s about enterprise-grade financial controls.' },
+    { emoji: '\u{1F517}', cellLabel: 'Multi-phase margin roll-up, ServiceTitan write-back \u2014 integration stickiness', state: 'Integrated', text: 'This job closes as part of Elena\'s portfolio. Multi-phase projects roll up all phases into a total project margin. CRM write-back to ServiceTitan is mandatory \u2014 the job record flows back automatically so Elena\'s team has a complete picture without re-entering data. Every closed job with clean data flowing back increases QXO\'s integration stickiness. The cost of unwinding this integration \u2014 rebuilding API connections, retraining the team on a new system, losing historical data \u2014 is what keeps Elena on the platform, not loyalty or pricing alone.' },
+    { emoji: '\u{1F4C8}', cellLabel: 'QBRs with KAM \u2014 delivery SLAs, margin trends, integration depth as moat', state: 'Strategic', text: 'Elena\'s quarterly business reviews with her KAM draw on portfolio-level analytics: margin trends by project type, delivery performance by branch, product mix evolution, and manufacturer rebate tracking. Elena\'s question is whether QXO is making her operation run better than it would with ABC or SRS. The answer lives in the data: on-time delivery rates, pricing accuracy, API uptime, and the operational cost of switching. If the integration is deep enough \u2014 ServiceTitan sync, NetSuite invoicing, delivery API, template library \u2014 the switching cost becomes prohibitive. Not because Elena is locked in, but because she\'d be operationally worse off without QXO. The KAM and National Account Rep use these QBRs to proactively address issues before they become reasons to split volume.' },
+  ],
+  elena_b: [
+    null,
+    null,
+    null,
+    { emoji: '\u23ED\uFE0F', cellLabel: 'Skip \u2014 procurement team knows the spec', state: 'N/A', text: 'Elena\'s procurement team already knows exactly what materials are needed for this job type. No estimation or measurement step required. They move straight to loading the appropriate Build template from Elena\'s operations-managed library.' },
+    { emoji: '\u{1F6D2}', cellLabel: 'Operations-managed templates \u2014 version-controlled, multi-trade, IP', state: 'Controlled', text: 'Elena has an extensive template library managed by her operations team. This is the most common ordering path at enterprise scale \u2014 her procurement team loads a standardized Build and adjusts quantities. Version control and approval workflows ensure consistency: a PM can\'t modify the master template without operations sign-off. Multi-trade templates bundle roofing + siding into a single Build. Elena\'s standardized Builds are intellectual property \u2014 they represent years of optimized material specs and waste factors. The master/instance model is critical: the master template stays locked, each job gets an instance that can be adjusted. Whether the procurement team loads this template through the QXO platform or it\'s pulled via API into ServiceTitan, the Build is the same.' },
+    { emoji: '\u23ED\uFE0F', cellLabel: 'Skip \u2014 orders at contract pricing', state: 'N/A', text: 'This is a procurement order at Elena\'s pre-negotiated contract pricing. No proposal or quote needed \u2014 the pricing was negotiated at the account level by the KAM and National Account Rep. Her team sees contract pricing, they\'re ready to order.' },
+    { emoji: '\u2705', cellLabel: 'Procurement order fires \u2014 API or platform, $50K gate', state: 'Decided', text: 'Elena\'s procurement team confirms the Build order at contract pricing. The order may fire through the QXO platform or through API integration with ServiceTitan \u2014 at her scale, the ordering interface matters less than the data accuracy. For standard orders, this flows automatically. For orders exceeding $50K, Elena\'s approval gate triggers. Contract pricing is enforced on every order \u2014 if the system ever charges list price instead of Elena\'s negotiated rate, it\'s a KAM-level issue. This is the cleanest path: standardized template, contract pricing, no negotiation.' },
+    null, null, null, null, null,
+  ],
+  elena_c: [
+    null,
+    null,
+    null,
+    { emoji: '\u{1F3D7}\uFE0F', cellLabel: 'KAM-involved estimation \u2014 large commercial, custom spec', state: 'Collaborative', text: 'For large commercial projects or multi-phase work that doesn\'t fit Elena\'s standard templates, the estimation process involves her KAM and potentially the National Account Rep. This is white-glove service: the KAM may coordinate with QXO\'s commercial product specialists to help Elena\'s estimating team spec unfamiliar systems or source specialty materials. For a large multi-family reroof or a commercial project with multiple roofing systems, the estimation conversation happens in person or over structured calls \u2014 not through the platform UI. The platform captures the outcome as the persistent record, but the estimation itself is a collaborative, relationship-driven process.' },
+    { emoji: '\u{1F527}', cellLabel: 'Custom Build \u2014 operations team assembles from estimation spec', state: 'Assembling', text: 'The estimation conversation produces a custom materials spec that Elena\'s operations team assembles into a formal Build. There\'s no template for this job \u2014 it\'s a one-off configuration for a project that doesn\'t match her standard library. For a multi-phase commercial project, each phase may get its own Build with different materials and delivery timing. Elena\'s operations team needs the platform to support project-level organization: multiple Builds under one project umbrella, each with its own timeline. The KAM may review the Build to ensure pricing and availability align before it moves to quoting.' },
+    { emoji: '\u{1F4B0}', cellLabel: 'Iterative quoting \u2014 KAM negotiates, estimating team reviews each version', state: 'Negotiating', text: 'Large commercial quoting at Elena\'s scale is iterative and involves multiple stakeholders. Elena\'s dedicated estimating team reviews every quote version before it goes external. The KAM negotiates pricing on specialty items or volume commitments. The building owner or property management company may come back with scope changes, value engineering requests, or phasing adjustments \u2014 each revision flows through Elena\'s estimating team and may require KAM involvement on pricing. The platform tracks quote versions so Elena\'s team isn\'t losing track of which revision is current across 20+ active bids. Unlike residential G/B/B proposals, these are formal bid submissions that may include phasing schedules, material specifications, and warranty terms.' },
+    { emoji: '\u{1F91D}', cellLabel: 'Contract award \u2014 phased procurement plan, KAM-managed', state: 'Decided', text: 'For large commercial projects, acceptance isn\'t a homeowner e-signing a proposal \u2014 it\'s a contract award that may involve formal documentation, bonding verification, and phased procurement planning. The \'order\' isn\'t a single materials purchase \u2014 it\'s a staged procurement plan tied to project milestones. The KAM coordinates with the branch to ensure stock allocation and delivery capacity for each phase. For orders exceeding $50K, Elena\'s approval gate applies. The platform records the contract terms and phases so procurement can execute against them over weeks or months.' },
+    null, null, null, null, null,
+  ],
+  diego: [
+    { emoji: '\u{1F64F}', cellLabel: 'Breaking the retail barrier \u2014 bilingual OSR bridges the gap', state: 'Hesitant but hopeful', text: 'Diego is a skilled Hispanic contractor buying materials at Home Depot because the distributor experience feels unwelcoming. He\'s 70% more likely to buy at retail than from a distributor \u2014 not because of price, but because of trust and accessibility. Nobody has explained in Spanish that distributor pricing is significantly cheaper. The credit application is in English. The catalog is in English. The website is in English. A bilingual OSR who visits Diego\'s jobsite, speaks to him in Spanish, and walks him through the first order is the difference between capturing this customer for 10+ years and losing him to retail forever. Diego\'s loyalty will be to this person first and the platform second. The branch relationship is the anchor for everything that follows.' },
+    { emoji: '\u{1F4AA}', cellLabel: 'Word-of-mouth lead \u2014 WhatsApp is his business tool', state: 'Motivated', text: 'Diego\'s leads come from word-of-mouth within community networks \u2014 a neighbor, a church connection, a referral from another contractor. He has no CRM. WhatsApp is his primary business communication tool: he receives leads, sends photos of damage, coordinates with his crew, and quotes jobs all through WhatsApp. He quotes verbally or with a handwritten estimate. The lead itself is the same as Marcus\'s \u2014 a homeowner needs a roof. But Diego\'s tools for acting on it are minimal, and everything runs through his phone in Spanish.' },
+    { emoji: '\u{1F331}', cellLabel: 'Spanish-first platform or OSR helps create first Job on-site', state: 'First time', text: 'If the platform is available in Spanish, Diego will try creating a Job. If not, he\'s doing this on paper or asking his OSR for help. The OSR may create Diego\'s first Job on-site during a visit, walking him through the process in Spanish. The first-time experience is make-or-break \u2014 if Diego feels lost or encounters English-only screens, he won\'t come back. The platform needs to function as a Spanish-language reference guide that reinforces what the OSR showed him, so Diego can repeat the process on his own without having to call the branch every time. The omnichannel experience means the Job record looks the same whether Diego\'s OSR created it at the jobsite or Diego created it himself on his phone \u2014 both in Spanish.' },
+    { emoji: '\u{1F4DA}', cellLabel: 'ATB Blue in Spanish \u2014 accurate bids replace mental math', state: 'Learning', text: 'Diego currently estimates by mental math or hand measurement. He often underprices because he doesn\'t have accurate takeoff data. ATB Blue at $20 could be transformative: accurate measurements and professional proposals generated in Spanish with Diego\'s business name. But the interface has to be accessible \u2014 Diego knows how to install a roof, not how to navigate a distributor catalog. The AI chatbot in Spanish is a key unlock here: Diego can ask product questions in Spanish and get spec answers he\'d otherwise need to call the branch for. \'What underlayment do I need for this pitch?\' \u2014 answered instantly in Spanish from the catalog, with product docs that are normally English-only translated on the fly.' },
+    { emoji: '\u{1F9ED}', cellLabel: 'Branch defaults power the Build \u2014 AI chatbot helps him learn the catalog', state: 'Guided', text: 'Diego doesn\'t have established product preferences at the distributor catalog level. He knows what works from years of installation experience but hasn\'t translated that into brand-specific SKU ordering. He relies almost entirely on branch defaults (Layer 1 of three-tiered intelligence) \u2014 the curated templates, promotional deals, and high-stock items that the branch has configured. If the template is accurate, Diego can order successfully without knowing the full catalog. Over time, as he completes more jobs, Layer 3 (AI from his order history) starts building his preference profile automatically. The Spanish-language AI chatbot helps him understand what he\'s ordering: \'This is GAF HDZ \u2014 it\'s the most popular architectural shingle, 130 mph wind rating, lifetime warranty.\' The platform educates while it serves.' },
+    { emoji: '\u2728', cellLabel: 'Professional Spanish-language proposal \u2014 transforms his business overnight', state: 'Transformed', text: 'Diego currently quotes verbally or writes estimates by hand. A professional digital proposal with his business name, Good/Better/Best tier options, and warranty language \u2014 all in Spanish \u2014 would be a massive upgrade. This is the moment where the platform transforms Diego\'s business. His homeowner receives a branded proposal via SMS or WhatsApp that looks like it came from a company twice Diego\'s size. The proposal includes material specs, labor, and warranty terms \u2014 all in Spanish for his Spanish-speaking customers, or in English when needed. Diego goes from handwritten estimates to professional proposals overnight. The cash pricing is clear and upfront \u2014 no hidden credit terms, no confusing financing language. Total cost, pay on delivery.' },
+    { emoji: '\u{1F64C}', cellLabel: 'Homeowner accepts, auto-order fires \u2014 cash payment captured', state: 'Validated', text: 'If Diego has gotten this far, the acceptance flow works. His homeowner views the proposal, selects a tier, and confirms. The auto-order fires to the branch. This moment is the proof point: the platform just helped Diego close a job with a professional process he couldn\'t have replicated on his own. The purchase experience is cash-centric \u2014 no credit application required, no net-30 terms to navigate. Diego pays cash or COD on delivery, and the order flows through cleanly. The branch knows this is a cash order. The platform doesn\'t pressure Diego toward credit \u2014 it meets him where he is.' },
+    { emoji: '\u{1F69B}', cellLabel: 'Delivery unlocks larger jobs \u2014 sub work to full-scale business owner', state: 'Growing', text: 'QXO\'s delivery capabilities unlock jobs Diego couldn\'t take on through retail. Home Depot doesn\'t deliver 40 squares of shingles to a rooftop. QXO does. This isn\'t just a convenience \u2014 it\'s the difference between Diego subcontracting under someone else and bidding jobs as a full-scale business owner. Reliable jobsite delivery means Diego can take on larger residential reroofs, multi-day jobs, and projects that require more materials than his truck can carry. If the delivery is reliable and on time, this is the experience that converts Diego from a retail buyer to a distributor customer permanently. It\'s also the moment Diego starts to see QXO as a growth partner \u2014 not just a materials supplier, but an enabler of the bigger jobs that grow his business.' },
+    { emoji: '\u{1F4F1}', cellLabel: 'Texts his rep for more materials \u2014 WhatsApp capture as flywheel', state: 'Building trust', text: 'Diego\'s on the roof and needs 3 more bundles. His instinct is to text his OSR directly \u2014 probably through WhatsApp or SMS. Right now, that conversation happens outside the system entirely: the rep reads the text, calls the branch, places the order manually. The platform should capture this. If WhatsApp messages to his OSR can be tied into an automated workflow \u2014 Diego texts \'necesito 3 paquetes m\u00E1s de HDZ para Oak Street,\' the system recognizes the Job, the materials, and generates a supplemental order for the rep to confirm \u2014 that\'s a flywheel. The communication channel Diego already uses becomes the ordering channel. Over time, this teaches Diego to trust the platform for ordering through the relationship he already trusts. Low stakes, urgent need, clear outcome, in his language.' },
+    { emoji: '\u{1F4B5}', cellLabel: 'Cash/COD \u2014 simple, transparent, no credit pressure', state: 'Comfortable', text: 'Diego pays cash or COD. The payment experience needs to be simple, transparent, and free of friction. No credit application pop-ups. No upsell to net-30 terms. Just a clear invoice in Spanish showing what he ordered, what he paid, and what his margin looks like on this job. This is where QXO has historically stumbled \u2014 trying to push every customer onto credit accounts with credit lines, which feels intimidating and unnecessary to a cash-centric business owner. For Diego, the platform\'s job isn\'t to make payment sophisticated. It\'s to make it easy, transparent, and feel safer than paying cash at Home Depot\'s register. Every clean cash transaction builds the trust that eventually makes credit feel possible.' },
+    { emoji: '\u{1F331}', cellLabel: 'Job history builds \u2014 first business intelligence Diego has ever had', state: 'Growing', text: 'Diego\'s job closes and his job history is building in the platform. For the first time, he has data: average job cost, actual waste per job type, seasonal patterns, and margins he didn\'t know he had. This is business intelligence that Diego never had access to before \u2014 not because he wasn\'t smart enough to use it, but because nobody built it for him in his language. The platform shows him his completed job record in Spanish: materials cost, what he charged, his margin. He starts to see patterns. The data makes him a better business owner with every job, and it\'s all happening in the system he\'s already using \u2014 no spreadsheets, no separate tools, no English-only reports.' },
+    { emoji: '\u{1F4A1}', cellLabel: 'Margin visibility, business growth \u2014 trust-first path to credit', state: 'Scaling', text: 'Over time, Diego\'s accumulated job history becomes the business education he never had. The platform shows him margins he didn\'t know existed: \'You\'re averaging 22% gross margin \u2014 industry benchmark is 30-40%.\' In Spanish. With actionable suggestions. This is the Build Intelligence layer at its most transformative \u2014 teaching a talented installer how to be a profitable business owner. And this is where the credit conversation can finally happen, but only because trust has been built first. Diego has completed dozens of cash jobs through QXO. His OSR knows him. The branch knows him. The platform has his full job history proving his business works. Now the platform can introduce credit not as a sales pitch but as a growth tool: \'Diego, you\'ve done $180K in jobs this year. A credit line means you don\'t have to front $8K in materials for the next big job \u2014 you pay when you get paid.\' In Spanish. From his OSR. Backed by data. This is the opposite of putting a stranger on credit day one \u2014 it\'s earning the right to offer it.' },
+  ],
+  insurance: [
+    { emoji: '\u26C8\uFE0F', state: 'Urgent', text: 'A major hail event hits a new market. The insurance restoration contractor deploys 3-5 crews and needs a local materials source that can deliver 20+ roofs in a two-week window. If QXO\'s branch has stock and can accommodate the surge, the relationship cements through performance. If QXO is out of stock while ABC and SRS deliver, the relationship dies before it starts.' },
+    { emoji: '\u{1F3AF}', state: 'Hunt mode', text: 'The lead doesn\'t come from a homeowner deciding to replace their roof. It comes from a storm event. HailTrace or weather data flags the affected area. The contractor deploys crews to neighborhoods, knocks doors, inspects damage. Speed is everything \u2014 5 other contractors are knocking the same doors within 48 hours. The lead source is weather data, not CRM.' },
+    { emoji: '\u{1F4CB}', state: 'Systematic', text: 'The job needs additional metadata: claim number, adjuster name, insurance company, date of loss, and authorization status. Without this metadata, the platform can\'t support the claim-driven workflow. The job type should be flagged as \'insurance restoration.\'' },
+    { emoji: '\u{1F4CA}', state: 'Specialized', text: 'ATB Blue is not the estimation tool for insurance restoration. The estimate comes from Xactimate. Initial adjuster estimates typically understate scope by 35\u201350%. The experienced contractor writes supplements to recover 25\u201330% additional revenue. The platform needs to integrate with Xactimate or provide a translation layer.' },
+    { emoji: '\u{1F4CE}', state: 'Constrained', text: 'The Build is constrained by the insurance claim. Materials aren\'t preference-driven \u2014 they\'re what the adjuster approved in the Xactimate scope. The Build template is effectively external \u2014 generated from Xactimate line items, not saved preferences.' },
+    { emoji: '\u{1F6E1}\uFE0F', state: 'Advisory', text: 'The insurance \'quote\' is not a traditional G/B/B proposal. It\'s the Xactimate scope presented alongside insurance claim details: \'here\'s what your insurance covers\' plus optional upgrades the homeowner can pay out of pocket. The psychology is fundamentally different from retail.' },
+    { emoji: '\u23F3', state: 'In progress', text: 'The homeowner signs a claims authorization, not a traditional proposal acceptance. Materials order may not fire immediately \u2014 it depends on claim approval status. The platform needs to support a conditional order state: \'authorized, pending claim approval.\'' },
+    { emoji: '\u26A1', state: 'Urgent', text: 'Post-storm surge creates massive delivery bottlenecks. Every restoration contractor needs materials simultaneously. Priority delivery or guaranteed stock allocation for established accounts is a competitive advantage. The contractor who gets materials first gets the authorization signed first.' },
+    { emoji: '\u{1F4F8}', state: 'Documenting', text: 'Supplemental orders are especially common in insurance restoration. The original scope couldn\'t account for hidden damage. The platform should capture supplementals in a way that feeds directly into supplement documentation for the insurance adjuster.' },
+    { emoji: '\u{1F4B0}', state: 'Cash-strapped', text: 'Payment follows the insurance claim cycle \u2014 fundamentally different from standard net-30. The contractor floats materials and labor costs while waiting for claim payments. This cycle can stretch weeks to months. QXO\'s credit terms need to accommodate this reality.' },
+    { emoji: '\u{1F4C1}', state: 'Finally', text: 'The job doesn\'t close when the roof is installed \u2014 it closes when the final insurance payment is received, which may be months later. The job record needs to track original scope, supplements, total claim value, and actual materials used.' },
+    { emoji: '\u{1F32A}\uFE0F', state: 'Data-driven', text: 'Portfolio intelligence includes storm pattern analysis, supplement success rates, actual vs. Xactimate-estimated materials, and market deployment ROI. This data doesn\'t exist anywhere else in the restoration contractor\'s tech stack.' },
+  ],
+  commercial: [
+    { emoji: '\u{1F50D}', state: 'Qualifying', text: 'Stage 0 is a capability qualification. Can QXO supply commercial systems \u2014 TPO, PVC, EPDM, modified bitumen, metal? Does the branch have commercial technical expertise? Can QXO provide bonding documentation and lien waiver management? The branch needs to demonstrate commercial competence before the relationship starts.' },
+    { emoji: '\u{1F4D0}', state: 'Evaluating', text: 'The contractor receives a bid invitation from a general contractor or building owner. This is a formal RFP with architectural drawings, material specs, schedule requirements, and bonding thresholds. The \'lead\' is a business development function, not a marketing funnel.' },
+    { emoji: '\u{1F3D7}\uFE0F', state: 'Meticulous', text: 'Needs a Project entity with phases, not a single Job. GC contact fields, bonding info, insurance certificates, project phases, and approval workflows. A commercial reroof may involve multiple phases, each a separate Build with different materials and delivery timing.' },
+    { emoji: '\u2694\uFE0F', state: 'Competitive', text: 'Estimation starts from architectural drawings, not aerial measurement. The platform needs to accept manual takeoff inputs or integrate with commercial estimation tools. The bid is a competitive process against 3-5 other bidders on the same spec.' },
+    { emoji: '\u{1F4CF}', state: 'Spec-compliant', text: 'Builds are spec-driven, not preference-driven. The architect specified the roofing system. The contractor builds from the bid spec, not from saved templates. The platform needs to support commercial material systems with manufacturer-specific accessory requirements.' },
+    { emoji: '\u{1F4DD}', state: 'Competitive', text: 'The quote is a formal bid submission \u2014 itemized labor and materials by phase, bonding documentation, insurance certificates, project schedule. The contractor is competing on price, qualifications, schedule, and track record. No G/B/B tiers \u2014 one bid at the best price.' },
+    { emoji: '\u{1F3C6}', state: 'Awarded', text: 'Contract award requires bonding verification, insurance certificate exchange, and formal contract execution. The \'order\' isn\'t a single materials purchase \u2014 it\'s a phased procurement plan. The platform needs to support staged ordering tied to project milestones.' },
+    { emoji: '\u{1F4C5}', state: 'Scheduled', text: 'Phased deliveries over weeks or months. Each delivery coordinated with other trades on the jobsite. Crane coordination may be required for rooftop delivery on multi-story commercial buildings.' },
+    { emoji: '\u{1F527}', state: 'Adjusting', text: 'Commercial projects span weeks to months, making supplementals a regular occurrence. Phase-level supplementals should be linked to the project phase, not treated as standalone orders. The platform needs phase-level cost tracking.' },
+    { emoji: '\u23F0', state: 'Patient', text: 'Milestone-based payment. Each invoice may require a lien waiver before the GC releases payment. Retainage holdbacks of 10% are standard \u2014 the contractor doesn\'t receive the full amount until final project acceptance, months after the last delivery.' },
+    { emoji: '\u{1F4CB}', state: 'Complete', text: 'The project closes after final retainage is released. Project-level margin analysis rolls up all phases: did actual materials cost match the bid? Where were the overruns?' },
+    { emoji: '\u{1F9EE}', state: 'Informed', text: 'Portfolio intelligence includes bid win rate by project type and GC, project margin analysis, materials cost benchmarking per roofing system type, and delivery performance trends. This data informs future bids and GC relationship strategy.' },
+  ],
+  newconstruction: [
+    { emoji: '\u{1F91D}', state: 'Compliant', text: 'The subcontractor often doesn\'t choose their distributor \u2014 the builder does. The builder specifies QXO as the materials source, and the sub follows. Stage 0 is passive. Alternatively, the sub\'s existing relationship may drive the builder\'s source. Either way, the relationship is builder-mediated.' },
+    { emoji: '\u23ED\uFE0F', state: 'N/A', text: 'Stage 1 does not apply. The new construction sub doesn\'t generate leads from homeowners. Their \'lead\' was the builder subcontract \u2014 which happened outside the QXO journey entirely.' },
+    { emoji: '\u{1F3D8}\uFE0F', state: 'Production-minded', text: 'The sub doesn\'t create one job \u2014 they create jobs for an entire development. 20, 50, or 100 units of the same spec tied to a single builder contract. Needs bulk job creation from a single template, with each unit as a child job.' },
+    { emoji: '\u23ED\uFE0F', state: 'N/A', text: 'Estimation is part of the builder bid, which happened outside the QXO journey. The sub knows exactly what they\'re installing because the builder specified it. No ATB Blue needed.' },
+    { emoji: '\u{1F501}', state: 'Repetitive', text: 'The Build is externally locked by the builder\'s specification. The materials, brand, and product line are predetermined. The sub doesn\'t choose, customize, or override \u2014 they order exactly what the builder specified. The same Build repeats across 20-100 units.' },
+    { emoji: '\u23ED\uFE0F', state: 'N/A', text: 'No quoting stage. The builder contract sets the price. The sub isn\'t generating proposals for homeowners.' },
+    { emoji: '\u23ED\uFE0F', state: 'N/A', text: 'No homeowner acceptance. Builder contract governs. The sub orders materials per the construction schedule, not per a proposal acceptance event.' },
+    { emoji: '\u{1F3D7}\uFE0F', state: 'Sequenced', text: 'New construction deliveries are timed to the construction schedule \u2014 can\'t roof before framing is complete. A development of 50 homes might need 50 separate deliveries over 3-4 months, each triggered by framing completion on that specific unit.' },
+    { emoji: '\u{1F4C8}', state: 'Optimizing', text: 'High repetition makes supplemental patterns predictable. If unit #3 needed extra materials, units #4 through #50 probably will too. The platform should surface this pattern and offer to auto-adjust the Build template for remaining units.' },
+    { emoji: '\u23F3', state: 'Waiting', text: 'Payment is tied to construction draws \u2014 averaging 74 days from invoice to payment. The sub is floating materials AND labor costs for 2.5 months. QXO needs credit terms that bridge this gap \u2014 standard net-30 doesn\'t work when the sub won\'t be paid for 74 days.' },
+    { emoji: '\u{1F504}', state: 'Pattern recognition', text: 'Each unit closes individually. After 5-10 units, clear patterns emerge: actual waste per floorplan type, supplemental frequency, delivery timing accuracy. The platform should auto-adjust the Build template for remaining units.' },
+    { emoji: '\u{1F3D8}\uFE0F', state: 'Calculating', text: 'Development-level analytics show per-unit cost, waste variance by floorplan type, supplemental frequency, and builder relationship ROI. The platform can reveal margin differences between floorplan types, informing whether the builder relationship is worth pursuing.' },
+  ],
+};
+
+// ── Build Grid (supports multi-path personas) ──
+const grid = document.getElementById('grid');
+
+// Header row — explicit placement
+const corner = document.createElement('div');
+corner.style.gridRow = '1'; corner.style.gridColumn = '1';
+grid.appendChild(corner);
+
+stages.forEach((s, si) => {
+  const div = document.createElement('div');
+  div.className = 'stage-header';
+  div.style.gridRow = '1'; div.style.gridColumn = `${si + 2}`;
+  div.innerHTML = `<div class="sh-num">Stage ${s.num}</div><div class="sh-name">${s.name}</div>`;
+  grid.appendChild(div);
+});
+
+// Persona rows — explicit placement for rowspan support
+let rowIdx = 2;
+
+personas.forEach((p, pi) => {
+  const isMulti = !!p.paths;
+  const pathCount = isMulti ? p.paths.length : 1;
+
+  if (!isMulti) {
+    // ── Single-path persona (legacy) ──
+    const label = document.createElement('div');
+    label.className = 'persona-label';
+    label.style.gridRow = `${rowIdx}`; label.style.gridColumn = '1';
+    const labelDim = pi > 3 ? 'opacity:0.5;' : '';
+    label.innerHTML = `
+      <div class="pl-dot" style="background:${p.colorHex};${labelDim}"></div>
+      <div><div class="pl-type" style="${labelDim}">${p.type}</div>${p.name ? `<div class="pl-name" style="${labelDim}">${p.name}</div>` : ''}</div>
+    `;
+    grid.appendChild(label);
+
+    const statusClass = pi <= 3 ? 'finished' : 'draft';
+    p.tracks.forEach((track, si) => {
+      const cell = document.createElement('div');
+      cell.className = `cell ${track.t} ${p.colorClass} ${statusClass}`;
+      cell.style.gridRow = `${rowIdx}`; cell.style.gridColumn = `${si + 2}`;
+      cell.dataset.persona = pi; cell.dataset.stage = si; cell.dataset.path = '0';
+
+      if (track.t === 'core') {
+        const n = narratives[p.key][si];
+        cell.innerHTML = `<div class="core-text">${n.cellLabel || n.state}</div>`;
+      } else if (track.t === 'variant') {
+        cell.innerHTML = `<div class="variant-text">${track.label}</div>`;
+      } else {
+        cell.innerHTML = `<div class="skip-text">Skip</div>`;
+      }
+      grid.appendChild(cell);
+    });
+
+    rowIdx += 1;
+
+  } else {
+    // ── Multi-path persona ──
+    const statusClass = pi <= 3 ? 'finished' : 'draft';
+
+    // Path labels (one per sub-row)
+    p.paths.forEach((path, pathIdx) => {
+      const label = document.createElement('div');
+      label.className = 'persona-label';
+      label.style.gridRow = `${rowIdx + pathIdx}`; label.style.gridColumn = '1';
+      const dotColor = p.pathColors ? p.pathColors[pathIdx] : p.colorHex;
+      const dimStyle = pathIdx > 0 ? 'opacity:0.5;' : '';
+      label.innerHTML = `
+        <div class="pl-dot" style="background:${dotColor};${dimStyle}"></div>
+        <div>
+          <div class="pl-type" style="${dimStyle}">${p.type}</div>
+          <div class="pl-name" style="font-style:italic">${path.label}</div>
+        </div>
+      `;
+      grid.appendChild(label);
+    });
+
+    // Cells per stage
+    for (let si = 0; si < stages.length; si++) {
+      const firstTrack = p.paths[0].tracks[si];
+
+      if (firstTrack.t === 'shared') {
+        // Shared cell — spans all path rows
+        const cell = document.createElement('div');
+        cell.className = `cell core ${p.colorClass} ${statusClass}`;
+        cell.style.gridRow = `${rowIdx} / span ${pathCount}`;
+        cell.style.gridColumn = `${si + 2}`;
+        cell.dataset.persona = pi; cell.dataset.stage = si;
+        cell.dataset.path = '0'; cell.dataset.shared = 'true';
+
+        const n = narratives[p.paths[0].key][si];
+        cell.innerHTML = `<div class="core-text">${n.cellLabel || n.state}</div>`;
+        grid.appendChild(cell);
+
+      } else {
+        // Path-specific cells
+        p.paths.forEach((path, pathIdx) => {
+          const track = path.tracks[si];
+          const cell = document.createElement('div');
+          cell.className = `cell ${track.t} ${p.colorClass} ${statusClass}`;
+          cell.style.gridRow = `${rowIdx + pathIdx}`;
+          cell.style.gridColumn = `${si + 2}`;
+          cell.dataset.persona = pi; cell.dataset.stage = si;
+          cell.dataset.path = `${pathIdx}`;
+
+          if (track.t === 'core') {
+            const n = narratives[path.key][si];
+            cell.innerHTML = `<div class="core-text">${n.cellLabel || n.state}</div>`;
+          } else if (track.t === 'variant') {
+            cell.innerHTML = `<div class="variant-text">${track.label}</div>`;
+          } else {
+            cell.innerHTML = `<div class="skip-text">Skip</div>`;
+          }
+          grid.appendChild(cell);
+        });
+      }
+    }
+
+    rowIdx += pathCount;
+  }
+});
+
+// ── SVG Lines (one line per path) ──
+function drawLinePath(points, color, dashed, isDraft) {
+  const svg = document.getElementById('svg-lines');
+  for (let i = 0; i < points.length - 1; i++) {
+    const f = points[i], t = points[i + 1];
+    const isSkip = f.skip || t.skip;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', f.x); line.setAttribute('y1', f.y);
+    line.setAttribute('x2', t.x); line.setAttribute('y2', t.y);
+    line.setAttribute('stroke', isSkip ? '#ef4444' : color);
+    line.setAttribute('stroke-width', isSkip ? '1' : '1.5');
+    const opacity = isSkip ? '0.2' : isDraft ? '0.08' : (dashed ? '0.18' : '0.25');
+    line.setAttribute('stroke-opacity', opacity);
+    if (isSkip) line.setAttribute('stroke-dasharray', '4 3');
+    else if (dashed) line.setAttribute('stroke-dasharray', '6 3');
+    svg.appendChild(line);
+  }
+}
+
+function cellCenter(cell, rect) {
+  const cr = cell.getBoundingClientRect();
+  return { x: cr.left + cr.width / 2 - rect.left, y: cr.top + cr.height / 2 - rect.top, skip: cell.classList.contains('skip') };
+}
+
+function drawLines() {
+  const svg = document.getElementById('svg-lines');
+  const container = document.querySelector('.map-container');
+  const rect = container.getBoundingClientRect();
+  svg.setAttribute('width', container.scrollWidth);
+  svg.setAttribute('height', container.scrollHeight);
+  svg.innerHTML = '';
+
+  personas.forEach((p, pi) => {
+    const isMulti = !!p.paths;
+    const pathCount = isMulti ? p.paths.length : 1;
+
+    for (let pathIdx = 0; pathIdx < pathCount; pathIdx++) {
+      const points = [];
+      for (let si = 0; si < stages.length; si++) {
+        let cell = grid.querySelector(`.cell[data-persona="${pi}"][data-stage="${si}"][data-path="${pathIdx}"]`);
+        if (!cell) cell = grid.querySelector(`.cell[data-persona="${pi}"][data-stage="${si}"][data-shared="true"]`);
+        if (cell) points.push(cellCenter(cell, rect));
+      }
+      const lineColor = (p.pathColors && p.pathColors[pathIdx]) ? p.pathColors[pathIdx] : p.colorHex;
+      drawLinePath(points, lineColor, isMulti && pathIdx > 0, pi > 3);
+    }
+  });
+}
+drawLines();
+window.addEventListener('resize', drawLines);
+
+// ── Detail Panel (path-aware) ──
+const panel = document.getElementById('panel');
+const pStage = document.getElementById('p-stage');
+const pPersona = document.getElementById('p-persona');
+const pName = document.getElementById('p-name');
+const pBody = document.getElementById('p-body');
+const pPrev = document.getElementById('p-prev');
+const pNext = document.getElementById('p-next');
+let curPI = -1, curSI = -1, curPath = 0;
+
+function openPanel(pi, si, pathIdx) {
+  if (pathIdx === undefined) pathIdx = 0;
+  curPI = pi; curSI = si; curPath = pathIdx;
+  const p = personas[pi];
+  const s = stages[si];
+  const isMulti = !!p.paths;
+
+  let n, track, pathLabel = '';
+  if (!isMulti) {
+    n = narratives[p.key][si];
+    track = p.tracks[si];
+  } else {
+    const isShared = p.paths[0].tracks[si].t === 'shared';
+    if (isShared) {
+      n = narratives[p.paths[0].key][si];
+      track = { t: 'core' };
+    } else {
+      const path = p.paths[pathIdx];
+      n = narratives[path.key][si];
+      track = path.tracks[si];
+      pathLabel = path.label;
+    }
+  }
+
+  const panelColor = (isMulti && p.pathColors) ? p.pathColors[pathIdx] : p.colorHex;
+  panel.style.borderLeftColor = panelColor;
+  pStage.textContent = `Stage ${s.num} \u2014 ${s.name}`;
+  pPersona.textContent = p.type;
+  pPersona.style.color = panelColor;
+  pName.textContent = pathLabel || p.name || '';
+
+  let html = '';
+  if (track.t === 'skip') {
+    html += `<div class="panel-skip-badge">Stage Skipped</div>`;
+  }
+  html += `<div class="panel-emotion"><span class="panel-emoji">${n.emoji}</span><span class="panel-state">${n.state}</span></div>`;
+  html += `<div class="panel-narrative ${track.t === 'skip' ? 'skip-text' : ''}">${n.text}</div>`;
+  pBody.innerHTML = html;
+  pBody.scrollTop = 0;
+
+  pPrev.disabled = si === 0;
+  pNext.disabled = si === stages.length - 1;
+
+  grid.querySelectorAll('.cell.selected').forEach(c => c.classList.remove('selected'));
+  let sel = grid.querySelector(`.cell[data-persona="${pi}"][data-stage="${si}"][data-path="${pathIdx}"]`);
+  if (!sel) sel = grid.querySelector(`.cell[data-persona="${pi}"][data-stage="${si}"][data-shared="true"]`);
+  if (sel) sel.classList.add('selected');
+
+  panel.classList.add('open');
+}
+
+function closePanel() {
+  panel.classList.remove('open');
+  grid.querySelectorAll('.cell.selected').forEach(c => c.classList.remove('selected'));
+  curPI = -1; curSI = -1; curPath = 0;
+}
+
+document.getElementById('panel-close').addEventListener('click', closePanel);
+
+pPrev.addEventListener('click', () => { if (curSI > 0) openPanel(curPI, curSI - 1, curPath); });
+pNext.addEventListener('click', () => { if (curSI < stages.length - 1) openPanel(curPI, curSI + 1, curPath); });
+
+document.addEventListener('keydown', (e) => {
+  if (!panel.classList.contains('open')) return;
+  if (e.key === 'Escape') closePanel();
+  if (e.key === 'ArrowLeft' && curSI > 0) openPanel(curPI, curSI - 1, curPath);
+  if (e.key === 'ArrowRight' && curSI < stages.length - 1) openPanel(curPI, curSI + 1, curPath);
+  if (e.key === 'ArrowUp' && curPI > 0) openPanel(curPI - 1, curSI, 0);
+  if (e.key === 'ArrowDown' && curPI < personas.length - 1) openPanel(curPI + 1, curSI, 0);
+});
+
+// Cell click → open panel
+grid.querySelectorAll('.cell').forEach(c => {
+  c.addEventListener('click', () => {
+    openPanel(parseInt(c.dataset.persona), parseInt(c.dataset.stage), parseInt(c.dataset.path || '0'));
+  });
+});
+
+// ── Tooltip (path-aware) ──
+const tooltip = document.getElementById('tooltip');
+grid.querySelectorAll('.cell').forEach(c => {
+  c.addEventListener('mouseenter', () => {
+    const p = personas[c.dataset.persona];
+    const s = stages[c.dataset.stage];
+    const pathIdx = parseInt(c.dataset.path || '0');
+    let label = `${p.type}${p.name ? ' ' + p.name : ''}`;
+    if (p.paths && c.dataset.shared !== 'true') {
+      label += ` \u00B7 ${p.paths[pathIdx].label}`;
+    }
+    tooltip.textContent = `${label} \u2014 Stage ${s.num}`;
+    tooltip.classList.add('visible');
+  });
+  c.addEventListener('mousemove', (e) => {
+    tooltip.style.left = (e.clientX + 12) + 'px';
+    tooltip.style.top = (e.clientY + 12) + 'px';
+  });
+  c.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+});
+</script>
+</body>
+</html>
