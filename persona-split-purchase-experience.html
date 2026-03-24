@@ -103,6 +103,14 @@
   .cell.variant.draft .variant-text { opacity: 0.45; }
   .cell.draft:not(.skip) { background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.04); }
 
+  /* Tier divider */
+  .tier-divider {
+    grid-column: 1 / -1;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.02) 100%);
+    margin: 50px 0;
+  }
+
   /* Color variants */
   .col-cyan .cell.variant { border-color: var(--cyan); }
   .col-cyan .cell.variant .variant-text { color: #67e8f9; }
@@ -188,6 +196,160 @@
     max-width: 190px; line-height: 1.4; box-shadow: 0 6px 20px rgba(0,0,0,0.4);
   }
   .tooltip.visible { opacity: 1; }
+
+  /* ── CTO Context Box ── */
+  .context-box {
+    max-width: 1200px;
+    margin: 0 auto 24px auto;
+    background: #1a2332;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .context-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    cursor: pointer;
+    user-select: none;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid transparent;
+    transition: background 0.15s;
+  }
+  .context-toggle:hover { background: rgba(255,255,255,0.04); }
+  .context-box.open .context-toggle { border-bottom-color: var(--border); }
+  .context-toggle-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .context-toggle h2 {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .context-toggle .ctx-badge {
+    font-size: 0.58rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #004BEA;
+    background: rgba(0,75,234,0.12);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .context-toggle .ctx-chevron {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    transition: transform 0.2s;
+  }
+  .context-box.open .ctx-chevron { transform: rotate(180deg); }
+  .context-inner {
+    display: none;
+    padding: 0;
+  }
+  .context-box.open .context-inner { display: block; }
+
+  .ctx-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .ctx-tabs::-webkit-scrollbar { display: none; }
+  .ctx-tab {
+    padding: 10px 18px;
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    user-select: none;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: inherit;
+  }
+  .ctx-tab:hover { color: var(--text); }
+  .ctx-tab.active {
+    color: var(--text);
+    font-weight: 600;
+    border-bottom-color: #004BEA;
+  }
+
+  .ctx-panel {
+    display: none;
+    padding: 18px 20px;
+    font-size: 0.72rem;
+    line-height: 1.65;
+    color: var(--text-dim);
+    max-height: 420px;
+    overflow-y: auto;
+  }
+  .ctx-panel.active { display: block; }
+  .ctx-panel h3 {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 16px 0 6px 0;
+  }
+  .ctx-panel h3:first-child { margin-top: 0; }
+  .ctx-panel p { margin-bottom: 10px; }
+  .ctx-panel .ctx-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .ctx-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+    padding: 10px 12px;
+  }
+  .ctx-card-title {
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .ctx-card-personas {
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+  .ctx-card p {
+    font-size: 0.64rem;
+    margin-bottom: 0;
+    line-height: 1.5;
+  }
+  .ctx-tier-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 1fr 1fr 1fr 1fr;
+    gap: 1px;
+    margin-bottom: 1px;
+  }
+  .ctx-tier-cell {
+    padding: 7px 10px;
+    font-size: 0.62rem;
+    background: rgba(255,255,255,0.015);
+    border: 1px solid rgba(255,255,255,0.04);
+    line-height: 1.4;
+  }
+  .ctx-tier-cell.th {
+    font-weight: 600;
+    color: var(--text);
+    background: rgba(255,255,255,0.03);
+  }
+  .ctx-highlight {
+    color: var(--text);
+    font-weight: 500;
+  }
 </style>
 </head>
 <body>
@@ -204,6 +366,216 @@
   <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Commercial</div>
   <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>New Construction</div>
   <div class="legend-item skip"><div class="legend-dot"></div>Skipped</div>
+</div>
+
+<!-- CTO Context Box -->
+<div class="context-box" id="context-box">
+  <div class="context-toggle" onclick="document.getElementById('context-box').classList.toggle('open')">
+    <div class="context-toggle-left">
+      <h2>Journey Map Context</h2>
+      <span class="ctx-badge">Context</span>
+    </div>
+    <span class="ctx-chevron">&#9660;</span>
+  </div>
+  <div class="context-inner">
+    <div class="ctx-tabs" id="ctx-tabs">
+      <button class="ctx-tab active" data-tab="jobs">Job Types</button>
+      <button class="ctx-tab" data-tab="scaling">Platform Scaling</button>
+      <button class="ctx-tab" data-tab="concepts">Key Concepts</button>
+      <button class="ctx-tab" data-tab="growth">Growth Arcs</button>
+      <button class="ctx-tab" data-tab="opportunities">Underserved Segments</button>
+    </div>
+
+    <!-- Tab: Job Types -->
+    <div class="ctx-panel active" id="ctx-jobs">
+      <p>10 distinct job types identified across 7 personas. Each creates different platform requirements for estimation, ordering, delivery, and payment.</p>
+
+      <h3>Residential</h3>
+      <div class="ctx-grid">
+        <div class="ctx-card">
+          <div class="ctx-card-title">Standard Residential Reroof</div>
+          <div class="ctx-card-personas">Marcus &middot; Philip &middot; Elena &middot; Diego</div>
+          <p>The bread-and-butter job. ATB-eligible, template-driven, G/B/B proposals to homeowners. Volume varies by tier.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Complex Residential</div>
+          <div class="ctx-card-personas">Philip (Path A)</div>
+          <p>Hip roofs, historic homes, non-standard waste factors. ATB with manual overrides. May involve multi-trade (roofing + siding).</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Competitive Bid Residential</div>
+          <div class="ctx-card-personas">Marcus (Path C) &middot; Philip (Path C)</div>
+          <p>Another contractor is undercutting on materials. Branch provides special pricing to win the job. CPQ evaluates special pricing and may route approval.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">HOA Contract</div>
+          <div class="ctx-card-personas">Marcus (Path C) &middot; Philip (Path C)</div>
+          <p>Volume pricing negotiated with branch. Multiple properties on the same spec. Competitive against other contractors. CPQ validates the negotiated volume pricing against margin floors.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Insurance Restoration</div>
+          <div class="ctx-card-personas">Insurance Persona</div>
+          <p>Storm-driven, Xactimate-estimated, claim-constrained. Surge delivery critical. Payment follows insurance claim cycle.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Multi-Family Reroof</div>
+          <div class="ctx-card-personas">Elena</div>
+          <p>Development-scale residential at enterprise volume. Standing contracts with property management companies.</p>
+        </div>
+      </div>
+
+      <h3>Commercial</h3>
+      <div class="ctx-grid">
+        <div class="ctx-card">
+          <div class="ctx-card-title">Small Commercial</div>
+          <div class="ctx-card-personas">Philip (Path C)</div>
+          <p>Waterproofing, flat roof sections, TPO, modified bitumen. No templates exist &mdash; built from scratch with branch help. Philip is learning these systems. CPQ&rsquo;s configuration validity rules are especially important here &mdash; no template guardrails means CPQ catches compatibility and warranty issues.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Large Commercial Reroof</div>
+          <div class="ctx-card-personas">Elena (Path C)</div>
+          <p>Multi-phase, spec-driven, KAM-negotiated. Iterative quoting with building owners. Phased procurement plans. Every iteration passes through CPQ.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Commercial (Full)</div>
+          <div class="ctx-card-personas">Commercial Persona</div>
+          <p>Bid from drawings, spec-compliant, GC-mediated. Bonding, lien waivers, milestone invoicing, phased delivery over months.</p>
+        </div>
+      </div>
+
+      <h3>Residential &amp; Commercial</h3>
+      <div class="ctx-grid">
+        <div class="ctx-card">
+          <div class="ctx-card-title">New Construction</div>
+          <div class="ctx-card-personas">New Construction Persona</div>
+          <p>Builder-mediated, locked specs, 20&ndash;100 units of the same Build. Construction-schedule delivery, draw cycle payment. Can span residential developments or commercial builds.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Platform Scaling -->
+    <div class="ctx-panel" id="ctx-scaling">
+      <p>The platform serves fundamentally differently at each tier. This table shows how the same 12-stage journey requires different capabilities depending on contractor scale.</p>
+      <div style="overflow-x:auto;">
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th"></div>
+          <div class="ctx-tier-cell th">Diego (Emerging)</div>
+          <div class="ctx-tier-cell th">Marcus (Tier 3)</div>
+          <div class="ctx-tier-cell th">Philip (Tier 2)</div>
+          <div class="ctx-tier-cell th">Elena (Tier 1)</div>
+        </div>
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th">Who Does the Work</div>
+          <div class="ctx-tier-cell">Diego himself, with OSR help</div>
+          <div class="ctx-tier-cell">Marcus himself</div>
+          <div class="ctx-tier-cell">Office manager, crew leads</div>
+          <div class="ctx-tier-cell">PMs, procurement team, logistics coordinator</div>
+        </div>
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th">Ordering Interface</div>
+          <div class="ctx-tier-cell">Web (Spanish)</div>
+          <div class="ctx-tier-cell">Web</div>
+          <div class="ctx-tier-cell">Web or CRM</div>
+          <div class="ctx-tier-cell">ServiceTitan</div>
+        </div>
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th">Payment Model</div>
+          <div class="ctx-tier-cell">Cash / COD</div>
+          <div class="ctx-tier-cell">Credit</div>
+          <div class="ctx-tier-cell">Credit + third-party payment integration via CRM</div>
+          <div class="ctx-tier-cell">Credit + third-party payment integration via CRM</div>
+        </div>
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th">Account Management</div>
+          <div class="ctx-tier-cell">Bilingual OSR &mdash; loyalty to the person</div>
+          <div class="ctx-tier-cell">ISR (Victor) + OSR (Jake)</div>
+          <div class="ctx-tier-cell">ISR/OSR + heavier branch for commercial</div>
+          <div class="ctx-tier-cell">KAM + National Account Rep &mdash; white glove</div>
+        </div>
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th">Active Jobs</div>
+          <div class="ctx-tier-cell">1&ndash;2</div>
+          <div class="ctx-tier-cell">1&ndash;3</div>
+          <div class="ctx-tier-cell">5+</div>
+          <div class="ctx-tier-cell">20+</div>
+        </div>
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th">CRM Integration</div>
+          <div class="ctx-tier-cell">None</div>
+          <div class="ctx-tier-cell">None</div>
+          <div class="ctx-tier-cell">AccuLynx / JobNimbus / other</div>
+          <div class="ctx-tier-cell">ServiceTitan API sync &mdash; bidirectional</div>
+        </div>
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th">CPQ &mdash; Smarter Order Building</div>
+          <div class="ctx-tier-cell">Branch defaults power the Build &mdash; CPQ validates compatibility behind the scenes</div>
+          <div class="ctx-tier-cell">Saved templates + CPQ catches warranty and companion issues automatically</div>
+          <div class="ctx-tier-cell">Office-managed templates + CPQ validates unfamiliar commercial configurations built from scratch</div>
+          <div class="ctx-tier-cell">Hard enforcement on all negotiated pricing; approval chains through KAM and national accounts</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Key Concepts -->
+    <div class="ctx-panel" id="ctx-concepts">
+      <h3>Omnichannel &rarr; Branch Companion</h3>
+      <p>The digital platform's role shifts as you move up tiers. <span class="ctx-highlight">Marcus:</span> "Branch and digital are the same record." <span class="ctx-highlight">Philip:</span> "Platform supports what happens in the branch relationship &mdash; especially for commercial work where Victor and Jake help spec unfamiliar systems." <span class="ctx-highlight">Elena:</span> "API data layer &mdash; she may never use the UI." <span class="ctx-highlight">Diego:</span> "Spanish-language reference guide that reinforces what the OSR showed him." The platform isn't replacing the branch &mdash; it's the persistent record that keeps everyone aligned.</p>
+
+      <h3>Three-Tiered Intelligence</h3>
+      <p><span class="ctx-highlight">Layer 1:</span> Branch defaults &mdash; curated templates, promotional deals, high stock availability. This is all Diego uses. <span class="ctx-highlight">Layer 2:</span> Explicit contractor preferences &mdash; Marcus's saved templates, Philip's office-manager-maintained library. <span class="ctx-highlight">Layer 3:</span> AI-driven recommendations from order history &mdash; waste factor calibration, product suggestions, margin optimization. Builds automatically over time. All three layers operate within CPQ&rsquo;s configuration validity and pricing constraint rules &mdash; the governing constraint space that ensures recommendations never break warranty eligibility, compatibility requirements, or pricing guardrails.</p>
+
+      <h3>ATB (Address-to-Bid)</h3>
+      <p>The product that bundles measurement &rarr; template selection &rarr; material configuration &rarr; proposal formatting &rarr; send into one estimation step. Powers Path A for Marcus, Philip, and Elena. Skips Template &amp; Build (Stage 4) and Quoting (Stage 5). ATB is residential-only &mdash; commercial jobs require custom estimation through the branch.</p>
+
+      <h3>Multi-Path Ordering Model</h3>
+      <p>Marcus, Philip, and Elena each have three ordering paths: <span class="ctx-highlight">Path A (ATB Proposal)</span> &mdash; fastest path from lead to bid, residential. <span class="ctx-highlight">Path B (Standard Order)</span> &mdash; most common day-to-day, template-driven procurement at profile pricing. <span class="ctx-highlight">Path C (Special/Custom Pricing)</span> &mdash; branch-involved, commercial-capable, iterative quoting. Philip's Path C is unique: all four stages active (core, core, core, core) because commercial quoting requires estimation, build, quoting, and acceptance separately.</p>
+
+      <h3>Job Entity</h3>
+      <p>The persistent record anchoring every estimate, order, delivery, and invoice for a project. Created once, visible across all touchpoints (branch counter, phone app, website) instantly. The omnichannel backbone.</p>
+
+      <h3>CPQ (Configure, Price, Quote)</h3>
+      <p>A rules evaluation layer &mdash; not a separate ordering flow &mdash; that validates every basket before it becomes a proposal or order. CPQ enforces configuration validity (warranty eligibility, required companions, compatibility), pricing constraints (margin floors, discount authorization), generates internal quote documents, and manages approval workflows when constraints are violated. CPQ is invisible on simple orders and progressively reveals guardrails as basket complexity increases. On ecommerce paths (ATB Blue, Builds), CPQ surfaces advisory and soft interventions during the Build flow &mdash; before the proposal goes out. On POS/branch paths, CPQ adds hard enforcements including pricing floor gates and approval routing. CPQ&rsquo;s evaluation state travels with the basket across channels: if a contractor starts a Build on their phone and Victor modifies it at the branch, CPQ sees the full history. The rules are channel-agnostic; the UX response is channel-specific.</p>
+    </div>
+
+    <!-- Tab: Growth Arcs -->
+    <div class="ctx-panel" id="ctx-growth">
+      <h3>Growth Arcs by Persona</h3>
+      <p>Each persona follows a distinct growth trajectory. The platform&rsquo;s role shifts from capability enabler to intelligence layer to operational infrastructure depending on where the contractor is in their arc.</p>
+      <div class="ctx-grid">
+        <div class="ctx-card">
+          <div class="ctx-card-title">Diego &mdash; Capability Unlock</div>
+          <p>Subcontractor &rarr; full-scale business owner. Delivery enables larger jobs. Professional Spanish-language proposals give him credibility he&rsquo;s never had. Cash &rarr; trust-first credit after dozens of successful transactions. The platform teaches him to be a profitable business &mdash; margin visibility, waste tracking, and business intelligence in his language for the first time.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Marcus &mdash; Passive Intelligence</div>
+          <p>Solo operator &rarr; data-informed business. Waste calibration improves with every job. Margin visibility reveals which jobs are actually profitable. The platform learns his patterns and gets smarter around him &mdash; he doesn&rsquo;t actively manage it, but the intelligence compounds over time.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Philip &mdash; Growth Partner</div>
+          <p>Residential-only &rarr; commercial-capable. The branch helps him learn systems he doesn&rsquo;t have templates for. The platform surfaces commercial opportunities based on his margin data and job history. Crew performance tracking, residential vs. commercial profitability split, and CRM integration make QXO a growth partner, not just a supplier.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Elena &mdash; Integration Depth</div>
+          <p>Not a growth arc &mdash; a depth arc. ServiceTitan sync, NetSuite invoicing, delivery API, template library. Integration stickiness compounds with every closed job. She&rsquo;s not growing toward something new; she&rsquo;s becoming operationally dependent on what already works. The cost of unwinding is what makes the relationship durable.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Underserved Segments -->
+    <div class="ctx-panel" id="ctx-opportunities">
+      <h3>Spanish-First Experience</h3>
+      <p>The Hispanic contractor base is systematically underserved by English-only distribution. <span class="ctx-highlight">Platform UI, proposals, invoices, job records, AI chatbot for product specs</span> &mdash; all need Spanish-language support. Spanish-language distribution is a direct market entry strategy. Diego is 70% more likely to buy at retail not because of price but because nobody has built the distributor experience for him in his language.</p>
+
+      <h3>Cash-Centric Purchase Flow</h3>
+      <p>QXO has historically pushed every customer onto credit accounts with credit lines. For the emerging contractor segment, this is a barrier, not a feature. The opportunity: <span class="ctx-highlight">design the purchase experience as cash-first</span> &mdash; no credit application pop-ups, no upsell to net-30, just clear invoicing in Spanish. Introduce credit only after trust is built through dozens of successful cash transactions, from the OSR, backed by job history data. "You've done $180K in jobs this year. A credit line means you don't have to front $8K for the next big job."</p>
+
+      <h3>WhatsApp as Ordering Channel</h3>
+      <p>Diego texts his OSR through WhatsApp for everything &mdash; leads, quotes, supplemental orders. <span class="ctx-highlight">These conversations happen outside the system entirely.</span> The flywheel opportunity: capture WhatsApp messages tied to the OSR, recognize the Job and materials, generate a supplemental order for the rep to confirm. The communication channel Diego already uses becomes the ordering channel. Low stakes, urgent need, clear outcome, in his language.</p>
+
+      <h3>AI Chatbot in Spanish</h3>
+      <p>Most product docs and specifications are English-only. A <span class="ctx-highlight">Spanish-language AI chatbot that translates catalog questions on the fly</span> would be a sticky feature: "What underlayment do I need for this pitch?" answered instantly in Spanish. This bridges the knowledge gap between Diego's installation expertise and the distributor catalog system he's never been trained on.</p>
+    </div>
+  </div>
 </div>
 
 <div class="map-container">
@@ -229,6 +601,16 @@
 <div class="tooltip" id="tooltip"></div>
 
 <script>
+// ── CTO Context Box Tab Switching ──
+document.querySelectorAll('.ctx-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.ctx-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.ctx-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('ctx-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
 const stages = [
   { num: '0', name: 'First Contact' },
   { num: '1', name: 'Awareness & Lead' },
@@ -317,8 +699,8 @@ const narratives = {
     null,
     { emoji: '\u23ED\uFE0F', cellLabel: 'Skip \u2014 knows what he needs', state: 'N/A', text: 'Marcus already won this job and knows what materials he needs. No estimation or measurement step required.' },
     { emoji: '\u{1F527}', cellLabel: 'Loads template, identifies materials', state: 'Preparing', text: 'Marcus loads a saved Build via \'From Template\' or \'Reorder from Job\' and configures his materials list. Same three-tiered intelligence applies. But for this job \u2014 maybe an HOA contract or a competitive situation \u2014 Marcus knows he needs better-than-profile pricing to make the margins work. He identifies what he needs before reaching out to the branch for a special quote.' },
-    { emoji: '\u{1F4B0}', cellLabel: 'Requests special pricing from branch', state: 'Negotiating', text: 'This is less common but critical when it happens. Marcus needs special pricing \u2014 most likely for an HOA job or a situation where a competitor is undercutting on materials cost. He talks to Jake (OSR) or Victor (ISR), either in person at the branch or over the phone. The branch team quotes special pricing tied to his digital Job entity. This is the omnichannel moment: the conversation happens face-to-face or by phone, but the quoted pricing appears on Marcus\'s digital account instantly. The branch and the app are looking at the same record.' },
-    { emoji: '\u{1F91D}', cellLabel: 'Accepts special pricing, places order', state: 'Decided', text: 'Marcus sees the special pricing QXO quoted \u2014 whether he\'s checking on his phone after leaving the branch or Victor is showing him at the counter. He accepts and places the order. The in-branch conversation and the digital order are the same record. QXO wins his spend on this job because the branch relationship and the platform worked together.' },
+    { emoji: '\u{1F4B0}', cellLabel: 'Requests special pricing from branch', state: 'Negotiating', text: 'This is less common but critical when it happens. Marcus needs special pricing \u2014 most likely for an HOA job or a situation where a competitor is undercutting on materials cost. He talks to Jake (OSR) or Victor (ISR), either in person at the branch or over the phone. Jake evaluates the competitive situation and proposes a price. When Jake enters that pricing into the system, CPQ evaluates it against margin floors and discount authorization thresholds. If the proposed price is within Jake\'s authorization level, it locks to the Job immediately \u2014 the branch conversation and the digital record align in real-time. If the proposed price breaches a margin threshold, CPQ routes an approval request to the branch manager or regional pricing authority. Marcus sees the special pricing on his digital account once the approval resolves. The conversation happens face-to-face; CPQ ensures the pricing is within guardrails and creates an audit trail of who approved what.' },
+    { emoji: '\u{1F91D}', cellLabel: 'Accepts special pricing, places order', state: 'Decided', text: 'Marcus sees the special pricing QXO quoted \u2014 whether he\'s checking on his phone after leaving the branch or Victor is showing him at the counter. The pricing was CPQ-validated before it appeared on his account: margin floors were checked, any necessary approvals were obtained, and the audit trail is complete. He accepts and places the order on a CPQ-validated basket. The in-branch conversation and the digital order are the same record. QXO wins his spend on this job because the branch relationship and the platform worked together.' },
     null, null, null, null, null,
   ],
   philip_a: [
@@ -351,8 +733,8 @@ const narratives = {
     null,
     { emoji: '\u{1F3D7}\uFE0F', cellLabel: 'In-branch estimation \u2014 Victor/Jake help spec unfamiliar systems', state: 'Learning', text: 'This is where Philip\'s emerging commercial work changes the estimation dynamic entirely. For residential special pricing \u2014 an HOA contract or competitive situation \u2014 Philip already knows his materials and this step is straightforward. But for commercial jobs like waterproofing or flat roof systems, Philip doesn\'t have repeatable item lists. There\'s no template for TPO or modified bitumen in his library. He sits down with Victor at the branch counter or walks the jobsite with Jake, and they scope the job together \u2014 what system fits this building, what accessories are required, what are the quantities. The branch team has the product knowledge Philip is still developing on commercial systems. This is estimation in the truest sense: figuring out what the job actually needs. The platform captures everything decided in that conversation as the branch companion \u2014 the persistent digital record that Philip\'s office manager can see and act on after the in-person work is done.' },
     { emoji: '\u{1F527}', cellLabel: 'Custom Build from estimation \u2014 no template, built from scratch', state: 'Assembling', text: 'The materials list from the estimation conversation gets assembled into a formal Build. For residential special pricing, Philip loads an existing template and flags the items that need a better price \u2014 this step is fast. For commercial work, there is no template to load. The Build is constructed from scratch based on what Philip and the branch team scoped together in Stage 3. This is a one-off configuration: the specific TPO system, the accessories, the quantities, the waste factors for a flat roof Philip hasn\'t done before. Philip\'s office manager can see the Build digitally, verify quantities, and track it alongside his other active jobs. Over time, if Philip does more commercial work, this Build becomes reusable reference \u2014 the template that didn\'t exist before gets created through doing the work.' },
-    { emoji: '\u{1F4B0}', cellLabel: 'Iterative quoting \u2014 back-and-forth with owner or architect', state: 'Negotiating', text: 'Philip is creating a competitive quote to win the commercial job from the building owner or architect. Unlike residential where it\'s a one-shot G/B/B proposal, commercial quoting is iterative. The first quote goes out. The building owner comes back: \'Can you value-engineer this? What if we use a 45-mil TPO instead of 60-mil?\' Philip takes it back to Victor or Jake, they revise the Build, a new quote version gets generated. This back-and-forth might take days or weeks. The platform tracks quote revisions so Philip and his office manager aren\'t losing track of which version is current. For residential special pricing, this stage is simpler \u2014 it\'s negotiating volume pricing for an HOA or competitive situation, and Victor or Jake work the numbers in person. Either way, the platform\'s role is branch companion: whatever gets quoted in the offline conversation appears on Philip\'s digital record instantly. His office manager can see it, verify it, and act on it without Philip being in the loop.' },
-    { emoji: '\u{1F91D}', cellLabel: 'Accepts negotiated pricing \u2014 commercial may involve GC PO', state: 'Decided', text: 'Philip or his office manager sees the pricing QXO quoted \u2014 whether checking online after the branch conversation or reviewing at the counter. For residential special pricing, acceptance works like any other order. For commercial jobs, acceptance may involve a PO from a general contractor rather than a homeowner e-sign \u2014 the branch captures that authorization and the platform records it. For orders exceeding $20K, Philip\'s approval gate still applies. QXO wins this job\'s spend because the branch relationship and the platform worked together \u2014 and at Philip\'s volume, winning one commercial job builds the track record that wins the next one.' },
+    { emoji: '\u{1F4B0}', cellLabel: 'Iterative quoting \u2014 back-and-forth with owner or architect', state: 'Negotiating', text: 'Philip is creating a competitive quote to win the commercial job from the building owner or architect. Unlike residential where it\'s a one-shot G/B/B proposal, commercial quoting is iterative. The first quote goes out. The building owner comes back: \'Can you value-engineer this? What if we use a 45-mil TPO instead of 60-mil?\' Philip takes it back to Victor or Jake, they revise the Build, and when the new pricing is entered, CPQ evaluates it against margin floors and discount authorization thresholds. If the quoted price is within the branch rep\'s authorization level, the revised quote locks immediately. If the commercial-grade deviation breaches a threshold, CPQ routes an approval request to the branch manager. This back-and-forth might take days or weeks, and CPQ validates every iteration \u2014 the platform tracks quote revisions with a full audit trail of who approved what pricing at each step. For residential special pricing, this stage is simpler \u2014 it\'s negotiating volume pricing for an HOA or competitive situation, and Victor or Jake work the numbers in person with CPQ validating the proposed pricing before it locks. Either way, the platform\'s role is branch companion: whatever gets quoted in the offline conversation appears on Philip\'s digital record instantly, CPQ-validated and audit-trailed. His office manager can see it, verify it, and act on it without Philip being in the loop \u2014 and the approval history is clean for her records.' },
+    { emoji: '\u{1F91D}', cellLabel: 'Accepts negotiated pricing \u2014 commercial may involve GC PO', state: 'Decided', text: 'Philip or his office manager sees the pricing QXO quoted \u2014 whether checking online after the branch conversation or reviewing at the counter. The pricing was CPQ-validated before it appeared on Philip\'s account: margin floors were checked, any necessary branch manager approvals were obtained, and the full audit trail is available for his office manager\'s records. For residential special pricing, acceptance works like any other order \u2014 the basket is already CPQ-validated. For commercial jobs, acceptance may involve a PO from a general contractor rather than a homeowner e-sign \u2014 the branch captures that authorization and the platform records it. For orders exceeding $20K, Philip\'s approval gate still applies. QXO wins this job\'s spend because the branch relationship and the platform worked together \u2014 and at Philip\'s volume, winning one commercial job builds the track record that wins the next one.' },
     null, null, null, null, null,
   ],
   elena_a: [
@@ -385,8 +767,8 @@ const narratives = {
     null,
     { emoji: '\u{1F3D7}\uFE0F', cellLabel: 'KAM-involved estimation \u2014 large commercial, custom spec', state: 'Collaborative', text: 'For large commercial projects or multi-phase work that doesn\'t fit Elena\'s standard templates, the estimation process involves her KAM and potentially the National Account Rep. This is white-glove service: the KAM may coordinate with QXO\'s commercial product specialists to help Elena\'s estimating team spec unfamiliar systems or source specialty materials. For a large multi-family reroof or a commercial project with multiple roofing systems, the estimation conversation happens in person or over structured calls \u2014 not through the platform UI. The platform captures the outcome as the persistent record, but the estimation itself is a collaborative, relationship-driven process.' },
     { emoji: '\u{1F527}', cellLabel: 'Custom Build \u2014 operations team assembles from estimation spec', state: 'Assembling', text: 'The estimation conversation produces a custom materials spec that Elena\'s operations team assembles into a formal Build. There\'s no template for this job \u2014 it\'s a one-off configuration for a project that doesn\'t match her standard library. For a multi-phase commercial project, each phase may get its own Build with different materials and delivery timing. Elena\'s operations team needs the platform to support project-level organization: multiple Builds under one project umbrella, each with its own timeline. The KAM may review the Build to ensure pricing and availability align before it moves to quoting.' },
-    { emoji: '\u{1F4B0}', cellLabel: 'Iterative quoting \u2014 KAM negotiates, estimating team reviews each version', state: 'Negotiating', text: 'Large commercial quoting at Elena\'s scale is iterative and involves multiple stakeholders. Elena\'s dedicated estimating team reviews every quote version before it goes external. The KAM negotiates pricing on specialty items or volume commitments. The building owner or property management company may come back with scope changes, value engineering requests, or phasing adjustments \u2014 each revision flows through Elena\'s estimating team and may require KAM involvement on pricing. The platform tracks quote versions so Elena\'s team isn\'t losing track of which revision is current across 20+ active bids. Unlike residential G/B/B proposals, these are formal bid submissions that may include phasing schedules, material specifications, and warranty terms.' },
-    { emoji: '\u{1F91D}', cellLabel: 'Contract award \u2014 phased procurement plan, KAM-managed', state: 'Decided', text: 'For large commercial projects, acceptance isn\'t a homeowner e-signing a proposal \u2014 it\'s a contract award that may involve formal documentation, bonding verification, and phased procurement planning. The \'order\' isn\'t a single materials purchase \u2014 it\'s a staged procurement plan tied to project milestones. The KAM coordinates with the branch to ensure stock allocation and delivery capacity for each phase. For orders exceeding $50K, Elena\'s approval gate applies. The platform records the contract terms and phases so procurement can execute against them over weeks or months.' },
+    { emoji: '\u{1F4B0}', cellLabel: 'Iterative quoting \u2014 KAM negotiates, estimating team reviews each version', state: 'Negotiating', text: 'Large commercial quoting at Elena\'s scale is iterative and involves multiple stakeholders. Elena\'s dedicated estimating team reviews every quote version before it goes external. The KAM and National Account Rep negotiate pricing on specialty items or volume commitments \u2014 and that negotiation happens within CPQ\'s guardrails, not outside them. The KAM operates under the same margin floors and discount authorization thresholds that govern branch reps; the authorization levels are higher at Elena\'s tier, but the system is the same. CPQ validates every iteration of the quote. The building owner or property management company may come back with scope changes, value engineering requests, or phasing adjustments \u2014 each revision flows through Elena\'s estimating team, the KAM adjusts pricing within CPQ\'s constraint space, and CPQ re-validates before the next version goes out. For multi-phase commercial projects, each phase\'s pricing is independently validated. The approval chain at Elena\'s tier runs through the KAM and national accounts, not the branch manager. The platform tracks quote versions with full CPQ audit trails so Elena\'s team isn\'t losing track of which revision is current across 20+ active bids. Unlike residential G/B/B proposals, these are formal bid submissions that may include phasing schedules, material specifications, and warranty terms.' },
+    { emoji: '\u{1F91D}', cellLabel: 'Contract award \u2014 phased procurement plan, KAM-managed', state: 'Decided', text: 'For large commercial projects, acceptance isn\'t a homeowner e-signing a proposal \u2014 it\'s a contract award that may involve formal documentation, bonding verification, and phased procurement planning. By the time the contract award is formalized, CPQ has already validated and \u2014 where necessary \u2014 obtained approval for the pricing on every phase. The \'order\' isn\'t a single materials purchase \u2014 it\'s a staged procurement plan tied to project milestones, each phase firing on a CPQ-validated basket. The KAM coordinates with the branch to ensure stock allocation and delivery capacity for each phase. For orders exceeding $50K, Elena\'s approval gate applies. The platform records the contract terms, phases, and CPQ audit trails so procurement can execute against them over weeks or months.' },
     null, null, null, null, null,
   ],
   diego: [
@@ -464,9 +846,12 @@ stages.forEach((s, si) => {
 });
 
 // Persona rows — explicit placement for rowspan support
+// Render order: Marcus(0), Diego(3), divider, Philip(1), Elena(2), then drafts(4,5,6)
 let rowIdx = 2;
+const renderOrder = [0, 3, 1, 2, 4, 5, 6];
 
-personas.forEach((p, pi) => {
+renderOrder.forEach(pi => {
+  const p = personas[pi];
   const isMulti = !!p.paths;
   const pathCount = isMulti ? p.paths.length : 1;
 
@@ -565,6 +950,16 @@ personas.forEach((p, pi) => {
     }
 
     rowIdx += pathCount;
+  }
+
+  // Insert tier divider after Diego (last finished persona)
+  if (pi === 3) {
+    const divider = document.createElement('div');
+    divider.className = 'tier-divider';
+    divider.style.gridRow = `${rowIdx}`;
+    divider.style.gridColumn = '1 / -1';
+    grid.appendChild(divider);
+    rowIdx += 1;
   }
 });
 
