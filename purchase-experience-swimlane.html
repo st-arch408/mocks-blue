@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QXO Contractor Lifecycle Journey Map v2</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1724;
+    --bg-card: #1e293b;
+    --bg-card-hover: #263348;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --border: #334155;
+    --cyan: #06b6d4;
+    --purple: #a78bfa;
+    --orange: #f59e0b;
+    --blue: #3b82f6;
+    --green: #22c55e;
+    --red: #ef4444;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding: 24px;
+    overflow-x: auto;
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; margin-bottom: 20px; }
+  .header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 3px; }
+  .header h1 span { color: #004BEA; }
+  .header p { font-size: 0.78rem; color: var(--text-dim); }
+
+  /* ── Legend ── */
+  .legend { display: flex; justify-content: center; gap: 18px; margin-bottom: 20px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; color: var(--text-dim); }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .legend-item.skip .legend-dot { border: 2px dashed var(--red); background: transparent; border-radius: 3px; }
+
+  /* ── CTO Context Box (copied exactly from v1) ── */
+  .context-box {
+    max-width: 1200px;
+    margin: 0 auto 24px auto;
+    background: #1a2332;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .context-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    cursor: pointer;
+    user-select: none;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid transparent;
+    transition: background 0.15s;
+  }
+  .context-toggle:hover { background: rgba(255,255,255,0.04); }
+  .context-box.open .context-toggle { border-bottom-color: var(--border); }
+  .context-toggle-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .context-toggle h2 {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .context-toggle .ctx-badge {
+    font-size: 0.58rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #004BEA;
+    background: rgba(0,75,234,0.12);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .context-toggle .ctx-chevron {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    transition: transform 0.2s;
+  }
+  .context-box.open .ctx-chevron { transform: rotate(180deg); }
+  .context-inner {
+    display: none;
+    padding: 0;
+  }
+  .context-box.open .context-inner { display: block; }
+
+  .ctx-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .ctx-tabs::-webkit-scrollbar { display: none; }
+  .ctx-tab {
+    padding: 10px 18px;
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    user-select: none;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: inherit;
+  }
+  .ctx-tab:hover { color: var(--text); }
+  .ctx-tab.active {
+    color: var(--text);
+    font-weight: 600;
+    border-bottom-color: #004BEA;
+  }
+
+  .ctx-panel {
+    display: none;
+    padding: 18px 20px;
+    font-size: 0.72rem;
+    line-height: 1.65;
+    color: var(--text-dim);
+    max-height: 420px;
+    overflow-y: auto;
+  }
+  .ctx-panel.active { display: block; }
+  .ctx-panel h3 {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 16px 0 6px 0;
+  }
+  .ctx-panel h3:first-child { margin-top: 0; }
+  .ctx-panel p { margin-bottom: 10px; }
+  .ctx-panel .ctx-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .ctx-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+    padding: 10px 12px;
+  }
+  .ctx-card-title {
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .ctx-card-personas {
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+  .ctx-card p {
+    font-size: 0.64rem;
+    margin-bottom: 0;
+    line-height: 1.5;
+  }
+  .ctx-tier-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 1fr 1fr 1fr 1fr;
+    gap: 1px;
+    margin-bottom: 1px;
+  }
+  .ctx-tier-cell {
+    padding: 7px 10px;
+    font-size: 0.62rem;
+    background: rgba(255,255,255,0.015);
+    border: 1px solid rgba(255,255,255,0.04);
+    line-height: 1.4;
+  }
+  .ctx-tier-cell.th {
+    font-weight: 600;
+    color: var(--text);
+    background: rgba(255,255,255,0.03);
+  }
+  .ctx-highlight {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ── Selector Controls ── */
+  .selector-controls {
+    max-width: 1200px;
+    margin: 0 auto 24px auto;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .selector-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .selector-group label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .selector-group select {
+    padding: 8px 12px;
+    background: var(--bg-card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.76rem;
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .selector-group select:hover {
+    background: var(--bg-card-hover);
+  }
+
+  /* ── Swimlane Container ── */
+  .swimlane-wrapper {
+    max-width: 100%;
+    margin: 0 auto;
+    background: #1a2332;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  /* CSS Grid Swimlane — 1 label column + 12 stage columns */
+  .swimlane-grid {
+    display: grid;
+    grid-template-columns: 130px repeat(12, minmax(170px, 1fr));
+    min-width: 2000px;
+    position: relative;
+  }
+
+  /* Stage header cells (row 1) */
+  .sg-header {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 2px solid var(--border);
+    border-right: 1px solid rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.01);
+  }
+  .sg-header:first-child {
+    border-right: 1px solid var(--border);
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    background: #1a2332;
+  }
+  .sg-header-num {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 2px;
+  }
+  .sg-header-name {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.25;
+  }
+  .sg-header.half-step {
+    background: rgba(167,139,250,0.08);
+    border-bottom: 2px solid var(--purple);
+  }
+  .sg-header.half-step .sg-header-num {
+    color: var(--purple);
+  }
+  .sg-header.half-step .sg-header-name {
+    color: var(--purple);
+  }
+
+  /* Lane label cells (column 1 of each lane row) */
+  .sg-lane-label {
+    padding: 12px 10px;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text);
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    background: #1a2332;
+    border-left: 3px solid transparent;
+  }
+  .sg-lane-label.contractor { border-left-color: var(--cyan); }
+  .sg-lane-label.branch { border-left-color: var(--orange); }
+  .sg-lane-label.platform { border-left-color: var(--blue); }
+  .sg-lane-label.cpq { border-left-color: var(--purple); }
+  .sg-lane-label.homeowner { border-left-color: var(--green); }
+  .sg-lane-label.collapsed-lane { padding: 4px 10px; font-size: 0.6rem; color: var(--text-dim); opacity: 0.5; }
+
+  /* Node cells (the grid cells where nodes appear) */
+  .sg-cell {
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid rgba(255,255,255,0.03);
+    padding: 8px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 50px;
+  }
+  .sg-cell.collapsed-lane {
+    min-height: 10px;
+    padding: 0;
+  }
+  .sg-cell.divergent {
+    background: rgba(255,255,255,0.015);
+  }
+
+  /* Nodes */
+  .node {
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.12s;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 3;
+  }
+  .node:hover {
+    transform: scale(1.06);
+    z-index: 10;
+  }
+
+  .node-box {
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 0.6rem;
+    font-weight: 500;
+    line-height: 1.3;
+    text-align: center;
+    border: 1.5px solid;
+    background: rgba(255,255,255,0.03);
+    width: 100%;
+    max-width: 148px;
+    word-wrap: break-word;
+    border-top: 3px solid;
+  }
+
+  .node.lane-contractor .node-box {
+    border-color: var(--cyan);
+    border-top-color: var(--cyan);
+    color: #67e8f9;
+  }
+  .node.lane-branch .node-box {
+    border-color: var(--orange);
+    border-top-color: var(--orange);
+    color: #fcd34d;
+  }
+  .node.lane-platform .node-box {
+    border-color: var(--blue);
+    border-top-color: var(--blue);
+    color: #93c5fd;
+  }
+  .node.lane-cpq .node-box {
+    border-color: var(--purple);
+    border-top-color: var(--purple);
+    color: #c4b5fd;
+  }
+  .node.lane-homeowner .node-box {
+    border-color: var(--green);
+    border-top-color: var(--green);
+    color: #86efac;
+  }
+
+  .node.type-skip .node-box {
+    border: 1.5px dashed var(--red);
+    border-top: 1.5px dashed var(--red);
+    color: #fca5a5;
+    font-style: italic;
+    opacity: 0.7;
+  }
+
+  .node.type-decision .node-box {
+    width: 90px;
+    max-width: 90px;
+    height: 90px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+    transform: rotate(45deg);
+    border-color: var(--purple);
+    border-top-color: var(--purple);
+    font-size: 0.58rem;
+  }
+  .node.type-decision .node-inner {
+    transform: rotate(-45deg);
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Detail Panel */
+  .panel-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 380px;
+    background: #141d2b;
+    border-left: 3px solid var(--border);
+    z-index: 50;
+    transform: translateX(100%);
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -8px 0 32px rgba(0,0,0,0.5);
+  }
+  .panel-overlay.open { transform: translateX(0); }
+
+  .panel-header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .panel-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s;
+  }
+  .panel-close:hover { background: var(--bg-card); color: var(--text); }
+
+  .panel-stage { font-size: 0.62rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .panel-persona { font-size: 1rem; font-weight: 700; margin-bottom: 2px; }
+  .panel-persona-name { font-size: 0.7rem; color: var(--text-dim); }
+
+  .panel-body { padding: 20px; overflow-y: auto; flex: 1; }
+  .panel-emotion { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .panel-emoji { font-size: 1.3rem; }
+  .panel-state { font-size: 0.76rem; color: var(--text-dim); }
+
+  .panel-skip-badge {
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--red);
+    background: rgba(239,68,68,0.1);
+    padding: 3px 10px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+
+  .panel-narrative {
+    font-size: 0.8rem;
+    line-height: 1.65;
+    color: var(--text);
+  }
+  .panel-narrative.skip-text { font-style: italic; opacity: 0.75; }
+
+  .panel-nav {
+    display: flex;
+    gap: 8px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .panel-nav button {
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+  }
+  .panel-nav button:hover:not(:disabled) { background: var(--bg-card-hover); color: var(--text); }
+  .panel-nav button:disabled { opacity: 0.3; cursor: default; }
+
+  /* Tooltip */
+  .tooltip {
+    position: fixed;
+    background: #1a2332;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 11px;
+    font-size: 0.68rem;
+    color: var(--text);
+    z-index: 40;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    max-width: 190px;
+    line-height: 1.4;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  }
+  .tooltip.visible { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span>QXO</span> Contractor Lifecycle Journey Map v2</h1>
+  <p>Swimlane Process Flow &mdash; Click any node to see the full narrative</p>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--cyan)"></div>Contractor</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>Branch Team</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Platform / Digital</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>CPQ</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Homeowner / Client</div>
+  <div class="legend-item skip"><div class="legend-dot"></div>Skipped</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple); border-radius:3px;"></div>Half-Step (Internal)</div>
+</div>
+
+<!-- Context Box - Exactly as in v1 -->
+<div class="context-box" id="context-box">
+  <div class="context-toggle" onclick="document.getElementById('context-box').classList.toggle('open')">
+    <div class="context-toggle-left">
+      <h2>Journey Map Context</h2>
+      <span class="ctx-badge">Context</span>
+    </div>
+    <span class="ctx-chevron">&#9660;</span>
+  </div>
+  <div class="context-inner">
+    <div class="ctx-tabs" id="ctx-tabs">
+      <button class="ctx-tab active" data-tab="jobs">Job Types</button>
+      <button class="ctx-tab" data-tab="scaling">Platform Scaling</button>
+      <button class="ctx-tab" data-tab="concepts">Key Concepts</button>
+      <button class="ctx-tab" data-tab="growth">Growth Arcs</button>
+      <button class="ctx-tab" data-tab="opportunities">Underserved Segments</button>
+    </div>
+
+    <div class="ctx-panel active" id="ctx-jobs">
+      <p>10 distinct job types identified across 7 personas. Each creates different platform requirements for estimation, ordering, delivery, and payment.</p>
+      <h3>Residential</h3>
+      <div class="ctx-grid">
+        <div class="ctx-card">
+          <div class="ctx-card-title">Standard Residential Reroof</div>
+          <div class="ctx-card-personas">Marcus &middot; Philip &middot; Elena &middot; Diego</div>
+          <p>The bread-and-butter job. ATB-eligible, template-driven, G/B/B proposals to homeowners. Volume varies by tier.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Complex Residential</div>
+          <div class="ctx-card-personas">Philip (Path A)</div>
+          <p>Hip roofs, historic homes, non-standard waste factors. ATB with manual overrides. May involve multi-trade (roofing + siding).</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Competitive Bid Residential</div>
+          <div class="ctx-card-personas">Marcus (Path C) &middot; Philip (Path C)</div>
+          <p>Another contractor is undercutting on materials. Branch provides special pricing to win the job. CPQ evaluates special pricing and may route approval.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">HOA Contract</div>
+          <div class="ctx-card-personas">Marcus (Path C) &middot; Philip (Path C)</div>
+          <p>Volume pricing negotiated with branch. Multiple properties on the same spec. Competitive against other contractors. CPQ validates the negotiated volume pricing against margin floors.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Insurance Restoration</div>
+          <div class="ctx-card-personas">Insurance Persona</div>
+          <p>Storm-driven, Xactimate-estimated, claim-constrained. Surge delivery critical. Payment follows insurance claim cycle.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Multi-Family Reroof</div>
+          <div class="ctx-card-personas">Elena</div>
+          <p>Development-scale residential at enterprise volume. Standing contracts with property management companies.</p>
+        </div>
+      </div>
+      <h3>Commercial</h3>
+      <div class="ctx-grid">
+        <div class="ctx-card">
+          <div class="ctx-card-title">Small Commercial</div>
+          <div class="ctx-card-personas">Philip (Path C)</div>
+          <p>Waterproofing, flat roof sections, TPO, modified bitumen. No templates exist &mdash; built from scratch with branch help. Philip is learning these systems. CPQ&rsquo;s configuration validity rules are especially important here &mdash; no template guardrails means CPQ catches compatibility and warranty issues.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Large Commercial Reroof</div>
+          <div class="ctx-card-personas">Elena (Path C)</div>
+          <p>Multi-phase, spec-driven, KAM-negotiated. Iterative quoting with building owners. Phased procurement plans. Every iteration passes through CPQ.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Commercial (Full)</div>
+          <div class="ctx-card-personas">Commercial Persona</div>
+          <p>Bid from drawings, spec-compliant, GC-mediated. Bonding, lien waivers, milestone invoicing, phased delivery over months.</p>
+        </div>
+      </div>
+      <h3>Residential &amp; Commercial</h3>
+      <div class="ctx-grid">
+        <div class="ctx-card">
+          <div class="ctx-card-title">New Construction</div>
+          <div class="ctx-card-personas">New Construction Persona</div>
+          <p>Builder-mediated, locked specs, 20&ndash;100 units of the same Build. Construction-schedule delivery, draw cycle payment. Can span residential developments or commercial builds.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ctx-panel" id="ctx-scaling">
+      <p>The platform serves fundamentally differently at each tier. This table shows how the same 12-stage journey requires different capabilities depending on contractor scale.</p>
+      <div style="overflow-x:auto;">
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th"></div>
+          <div class="ctx-tier-cell th">Diego (Emerging)</div>
+          <div class="ctx-tier-cell th">Marcus (Tier 3)</div>
+          <div class="ctx-tier-cell th">Philip (Tier 2)</div>
+          <div class="ctx-tier-cell th">Elena (Tier 1)</div>
+        </div>
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th">Who Does the Work</div>
+          <div class="ctx-tier-cell">Diego himself, with OSR help</div>
+          <div class="ctx-tier-cell">Marcus himself</div>
+          <div class="ctx-tier-cell">Office manager, crew leads</div>
+          <div class="ctx-tier-cell">PMs, procurement team, logistics coordinator</div>
+        </div>
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th">Ordering Interface</div>
+          <div class="ctx-tier-cell">Web (Spanish)</div>
+          <div class="ctx-tier-cell">Web</div>
+          <div class="ctx-tier-cell">Web or CRM</div>
+          <div class="ctx-tier-cell">ServiceTitan</div>
+        </div>
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th">Payment Model</div>
+          <div class="ctx-tier-cell">Cash / COD</div>
+          <div class="ctx-tier-cell">Credit</div>
+          <div class="ctx-tier-cell">Credit + third-party payment integration via CRM</div>
+          <div class="ctx-tier-cell">Credit + third-party payment integration via CRM</div>
+        </div>
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th">Account Management</div>
+          <div class="ctx-tier-cell">Bilingual OSR &mdash; loyalty to the person</div>
+          <div class="ctx-tier-cell">ISR (Victor) + OSR (Jake)</div>
+          <div class="ctx-tier-cell">ISR/OSR + heavier branch for commercial</div>
+          <div class="ctx-tier-cell">KAM + National Account Rep &mdash; white glove</div>
+        </div>
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th">Active Jobs</div>
+          <div class="ctx-tier-cell">1&ndash;2</div>
+          <div class="ctx-tier-cell">1&ndash;3</div>
+          <div class="ctx-tier-cell">5+</div>
+          <div class="ctx-tier-cell">20+</div>
+        </div>
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th">CRM Integration</div>
+          <div class="ctx-tier-cell">None</div>
+          <div class="ctx-tier-cell">None</div>
+          <div class="ctx-tier-cell">AccuLynx / JobNimbus / other</div>
+          <div class="ctx-tier-cell">ServiceTitan API sync &mdash; bidirectional</div>
+        </div>
+        <div class="ctx-tier-row">
+          <div class="ctx-tier-cell th">CPQ &mdash; Smarter Order Building</div>
+          <div class="ctx-tier-cell">Branch defaults power the Build &mdash; CPQ validates compatibility behind the scenes</div>
+          <div class="ctx-tier-cell">Saved templates + CPQ catches warranty and companion issues automatically</div>
+          <div class="ctx-tier-cell">Office-managed templates + CPQ validates unfamiliar commercial configurations built from scratch</div>
+          <div class="ctx-tier-cell">Hard enforcement on all negotiated pricing; approval chains through KAM and national accounts</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ctx-panel" id="ctx-concepts">
+      <h3>Omnichannel &rarr; Branch Companion</h3>
+      <p>The digital platform's role shifts as you move up tiers. <span class="ctx-highlight">Marcus:</span> "Branch and digital are the same record." <span class="ctx-highlight">Philip:</span> "Platform supports what happens in the branch relationship &mdash; especially for commercial work where Victor and Jake help spec unfamiliar systems." <span class="ctx-highlight">Elena:</span> "API data layer &mdash; she may never use the UI." <span class="ctx-highlight">Diego:</span> "Spanish-language reference guide that reinforces what the OSR showed him." The platform isn't replacing the branch &mdash; it's the persistent record that keeps everyone aligned.</p>
+
+      <h3>Three-Tiered Intelligence</h3>
+      <p><span class="ctx-highlight">Layer 1:</span> Branch defaults &mdash; curated templates, promotional deals, high stock availability. This is all Diego uses. <span class="ctx-highlight">Layer 2:</span> Explicit contractor preferences &mdash; Marcus's saved templates, Philip's office-manager-maintained library. <span class="ctx-highlight">Layer 3:</span> AI-driven recommendations from order history &mdash; waste factor calibration, product suggestions, margin optimization. Builds automatically over time. All three layers operate within CPQ&rsquo;s configuration validity and pricing constraint rules &mdash; the governing constraint space that ensures recommendations never break warranty eligibility, compatibility requirements, or pricing guardrails.</p>
+
+      <h3>ATB (Address-to-Bid)</h3>
+      <p>The product that bundles measurement &rarr; template selection &rarr; material configuration &rarr; proposal formatting &rarr; send into one estimation step. Powers Path A for Marcus, Philip, and Elena. Skips Template &amp; Build (Stage 4) and Quoting (Stage 5). ATB is residential-only &mdash; commercial jobs require custom estimation through the branch.</p>
+
+      <h3>Multi-Path Ordering Model</h3>
+      <p>Marcus, Philip, and Elena each have three ordering paths: <span class="ctx-highlight">Path A (ATB Proposal)</span> &mdash; fastest path from lead to bid, residential. <span class="ctx-highlight">Path B (Standard Order)</span> &mdash; most common day-to-day, template-driven procurement at profile pricing. <span class="ctx-highlight">Path C (Special/Custom Pricing)</span> &mdash; branch-involved, commercial-capable, iterative quoting. Philip's Path C is unique: all four stages active (core, core, core, core) because commercial quoting requires estimation, build, quoting, and acceptance separately.</p>
+
+      <h3>Job Entity</h3>
+      <p>The persistent record anchoring every estimate, order, delivery, and invoice for a project. Created once, visible across all touchpoints (branch counter, phone app, website) instantly. The omnichannel backbone.</p>
+
+      <h3>CPQ (Configure, Price, Quote)</h3>
+      <p>A rules evaluation layer &mdash; not a separate ordering flow &mdash; that validates every basket before it becomes a proposal or order. CPQ enforces configuration validity (warranty eligibility, required companions, compatibility), pricing constraints (margin floors, discount authorization), generates internal quote documents, and manages approval workflows when constraints are violated. CPQ is invisible on simple orders and progressively reveals guardrails as basket complexity increases. On ecommerce paths (ATB Blue, Builds), CPQ surfaces advisory and soft interventions during the Build flow &mdash; before the proposal goes out. On POS/branch paths, CPQ adds hard enforcements including pricing floor gates and approval routing. CPQ&rsquo;s evaluation state travels with the basket across channels: if a contractor starts a Build on their phone and Victor modifies it at the branch, CPQ sees the full history. The rules are channel-agnostic; the UX response is channel-specific.</p>
+    </div>
+
+    <div class="ctx-panel" id="ctx-growth">
+      <h3>Growth Arcs by Persona</h3>
+      <p>Each persona follows a distinct growth trajectory. The platform&rsquo;s role shifts from capability enabler to intelligence layer to operational infrastructure depending on where the contractor is in their arc.</p>
+      <div class="ctx-grid">
+        <div class="ctx-card">
+          <div class="ctx-card-title">Diego &mdash; Capability Unlock</div>
+          <p>Subcontractor &rarr; full-scale business owner. Delivery enables larger jobs. Professional Spanish-language proposals give him credibility he&rsquo;s never had. Cash &rarr; trust-first credit after dozens of successful transactions. The platform teaches him to be a profitable business &mdash; margin visibility, waste tracking, and business intelligence in his language for the first time.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Marcus &mdash; Passive Intelligence</div>
+          <p>Solo operator &rarr; data-informed business. Waste calibration improves with every job. Margin visibility reveals which jobs are actually profitable. The platform learns his patterns and gets smarter around him &mdash; he doesn&rsquo;t actively manage it, but the intelligence compounds over time.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Philip &mdash; Growth Partner</div>
+          <p>Residential-only &rarr; commercial-capable. The branch helps him learn systems he doesn&rsquo;t have templates for. The platform surfaces commercial opportunities based on his margin data and job history. Crew performance tracking, residential vs. commercial profitability split, and CRM integration make QXO a growth partner, not just a supplier.</p>
+        </div>
+        <div class="ctx-card">
+          <div class="ctx-card-title">Elena &mdash; Integration Depth</div>
+          <p>Not a growth arc &mdash; a depth arc. ServiceTitan sync, NetSuite invoicing, delivery API, template library. Integration stickiness compounds with every closed job. She&rsquo;s not growing toward something new; she&rsquo;s becoming operationally dependent on what already works. The cost of unwinding is what makes the relationship durable.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ctx-panel" id="ctx-opportunities">
+      <h3>Spanish-First Experience</h3>
+      <p>The Hispanic contractor base is systematically underserved by English-only distribution. <span class="ctx-highlight">Platform UI, proposals, invoices, job records, AI chatbot for product specs</span> &mdash; all need Spanish-language support. Spanish-language distribution is a direct market entry strategy. Diego is 70% more likely to buy at retail not because of price but because nobody has built the distributor experience for him in his language.</p>
+
+      <h3>Cash-Centric Purchase Flow</h3>
+      <p>QXO has historically pushed every customer onto credit accounts with credit lines. For the emerging contractor segment, this is a barrier, not a feature. The opportunity: <span class="ctx-highlight">design the purchase experience as cash-first</span> &mdash; no credit application pop-ups, no upsell to net-30, just clear invoicing in Spanish. Introduce credit only after trust is built through dozens of successful cash transactions, from the OSR, backed by job history data. "You've done $180K in jobs this year. A credit line means you don't have to front $8K for the next big job."</p>
+
+      <h3>WhatsApp as Ordering Channel</h3>
+      <p>Diego texts his OSR through WhatsApp for everything &mdash; leads, quotes, supplemental orders. <span class="ctx-highlight">These conversations happen outside the system entirely.</span> The flywheel opportunity: capture WhatsApp messages tied to the OSR, recognize the Job and materials, generate a supplemental order for the rep to confirm. The communication channel Diego already uses becomes the ordering channel. Low stakes, urgent need, clear outcome, in his language.</p>
+
+      <h3>AI Chatbot in Spanish</h3>
+      <p>Most product docs and specifications are English-only. A <span class="ctx-highlight">Spanish-language AI chatbot that translates catalog questions on the fly</span> would be a sticky feature: "What underlayment do I need for this pitch?" answered instantly in Spanish. This bridges the knowledge gap between Diego's installation expertise and the distributor catalog system he's never been trained on.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Persona Selector -->
+<div class="selector-controls">
+  <div class="selector-group">
+    <label for="persona-select">Journey:</label>
+    <select id="persona-select" onchange="handlePersonaChange()">
+      <option value="marcus_a">Marcus - Path A: ATB Proposal</option>
+      <option value="marcus_b">Marcus - Path B: Standard Order</option>
+      <option value="marcus_c">Marcus - Path C: Special Pricing</option>
+    </select>
+  </div>
+</div>
+
+<!-- Swimlane Visualization -->
+<div class="swimlane-wrapper">
+  <div class="swimlane-grid" id="swimlane-grid"></div>
+</div>
+
+<!-- Detail Panel -->
+<div class="panel-overlay" id="panel">
+  <div class="panel-header">
+    <button class="panel-close" id="panel-close">&times;</button>
+    <div class="panel-stage" id="p-stage"></div>
+    <div class="panel-persona" id="p-persona"></div>
+    <div class="panel-persona-name" id="p-persona-name"></div>
+  </div>
+  <div class="panel-body">
+    <div class="panel-emotion">
+      <span class="panel-emoji" id="p-emoji"></span>
+      <span class="panel-state" id="p-state"></span>
+    </div>
+    <div id="p-skip-badge"></div>
+    <div class="panel-narrative" id="p-narrative"></div>
+  </div>
+  <div class="panel-nav">
+    <button id="panel-prev" disabled>← Prev</button>
+    <button id="panel-next" disabled>Next →</button>
+  </div>
+</div>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// NARRATIVE DATA
+// ════════════════════════════════════════════════════════════════
+
+const narratives = {
+  marcus_a: [
+    { emoji: '🤝', cellLabel: 'Branch walk-in, OSR visit, or referral', state: 'Curious but cautious', text: 'Marcus walks into the nearest QXO branch because it\'s close to his jobsite. Victor (ISR) at the counter treats him well, remembers his name after the second visit. Jake (OSR) stops by a jobsite a few weeks later and introduces himself. First contact can also happen the other way — Jake cold-calls Marcus after spotting his truck in a neighborhood, or Marcus gets referred by another contractor who buys at the branch. However it starts, the branch team makes Marcus feel welcome and earns the first order. That personal connection is what brings him back before the platform ever matters.' },
+    { emoji: '🔥', cellLabel: 'Lead comes in — needs to bid fast', state: 'Urgently optimistic', text: 'Marcus gets a call from a homeowner, spots storm damage while driving his territory, or picks up a referral through word-of-mouth. He needs to move fast — homeowners get 3+ bids, and the contractor who responds first usually wins. Marcus has a QXO account with his pricing profile loaded, but he\'s not working from a CRM — leads come in through his phone, his network, and his own hustle. He\'s energized but impatient. Every minute he\'s not acting is a minute a competitor could swoop in.' },
+    { emoji: '🏠', cellLabel: 'Job record auto-created at proposal send', state: 'Seamless', text: 'Marcus never stops to create a Job record — it happens automatically the moment his ATB proposal sends. The system captures the homeowner\'s address from the measurement step and creates a persistent record anchored to that address. From this point forward, every estimate, order, invoice, delivery, and margin report rolls up under this address. If Marcus loses this bid but comes back to the same house six months later, the history is already there. If he wins and places three supplemental orders over the next two weeks, they\'re grouped together — not scattered across his order history by date. For Marcus, nothing changed in his workflow. For QXO, this is the moment the lead becomes trackable intelligence: did he win or lose? What was his close rate this month? The Job record is invisible to Marcus but foundational to everything the platform learns about him.' },
+    { emoji: '⚡', cellLabel: 'ATB: measure → propose → send in one step', state: 'Efficient', text: 'Address-to-Bid. Marcus enters a property address and kicks off the ATB flow — measurement (V1: EagleView Bid Perfect; long-term: manual, GAF QuickMeasure, EagleView, Roofr), template selection from his Builds profile, material configuration, and pricing all resolve into a Good/Better/Best homeowner proposal embedded directly in QXO\'s ordering system and catalog. Measure, build, send — 3 to 5 minutes. No separate quoting step. The proposal isn\'t a PDF floating outside the system; it\'s a live object tied to QXO\'s catalog, pricing, and fulfillment pipeline.' },
+    { emoji: '✏️', cellLabel: 'Reviews and tweaks G/B/B tiers', state: 'Confident', text: 'Marcus decides the final template and configuration of his Good/Better/Best tiers. As he adjusts materials and markup, CPQ is working behind the scenes — validating that each tier is warranty-compliant, flagging missing companions, and surfacing ROI signals so Marcus can build proposals that win jobs and protect margin. He\'s in control of the offer; CPQ makes sure his choices don\'t break anything and helps him make smarter ones.' },
+    { emoji: '📱', cellLabel: 'Proposal delivered to homeowner via SMS and email', state: 'Anticipatory', text: 'When Marcus hits send, the platform generates a branded, interactive proposal link and delivers it to the homeowner via SMS and email. The proposal includes the G/B/B tiers with materials, pricing, warranty details, and a projected delivery date based on branch inventory and logistics availability. It\'s a live object tied to Marcus\'s Job record and the QXO catalog — not a static PDF floating outside the system.' },
+    { emoji: '✅', cellLabel: 'Selects tier, e-signs, submits deposit', state: 'Committed', text: 'Homeowner picks Good, Better, or Best. E-signs the contract. Submits deposit. The moment that deposit hits, the order is locked in QXO\'s system.' },
+    { emoji: '🚗', cellLabel: 'Auto-order fires to branch', state: 'Action-oriented', text: 'The moment the deposit clears, an order is automatically generated in QXO\'s system with all the materials from the proposal. The branch team gets a notification that Marcus has an incoming delivery order. They pull stock, stage it, and prepare for delivery scheduling.' },
+    { emoji: '📲', cellLabel: 'Gets push notification: order placed', state: 'Validated', text: 'Marcus gets a push notification confirming his order is in the system, with an order number, total cost, and delivery window. He doesn\'t have to call anyone or follow up. The system tells him the work is real.' },
+    { emoji: '🗺️', cellLabel: 'GPS-tracked delivery scheduled', state: 'Organized', text: 'QXO\'s logistics system books a delivery slot, assigns a driver, and sends Marcus the delivery window and driver phone number. Marcus can track the truck in real time if he wants. This is where the promise of speed gets locked in: Marcus knows exactly when materials will arrive.' },
+    { emoji: '✓', cellLabel: 'Verifies delivery on jobsite', state: 'Thorough', text: 'When the truck arrives, Marcus (or his crew) checks off materials against the packing slip. Full roofing kit, all accessories, everything. If something is wrong, he texts or calls the driver immediately to sort it. Usually it\'s right.' },
+    { emoji: '⚠️', cellLabel: 'Discovers damage, needs more materials', state: 'Pragmatic', text: 'Two days into the job, Marcus finds unexpected damage — old plywood that needs replacement, venting issues that require extra flashing. He can\'t complete the job without more materials. He pulls up the Job record and creates a supplemental order directly from the site, using mobile.' },
+    { emoji: '📦', cellLabel: 'Supplemental order from Job record', state: 'Resourceful', text: 'The Job record now contains everything Marcus has ordered for this project. He can see what he already bought, what he used, and what the homeowner is expecting. He adds the supplemental materials to the Job and submits the order. The branch sees it instantly — it\'s not a new order, it\'s an amendment to the existing one.' },
+    { emoji: '💰', cellLabel: 'Invoice auto-matches, net-30 applied', state: 'Trusting', text: 'QXO\'s system matches the invoice to the Job and the original proposal. Pricing is validated automatically. Marcus gets net-30 terms on his account — he doesn\'t pay the full amount on delivery, he pays 30 days later. This cash flow freedom is huge for solo operators.' },
+    { emoji: '📊', cellLabel: 'Forwards to accountant', state: 'Professional', text: 'Marcus forwards the Job record and invoice to his accountant (or accountant pulls from QXO directly if they\'re integrated). All costs are tracked, margin is calculated automatically. No manual spreadsheets, no guessing.' },
+    { emoji: '📈', cellLabel: 'Full lifecycle record, margin visibility', state: 'Data-aware', text: 'The Job record now contains: estimate, proposal, order, delivery, invoice, payment status, and margin. Marcus can pull a report showing exactly how profitable this job was. Did I bid it right? Did I waste materials? Will I repeat this job type? The data feeds directly into his next estimate.' },
+    { emoji: '🧠', cellLabel: 'Margin trends, rebate accruing', state: 'Forward-thinking', text: 'Over 20 jobs this year, Marcus\'s waste patterns become visible. QXO\'s AI recommends template tweaks that reduce waste and improve his margin. He also discovers that cool-roof jobs are 8% more profitable for him than standard asphalt. His rebate accrual compounds with every dollar spent.' }
+  ],
+  marcus_b: [
+    { emoji: '🤝', cellLabel: 'Branch walk-in, OSR visit, or referral', state: 'Curious but cautious', text: 'Marcus walks into the nearest QXO branch because it\'s close to his jobsite. Victor (ISR) at the counter treats him well, remembers his name after the second visit. Jake (OSR) stops by a jobsite a few weeks later and introduces himself. First contact can also happen the other way — Jake cold-calls Marcus after spotting his truck in a neighborhood, or Marcus gets referred by another contractor who buys at the branch. However it starts, the branch team makes Marcus feel welcome and earns the first order. That personal connection is what brings him back before the platform ever matters.' },
+    { emoji: '🔥', cellLabel: 'Lead comes in — needs to bid fast', state: 'Urgently optimistic', text: 'Marcus gets a call from a homeowner, spots storm damage while driving his territory, or picks up a referral through word-of-mouth. He needs to move fast — homeowners get 3+ bids, and the contractor who responds first usually wins. Marcus has a QXO account with his pricing profile loaded, but he\'s not working from a CRM — leads come in through his phone, his network, and his own hustle. He\'s energized but impatient. Every minute he\'s not acting is a minute a competitor could swoop in.' },
+    { emoji: '🏠', cellLabel: 'Job record auto-created at order placement', state: 'Seamless', text: 'Marcus doesn\'t create a Job record — one is generated automatically when he places his order. He enters the delivery address, and the system uses that address to create a persistent Job record behind the scenes. This is the standard order flow: Marcus already knows what he needs, he\'s not sending a proposal to anyone, he\'s just ordering materials. But now that order is anchored to an address instead of just an order number. If he comes back next week for supplemental materials at the same address, the system groups them together. If he\'s worked at this address before, the previous history is already there. For contractors like Marcus who don\'t use a CRM, this is lightweight job tracking they get for free — every address becomes a mini project file. For QXO, it means order history is organized the way contractors actually think: by jobsite, not by date.' },
+    { emoji: '📋', cellLabel: 'Loads template, adjusts quantities', state: 'Experienced', text: 'Marcus already knows what he needs for this job type — he\'s done 30 similar jobs. He loads a saved template from QXO (standard 2000 sq ft residential reroof, 6/12 pitch, asphalt composite). He reviews quantities, makes small adjustments (add a few more squares due to complexity, adjust flashing counts), and confirms. Template loading takes 2–3 minutes vs. 15+ minutes if he was building from scratch or writing it on a napkin.' },
+    { emoji: '✅', cellLabel: 'Confirms order at standard pricing', state: 'Direct', text: 'Marcus submits the Build he just created. His saved pricing profile is applied automatically — the price he negotiated with his ISR months ago. One click, order submitted.' },
+    { emoji: '🚀', cellLabel: 'Order fires to branch', state: 'Fast', text: 'The order goes directly into the branch system. No homeowner proposal, no deposit requirement (for known repeat customers), no intermediate step. The branch gets notified and starts pulling materials.' },
+    { emoji: '🗺️', cellLabel: 'GPS-tracked delivery', state: 'Organized', text: 'Delivery is scheduled via QXO\'s logistics system. Marcus gets a delivery window and driver contact. The whole flow from "load template" to "delivery scheduled" is under 10 minutes.' },
+    { emoji: '✓', cellLabel: 'Verifies delivery', state: 'Thorough', text: 'Marcus checks materials on-site. Everything matches the order. No surprises, no missing items.' },
+    { emoji: '⚠️', cellLabel: 'Supplemental order from job', state: 'Pragmatic', text: 'Unexpected materials needed during install. Marcus adds to the Job and orders again.' },
+    { emoji: '📦', cellLabel: 'Inherits original pricing', state: 'Protected', text: 'The supplemental order inherits the same pricing profile as the original order. No repricing, no negotiation needed. The margin floor is protected.' },
+    { emoji: '💰', cellLabel: 'Invoice auto-matches', state: 'Trusting', text: 'Both orders (original + supplemental) get matched to the Job. Single invoice for the whole project. Net-30 terms apply to the full amount.' },
+    { emoji: '📊', cellLabel: 'Forwards to accountant', state: 'Professional', text: 'Marcus shares the Job record and invoices with his accountant. Clear cost breakdown, automatic margin calculation.' },
+    { emoji: '📈', cellLabel: 'Lifecycle record', state: 'Data-aware', text: 'The Job record shows actual cost vs. bid, material waste, delivery time, payment status. Over 50 jobs, patterns emerge.' },
+    { emoji: '💡', cellLabel: 'AI profile building', state: 'Learning', text: 'QXO\'s system learns: Marcus always picks 30-year shingles, rarely does hip roofs, prefers morning deliveries. These patterns feed into future template recommendations.' },
+    { emoji: '🧠', cellLabel: 'Margin trends, rebate', state: 'Forward-thinking', text: 'Marcus notices his standard residential jobs are his most profitable tier. Rebates compound monthly.' }
+  ],
+  marcus_c: [
+    { emoji: '🤝', cellLabel: 'Branch walk-in, OSR visit, or referral', state: 'Curious but cautious', text: 'Marcus walks into the nearest QXO branch because it\'s close to his jobsite. Victor (ISR) at the counter treats him well, remembers his name after the second visit. Jake (OSR) stops by a jobsite a few weeks later and introduces himself. First contact can also happen the other way — Jake cold-calls Marcus after spotting his truck in a neighborhood, or Marcus gets referred by another contractor who buys at the branch. However it starts, the branch team makes Marcus feel welcome and earns the first order. That personal connection is what brings him back before the platform ever matters.' },
+    { emoji: '🔥', cellLabel: 'Lead comes in — needs to bid fast', state: 'Urgently optimistic', text: 'Marcus gets a call from a homeowner, spots storm damage while driving his territory, or picks up a referral through word-of-mouth. He needs to move fast — homeowners get 3+ bids, and the contractor who responds first usually wins. Marcus has a QXO account with his pricing profile loaded, but he\'s not working from a CRM — leads come in through his phone, his network, and his own hustle. He\'s energized but impatient. Every minute he\'s not acting is a minute a competitor could swoop in.' },
+    { emoji: '🏠', cellLabel: 'Job record auto-created at quote creation', state: 'Seamless', text: 'When Marcus starts building his quote to request special pricing, the system automatically creates a Job record tied to the delivery address. Marcus is focused on getting the right price — he doesn\'t notice and doesn\'t need to. But the Job record is already working: it captures the address, links the quote request to a specific jobsite, and will eventually connect the special pricing, the branch negotiation, the final order, and every supplemental that follows. This matters for the special pricing flow specifically because the back-and-forth with the branch can span hours or days. The Job record holds it all together so nothing gets lost between the request and the resolution. If Marcus revises the quote, it\'s tracked. If the branch escalates to a manager, the Job record knows. And when Marcus finally accepts and the order fires, it doesn\'t start a new thread — it attaches to the story that started here.' },
+    { emoji: '📋', cellLabel: 'Loads template, identifies materials', state: 'Strategic', text: 'Marcus loads his standard template, but immediately realizes this isn\'t a standard job — the homeowner mentioned a competitor quoted $3,000 less on materials. Marcus needs to compete on price without losing margin. He identifies the specific materials where he can negotiate.' },
+    { emoji: '📲', cellLabel: 'Submits configured Build to branch for special pricing', state: 'Direct', text: 'Marcus submits the configured order list he built in Stage 3 to Jake or Victor through the digital channel — requesting special pricing to match the competitor. The Build travels with all its context: materials, quantities, Job record, and the pricing gap Marcus needs closed. No phone tag, no re-explaining. The branch team receives a complete picture.' },
+    { emoji: '💬', cellLabel: 'Jake receives Build, evaluates pricing request', state: 'Collaborative', text: 'Jake receives Marcus\'s configured Build digitally with full context — he can see exactly which materials Marcus needs and what the pricing gap looks like. Jake checks QXO\'s cost on those line items and proposes a special margin that Marcus can offer to win the job. Jake has authority to approve some discounts himself; others require escalation.' },
+    { emoji: '✓', cellLabel: 'Evaluates against margin floors', state: 'Governed', text: 'CPQ (the pricing rules engine) checks Jake\'s proposed price against QXO\'s margin floor for that product. If it\'s within Jake\'s authorization level ($500 discount authority on material cost), CPQ instantly approves. The pricing is locked into the system.' },
+    { emoji: '👤', cellLabel: 'Branch mgr approves (if escalated)', state: 'Escalated', text: 'If Jake\'s proposal breaches his authorization level (say, Marcus needs $800 off), CPQ routes the request to the branch manager for final approval. The branch manager reviews the order size, Marcus\'s history, and the competitive situation, then approves or denies.' },
+    { emoji: '💰', cellLabel: 'Pricing appears on digital account', state: 'Transparent', text: 'Once approved (whether by CPQ auto-approve or manager sign-off), the special pricing is loaded into Marcus\'s account on QXO digital and becomes available for this Job.' },
+    { emoji: '👁️', cellLabel: 'Sees special pricing on account', state: 'Confident', text: 'Marcus logs into his QXO account and sees the special pricing reflected on the template he loaded. The system shows: "Special pricing approved for this job — locked through [date]." He\'s now ready to quote competitively.' },
+    { emoji: '✅', cellLabel: 'Accepts CPQ-validated pricing', state: 'Empowered', text: 'Marcus confirms the order with the special pricing. He knows it\'s been validated by the system, so he can confidently quote it to the homeowner.' },
+    { emoji: '🚀', cellLabel: 'Order fires on validated basket', state: 'Fast', text: 'The order (with special pricing) goes into the branch system. Materials are pulled at the negotiated price. Delivery is scheduled.' },
+    { emoji: '🗺️', cellLabel: 'GPS-tracked delivery', state: 'Organized', text: 'Delivery scheduled via logistics. Marcus gets his delivery window.' },
+    { emoji: '✓', cellLabel: 'Verifies delivery', state: 'Thorough', text: 'Marcus checks everything on-site. All materials present and correct.' },
+    { emoji: '⚠️', cellLabel: 'Supplemental order', state: 'Pragmatic', text: 'Additional materials discovered mid-job. Marcus orders via the Job record.' },
+    { emoji: '📦', cellLabel: 'Inherits special pricing', state: 'Protected', text: 'The supplemental order automatically inherits the special pricing that was approved for the original Job. No repricing required.' },
+    { emoji: '💰', cellLabel: 'Invoice auto-matches', state: 'Trusting', text: 'Both orders matched to Job. Margin validated. Net-30 applied.' },
+    { emoji: '📊', cellLabel: 'Lifecycle record', state: 'Data-aware', text: 'Job record shows actual cost vs. bid. The special pricing negotiation is documented.' },
+    { emoji: '💡', cellLabel: 'AI profile building', state: 'Learning', text: 'QXO logs: Marcus needed $500 shingle discount to win this job. Pattern emerges over time.' },
+    { emoji: '🧠', cellLabel: 'Margin trends, rebate', state: 'Forward-thinking', text: 'Marcus tracks how many jobs he wins with special pricing vs. standard. Rebates compound.' }
+  ],
+  diego: [
+    { emoji: '👥', cellLabel: 'Bilingual OSR visits jobsite', state: 'Welcoming', text: 'Diego is working a small residential roof job when a QXO branch OSR stops by. Instead of English-only pitch, the OSR speaks Spanish, uses "usted," and asks about Diego\'s business in his language. This is the first moment Diego realizes there\'s a company that bothers to meet him where he is. The OSR doesn\'t try to close him that day — just introduces the branch, explains QXO serves Spanish-speaking contractors, and leaves a bilingual order form.' },
+    { emoji: '🎯', cellLabel: 'Breaking the retail barrier', state: 'Hopeful', text: 'Diego has historically bought materials at retail — Home Depot, Lowe\'s — because he didn\'t think a distributor would work with someone at his scale. The QXO OSR showed him that distributors have contractors like him. That single conversation shifts his thinking from "I buy at retail" to "Maybe I can get contractor pricing."' },
+    { emoji: '📱', cellLabel: 'Word-of-mouth lead via WhatsApp', state: 'Energized', text: 'Diego gets a WhatsApp message from another contractor recommending QXO. The referral is in Spanish and feels personal. He decides to try ordering from QXO for his next job.' },
+    { emoji: '📝', cellLabel: 'First Job — Spanish-first or OSR helps', state: 'Supported', text: 'Diego creates his first Job in QXO. The OSR might help him walk through it on the phone in Spanish, or Diego uses the Spanish-language UI and does it himself. Either way, the system records his first project.' },
+    { emoji: '💻', cellLabel: 'OSR may create first Job on-site', state: 'Hands-on', text: 'The OSR visits Diego\'s next jobsite and helps create the Job record together — address, measurements, basic info. This touch-point builds trust and ensures Diego doesn\'t get stuck on technical setup.' },
+    { emoji: '🌐', cellLabel: 'Job record in Spanish', state: 'Accessible', text: 'The Job record UI, all labels, all messages — everything Diego sees is in Spanish. The system speaks his language.' },
+    { emoji: '⚡', cellLabel: 'ATB Blue in Spanish — accurate bids', state: 'Efficient', text: 'Diego uses ATB (Address-to-Bid) to measure a roof and get an instant proposal. The entire flow is available in Spanish — measurements, templates, configurations. ATB replaces the mental math he used to do.' },
+    { emoji: '🧮', cellLabel: 'Replaces mental math with real takeoffs', state: 'Accurate', text: 'For years, Diego estimated materials by eye and memory. Now he\'s using actual measurements and AI-powered templates. His bids are more accurate. He wastes less.' },
+    { emoji: '🤖', cellLabel: 'Branch defaults power the Build', state: 'Supported', text: 'Diego doesn\'t have a saved template library like Marcus does. Instead, QXO\'s system uses "branch defaults" — pre-configured material profiles optimized for fast, accurate building. Diego just confirms the defaults, and the system generates a professional-looking proposal.' },
+    { emoji: '💬', cellLabel: 'Guided by AI chatbot in Spanish', state: 'Learning', text: 'As Diego builds an order, a Spanish-language AI chatbot appears: "Need help choosing underlayment for a 6/12 pitch?" Diego types his question in Spanish, and the bot recommends products from QXO\'s catalog with specs, price, and warranty info — all in Spanish. He\'s learning the QXO product system through Spanish-language guidance.' },
+    { emoji: '📄', cellLabel: 'Professional Spanish-language proposal', state: 'Proud', text: 'ATB generates a formal proposal in Spanish: homeowner name, address, materials specified, Good/Better/Best tiers, total price, terms. Diego shows this to the homeowner via mobile or printed. For the first time, Diego can offer a professional proposal in his language — not a handwritten estimate.' },
+    { emoji: '📱', cellLabel: 'Receives proposal via SMS/WhatsApp', state: 'Impressed', text: 'Diego can send the proposal to the homeowner via SMS or WhatsApp (Diego\'s preferred channel). The homeowner can review, accept a tier, and sign digitally — all in Spanish.' },
+    { emoji: '✅', cellLabel: 'Accepts tier, confirms', state: 'Committed', text: 'Homeowner selects Best tier, e-signs, confirms. Deposit submitted (or for Diego\'s trusted customers, deposit may be waived on smaller jobs).' },
+    { emoji: '🚀', cellLabel: 'Auto-order fires — cash/COD', state: 'Transactional', text: 'The order is generated automatically in QXO. But Diego\'s account is set to cash/COD — no credit line, no financing. The branch prepares the order for cash pickup or COD delivery.' },
+    { emoji: '✓', cellLabel: 'Validated — platform helped close the job', state: 'Proud', text: 'Diego closed the job using the platform. The proposal was professional, the pricing was fair, and he offered it in his customer\'s language. This is the moment Diego realizes QXO isn\'t just cheaper than retail — it\'s a legitimate business tool.' },
+    { emoji: '🚚', cellLabel: 'Delivery to jobsite', state: 'Enabling', text: 'Materials delivered to Diego\'s jobsite. Delivery unlocks larger jobs — instead of buying 5 squares at Home Depot (what fits in his truck), Diego can now order 20 squares and have them delivered. This changes the job scale he can take on.' },
+    { emoji: '⛓️', cellLabel: 'Receives rooftop delivery', state: 'Efficient', text: 'Materials are delivered directly to the rooftop (crane or manual) instead of Diego having to manage staging. This removes friction and saves him labor.' },
+    { emoji: '📱', cellLabel: 'Texts OSR for more materials', state: 'Empowered', text: 'Mid-job, Diego discovers he needs additional materials. Instead of driving to Home Depot, he texts the OSR via WhatsApp (the channel he already uses). The OSR processes the request.' },
+    { emoji: '💬', cellLabel: 'OSR processes WhatsApp request', state: 'Responsive', text: 'The OSR receives the WhatsApp message, recognizes Diego\'s Job, looks up what\'s already been ordered, and proposes the supplemental materials. Diego confirms, and the OSR inputs it into the system.' },
+    { emoji: '💵', cellLabel: 'Cash/COD payment — simple, transparent', state: 'Trust-based', text: 'Diego pays cash or COD. No credit line, no terms, no complexity. "Here\'s what you owe, cash on delivery." This is how Diego is comfortable transacting.' },
+    { emoji: '📜', cellLabel: 'Clear invoice in Spanish', state: 'Professional', text: 'QXO sends Diego an invoice in Spanish, breaking down all materials, quantities, unit prices, and totals. It\'s clear, professional, and he can show it to his accountant.' },
+    { emoji: '📊', cellLabel: 'First business intelligence ever', state: 'Enlightened', text: 'For the first time, Diego can see: How much did I spend on materials? What was my cost per square? Did I waste anything? The Job record gives him data he\'s never had before.' },
+    { emoji: '📈', cellLabel: 'Job history building', state: 'Growing', text: 'After 10 jobs with QXO, Diego has a track record: $180K in jobs, waste trending down, favorite products emerging. The system knows his patterns.' },
+    { emoji: '💪', cellLabel: 'Margin visibility, growth path', state: 'Confident', text: 'Diego sees that his jobs are averaging 35% margin (after material costs). This is real money. He can grow the business. The platform shows him a path: more jobs = more data = smarter operations = better margins.' },
+    { emoji: '🌟', cellLabel: 'Trust-first path to credit', state: 'Reaching', text: 'After 50 jobs and $500K in lifetime purchases, the OSR approaches Diego: "You\'ve been solid. We\'d like to offer you a $15K credit line. No application hassle, just on the strength of your history." Diego accepts. The transition from cash to credit happens organically, built on trust.' }
+  ]
+};
+
+const stageNames = [
+  'Stage 1: Awareness & Lead',
+  'Stage 2: Estimation',
+  'Stage 2.5: Job Creation',
+  'Stage 3: Template & Build',
+  'Stage 4: Quoting',
+  'Stage 4.5: Quote Resolution',
+  'Stage 5: Acceptance & Order',
+  'Stage 6: Delivery',
+  'Stage 6.5: Jobsite & Supplemental',
+  'Stage 7: Payment',
+  'Stage 8: Job Close',
+  'Stage 9: Portfolio Intelligence'
+];
+
+const laneInfo = {
+  contractor: { label: 'Contractor', color: 'var(--cyan)' },
+  branch: { label: 'Branch Team', color: 'var(--orange)' },
+  platform: { label: 'Platform / Digital', color: 'var(--blue)' },
+  cpq: { label: 'CPQ', color: 'var(--purple)' },
+  homeowner: { label: 'Homeowner / Client', color: 'var(--green)' }
+};
+
+// ════════════════════════════════════════════════════════════════
+// FLOW DATA
+// ════════════════════════════════════════════════════════════════
+
+const allFlows = {
+  marcus_a: createMarcusA(),
+  marcus_b: createMarcusB(),
+  marcus_c: createMarcusC()
+};
+
+function createMarcusA() {
+  return [
+    { id: 'ma_s1', stage: 1, lane: 'contractor', type: 'process', label: 'Lead comes in — needs to bid fast', narrative: narratives.marcus_a[1] },
+    { id: 'ma_s2_p', stage: 2.5, lane: 'platform', type: 'process', label: 'Job record auto-created when proposal sends — address anchors all future work', narrative: narratives.marcus_a[2], noNextArrow: true },
+    { id: 'ma_s3_c', stage: 2, lane: 'contractor', type: 'process', label: 'ATB: enters address, selects measurement, configures G/B/B tiers', narrative: narratives.marcus_a[3] },
+    { id: 'ma_s3_p', stage: 2, lane: 'platform', type: 'process', label: 'Builds profile powers template selection, pricing, and proposal generation', narrative: narratives.marcus_a[4] },
+    { id: 'ma_s3_cpq', stage: 2, lane: 'cpq', type: 'process', label: 'Enforces warranty compliance, catches missing companions, optimizes tier ROI', narrative: narratives.marcus_a[4] },
+    { id: 'ma_s4_skip', stage: 3, lane: 'contractor', type: 'skip', label: 'Rolled into ATB', narrative: narratives.marcus_a[3] },
+    { id: 'ma_s5_skip', stage: 4, lane: 'contractor', type: 'skip', label: 'Rolled into ATB', narrative: narratives.marcus_a[3], noNextArrow: true },
+    { id: 'ma_s5_p', stage: 4.5, lane: 'platform', type: 'process', label: 'Proposal delivered to homeowner via SMS and email link', narrative: narratives.marcus_a[5], noNextArrow: true },
+    { id: 'ma_s6_h', stage: 5, lane: 'homeowner', type: 'process', label: 'Receives G/B/B proposal, selects tier, e-signs, submits deposit', narrative: narratives.marcus_a[6] },
+    { id: 'ma_s6_c', stage: 5, lane: 'contractor', type: 'process', label: 'Gets push notification: order placed', narrative: narratives.marcus_a[8] },
+    { id: 'ma_s7_p', stage: 6, lane: 'platform', type: 'process', label: 'GPS-tracked delivery scheduled', narrative: narratives.marcus_a[9] },
+    { id: 'ma_s7_c', stage: 6, lane: 'contractor', type: 'process', label: 'Verifies delivery on jobsite', narrative: narratives.marcus_a[10] },
+    { id: 'ma_s7_5_c', stage: 6.5, lane: 'contractor', type: 'process', label: 'Discovers damage, needs more materials', narrative: narratives.marcus_a[11] },
+    { id: 'ma_s7_5_p', stage: 6.5, lane: 'platform', type: 'process', label: 'Supplemental order from Job record', narrative: narratives.marcus_a[12] },
+    { id: 'ma_s8_p', stage: 7, lane: 'platform', type: 'process', label: 'Invoice auto-matches, net-30 applied', narrative: narratives.marcus_a[13] },
+    { id: 'ma_s8_c', stage: 7, lane: 'contractor', type: 'process', label: 'Forwards to accountant', narrative: narratives.marcus_a[14] },
+    { id: 'ma_s9_p', stage: 8, lane: 'platform', type: 'process', label: 'Full lifecycle record, margin visibility', narrative: narratives.marcus_a[15] },
+    { id: 'ma_s9_c', stage: 8, lane: 'contractor', type: 'process', label: 'Reviews estimated vs. actual margin', narrative: narratives.marcus_a[15] },
+    { id: 'ma_s10_p', stage: 9, lane: 'platform', type: 'process', label: 'Waste calibration, AI profile building', narrative: narratives.marcus_a[16] },
+    { id: 'ma_s10_c', stage: 9, lane: 'contractor', type: 'process', label: 'Margin trends, rebate accruing', narrative: narratives.marcus_a[16] }
+  ];
+}
+
+function createMarcusB() {
+  return [
+    { id: 'mb_s1', stage: 1, lane: 'contractor', type: 'process', label: 'Lead comes in — needs to bid fast', narrative: narratives.marcus_b[1] },
+    { id: 'mb_s2_p', stage: 2.5, lane: 'platform', type: 'process', label: 'Job record auto-created at order placement — address anchors all future work', narrative: narratives.marcus_b[2] },
+    { id: 'mb_s3_skip', stage: 2, lane: 'contractor', type: 'skip', label: 'Knows what he needs — no estimation', noPanel: true },
+    { id: 'mb_s4_p', stage: 3, lane: 'platform', type: 'process', label: 'Builds profile + CPQ power the template', noNextArrow: true, narrative: { emoji: '🧠', cellLabel: 'Three-tiered intelligence powers the Build', state: 'Intelligent', text: 'Three intelligence layers work together to power Marcus\'s Build. Layer 1: branch-curated templates — standardized material packages optimized for the region. Layer 2: Marcus\'s explicit preferences — his saved brand choices, waste factors, and labor rates built up over dozens of jobs. Layer 3: AI-driven recommendations from his purchase history — waste calibration, product suggestions, and patterns Marcus hasn\'t noticed yet. All three layers operate within CPQ\'s constraint space, so every recommendation respects warranty eligibility, companion requirements, and pricing guardrails before Marcus ever sees it.' } },
+    { id: 'mb_s4_cpq', stage: 3, lane: 'cpq', type: 'process', label: 'Validates configuration, enforces warranty and companion rules', narrative: { emoji: '🔒', cellLabel: 'CPQ validates the Build', state: 'Governed', text: 'As Marcus\'s template loads and the Builds intelligence layers assemble his materials list, CPQ silently validates the entire configuration. Warranty eligibility is checked — are these products compatible for the manufacturer\'s warranty program? Required companions are enforced — does this shingle selection need a specific underlayment or starter strip? On a standard template-driven order like this, CPQ is invisible. Marcus never sees a warning because the template was already built within CPQ\'s rules. But if he overrides a material that breaks compatibility, CPQ surfaces an advisory before the order goes through.' } },
+    { id: 'mb_s4_c', stage: 3, lane: 'contractor', type: 'process', label: 'Loads template, adjusts quantities', narrative: narratives.marcus_b[3] },
+    { id: 'mb_s5_skip', stage: 4, lane: 'contractor', type: 'skip', label: 'Orders at profile pricing — no quote needed', noPanel: true },
+    { id: 'mb_s6_c', stage: 5, lane: 'contractor', type: 'process', label: 'Submits Build at standard pricing', narrative: narratives.marcus_b[4] },
+    { id: 'mb_s6_p', stage: 5, lane: 'platform', type: 'process', label: 'Order fires to branch', narrative: narratives.marcus_b[5] },
+    { id: 'mb_s6_b', stage: 5, lane: 'branch', type: 'process', label: 'Branch sees order instantly, begins processing', narrative: { emoji: '🏪', cellLabel: 'Branch receives and processes order', state: 'Aligned', text: 'The moment Marcus submits, the order appears in the branch system in real time. Victor at the counter or Jake on the road can see exactly what Marcus ordered, tied to the same Job record Marcus sees on his phone. This is the omnichannel promise — the order isn\'t a separate transaction that the branch has to look up or re-enter. It\'s the same record, the same pricing, the same Job. The branch team pulls stock, stages materials, and prepares for delivery scheduling without any phone call or duplicate data entry.' } },
+    { id: 'mb_s7_p', stage: 6, lane: 'platform', type: 'process', label: 'GPS-tracked delivery', narrative: narratives.marcus_b[6] },
+    { id: 'mb_s7_c', stage: 6, lane: 'contractor', type: 'process', label: 'Verifies delivery', narrative: narratives.marcus_b[7] },
+    { id: 'mb_s7_5_c', stage: 6.5, lane: 'contractor', type: 'process', label: 'Supplemental order from job', narrative: narratives.marcus_b[8] },
+    { id: 'mb_s7_5_p', stage: 6.5, lane: 'platform', type: 'process', label: 'Inherits original pricing', narrative: narratives.marcus_b[9] },
+    { id: 'mb_s8_p', stage: 7, lane: 'platform', type: 'process', label: 'Invoice auto-matches', narrative: narratives.marcus_b[10] },
+    { id: 'mb_s8_c', stage: 7, lane: 'contractor', type: 'process', label: 'Forwards to accountant', narrative: narratives.marcus_b[10] },
+    { id: 'mb_s9_p', stage: 8, lane: 'platform', type: 'process', label: 'Lifecycle record', narrative: narratives.marcus_b[11] },
+    { id: 'mb_s9_c', stage: 8, lane: 'contractor', type: 'process', label: 'Margin visibility', narrative: narratives.marcus_b[11] },
+    { id: 'mb_s10_p', stage: 9, lane: 'platform', type: 'process', label: 'AI profile building', narrative: narratives.marcus_b[12] },
+    { id: 'mb_s10_c', stage: 9, lane: 'contractor', type: 'process', label: 'Margin trends, rebate', narrative: narratives.marcus_b[14] }
+  ];
+}
+
+function createMarcusC() {
+  return [
+    { id: 'mc_s1', stage: 1, lane: 'contractor', type: 'process', label: 'Lead comes in — needs to bid fast', narrative: narratives.marcus_c[1] },
+    { id: 'mc_s2_p', stage: 2.5, lane: 'platform', type: 'process', label: 'Job record auto-created at quote creation — address anchors all future work', narrative: narratives.marcus_c[2] },
+    { id: 'mc_s3_c', stage: 2, lane: 'contractor', type: 'skip', label: 'Residential job — already knows materials needed', noPanel: true },
+    { id: 'mc_s4_c', stage: 3, lane: 'contractor', type: 'process', label: 'Loads template — but homeowner says competitor is $3K cheaper', narrative: { emoji: '📋', cellLabel: 'Loads template, identifies pricing gap', state: 'Strategic', text: 'Marcus loads his standard residential template — he knows the materials cold. But the homeowner mentioned another contractor quoted $3,000 less on materials. Marcus can see exactly which line items are the gap. He doesn\'t need help with the spec; he needs QXO to match or beat on price so he can win this job.' } },
+    { id: 'mc_s4_p', stage: 3, lane: 'platform', type: 'process', label: 'Builds profile + CPQ power the template', noNextArrow: true, narrative: { emoji: '🧠', cellLabel: 'Three-tiered intelligence powers the Build', state: 'Intelligent', text: 'Three intelligence layers work together to power Marcus\'s Build. Layer 1: branch-curated templates — standardized material packages optimized for the region. Layer 2: Marcus\'s explicit preferences — his saved brand choices, waste factors, and labor rates built up over dozens of jobs. Layer 3: AI-driven recommendations from his purchase history — waste calibration, product suggestions, and patterns Marcus hasn\'t noticed yet. All three layers operate within CPQ\'s constraint space, so every recommendation respects warranty eligibility, companion requirements, and pricing guardrails before Marcus ever sees it.' } },
+    { id: 'mc_s4_cpq', stage: 3, lane: 'cpq', type: 'process', label: 'Validates configuration, enforces warranty and companion rules', narrative: { emoji: '🔒', cellLabel: 'CPQ validates the Build', state: 'Governed', text: 'As Marcus\'s template loads and the Builds intelligence layers assemble his materials list, CPQ silently validates the entire configuration. Warranty eligibility is checked, required companions are enforced. On a standard template-driven order like this, CPQ is invisible. But the pricing gap Marcus is facing will require branch involvement — CPQ will play a bigger role at the quoting stage when Jake proposes special pricing and CPQ evaluates it against margin floors and authorization levels.' } },
+    { id: 'mc_s5_c1', stage: 4, lane: 'contractor', type: 'process', label: 'Submits Build to branch — requests special pricing', narrative: narratives.marcus_c[4] },
+    { id: 'mc_s5_b1', stage: 4, lane: 'branch', type: 'process', label: 'Jake receives Build, evaluates pricing request', narrative: narratives.marcus_c[5], noNextArrow: true },
+    { id: 'mc_s5_cpq', stage: 4.5, lane: 'cpq', type: 'decision', label: 'Within authorization?', narrative: narratives.marcus_c[6] },
+    { id: 'mc_s5_c2', stage: 5, lane: 'contractor', type: 'process', label: 'Reviews pricing — accept, revise, or walk away', narrative: { emoji: '👁️', cellLabel: 'Reviews special pricing', state: 'Evaluating', text: 'Marcus receives the special pricing that CPQ has validated. He reviews it against the competitor\'s quote to decide if it\'s enough to win the job. Three outcomes: If the price works, he accepts and the order fires — moving forward into delivery. If it doesn\'t close the gap, he requests a revision — the pricing request loops back to the branch team, where Jake adjusts and CPQ re-evaluates. If the revision requires pricing below Jake\'s authorization level, the request escalates to the branch manager for approval. If Marcus decides the pricing can\'t get competitive enough, he walks away — the flow ends here and the Job record is preserved for future reference.' } },
+    { id: 'mc_s5_revise', stage: 4.5, lane: 'contractor', type: 'process', label: 'Requests pricing revision', narrative: { emoji: '🔄', cellLabel: 'Requests pricing revision', state: 'Negotiating', text: 'Marcus isn\'t satisfied with the initial special pricing — it doesn\'t close the competitive gap. He sends a revision request back to the branch team with updated context: maybe he has new intel on the competitor\'s quote, or maybe the job scope changed. The request loops back into the branch process — Jake re-evaluates, CPQ checks the revised pricing against margin floors, and if the new price breaches Jake\'s authorization level, it escalates to the branch manager for approval. Once resolved, the updated pricing flows back to Marcus for final review at Stage 5.' } },
+    { id: 'mc_s5_b2', stage: 4.5, lane: 'branch', type: 'process', label: 'Branch mgr approves (if escalated)', narrative: narratives.marcus_c[7] },
+    { id: 'mc_s7_p', stage: 6, lane: 'platform', type: 'process', label: 'GPS-tracked delivery', narrative: narratives.marcus_c[12] },
+    { id: 'mc_s7_c', stage: 6, lane: 'contractor', type: 'process', label: 'Verifies delivery', narrative: narratives.marcus_c[13] },
+    { id: 'mc_s7_5_c', stage: 6.5, lane: 'contractor', type: 'process', label: 'Supplemental order', narrative: narratives.marcus_c[14] },
+    { id: 'mc_s7_5_p', stage: 6.5, lane: 'platform', type: 'process', label: 'Inherits special pricing', narrative: narratives.marcus_c[15] },
+    { id: 'mc_s8_p', stage: 7, lane: 'platform', type: 'process', label: 'Invoice auto-matches', narrative: narratives.marcus_c[16] },
+    { id: 'mc_s8_c', stage: 7, lane: 'contractor', type: 'process', label: 'Forwards to accountant', narrative: narratives.marcus_c[16] },
+    { id: 'mc_s9_p', stage: 8, lane: 'platform', type: 'process', label: 'Lifecycle record', narrative: narratives.marcus_c[17] },
+    { id: 'mc_s9_c', stage: 8, lane: 'contractor', type: 'process', label: 'Margin visibility', narrative: narratives.marcus_c[17] },
+    { id: 'mc_s10_p', stage: 9, lane: 'platform', type: 'process', label: 'AI profile building', narrative: narratives.marcus_c[18] },
+    { id: 'mc_s10_c', stage: 9, lane: 'contractor', type: 'process', label: 'Margin trends, rebate', narrative: narratives.marcus_c[19] }
+  ];
+}
+
+// ════════════════════════════════════════════════════════════════
+// RENDERING ENGINE
+// ════════════════════════════════════════════════════════════════
+
+let currentFlow = allFlows.marcus_a;
+let currentFlowKey = 'marcus_a';
+
+function handlePersonaChange() {
+  const select = document.getElementById('persona-select');
+  currentFlowKey = select.value;
+  currentFlow = allFlows[currentFlowKey];
+  renderSwimlane();
+}
+
+// Determine divergent stages for highlighting
+function isDivergentStage(stage) {
+  const s = parseFloat(stage);
+  return s >= 2 && s <= 5;
+}
+
+function renderSwimlane() {
+  const grid = document.getElementById('swimlane-grid');
+  grid.innerHTML = '';
+  // Update grid to 13 columns (1 label + 12 stage columns)
+  grid.style.gridTemplateColumns = '130px repeat(12, minmax(170px, 1fr))';
+
+  const allLanes = ['contractor', 'branch', 'platform', 'cpq', 'homeowner'];
+  const usedLanes = new Set(currentFlow.map(n => n.lane));
+  const stageList = [1, 2, 2.5, 3, 4, 4.5, 5, 6, 6.5, 7, 8, 9];
+
+  // Row 1: Header row
+  // Corner cell
+  const corner = document.createElement('div');
+  corner.className = 'sg-header';
+  corner.style.gridRow = '1';
+  corner.style.gridColumn = '1';
+  grid.appendChild(corner);
+
+  // Stage headers
+  stageList.forEach((s, i) => {
+    const header = document.createElement('div');
+    const isHalfStep = s % 1 !== 0;
+    header.className = `sg-header${isHalfStep ? ' half-step' : ''}`;
+    header.style.gridRow = '1';
+    header.style.gridColumn = `${i + 2}`;
+    if (!isHalfStep && isDivergentStage(s)) header.style.background = 'rgba(255,255,255,0.03)';
+    const sName = stageNames.find(sn => sn.startsWith('Stage ' + s + ':'));
+    const displayName = sName ? sName.split(': ').slice(1).join(': ') : ('Stage ' + s);
+    const stageNum = String(s);
+    const internalBadge = isHalfStep ? '<div style="font-size:0.52rem;color:var(--purple);opacity:0.7;margin-top:2px;text-transform:uppercase;letter-spacing:0.05em;">Internal</div>' : '';
+    header.innerHTML = `<div class="sg-header-num">Stage ${stageNum}</div><div class="sg-header-name">${displayName}</div>${internalBadge}`;
+    grid.appendChild(header);
+  });
+
+  // Remove old SVG overlay if exists
+  const oldSvg = document.getElementById('arrow-svg');
+  if (oldSvg) oldSvg.remove();
+
+  // Lane rows (row 2+)
+  allLanes.forEach((laneKey, laneIdx) => {
+    const isUsed = usedLanes.has(laneKey);
+    const rowNum = laneIdx + 2;
+
+    // Lane label
+    const label = document.createElement('div');
+    label.className = `sg-lane-label ${laneKey} ${!isUsed ? 'collapsed-lane' : ''}`;
+    label.textContent = laneInfo[laneKey].label;
+    label.style.gridRow = `${rowNum}`;
+    label.style.gridColumn = '1';
+    grid.appendChild(label);
+
+    // Stage cells for this lane
+    stageList.forEach((s, i) => {
+      const cell = document.createElement('div');
+      cell.className = `sg-cell ${!isUsed ? 'collapsed-lane' : ''} ${isDivergentStage(s) ? 'divergent' : ''}`;
+      cell.style.gridRow = `${rowNum}`;
+      cell.style.gridColumn = `${i + 2}`;
+      cell.dataset.lane = laneKey;
+      cell.dataset.stage = s;
+
+      // Find nodes for this cell
+      const cellNodes = currentFlow.filter(n => n.lane === laneKey && n.stage === s);
+      cellNodes.forEach(node => {
+        const nodeEl = document.createElement('div');
+        nodeEl.className = `node type-${node.type} lane-${node.lane}`;
+        nodeEl.id = node.id;
+
+        if (node.type === 'decision') {
+          nodeEl.innerHTML = `<div class="node-box"><div class="node-inner">${node.label}</div></div>`;
+        } else {
+          nodeEl.innerHTML = `<div class="node-box">${node.label}</div>`;
+        }
+
+        if (!node.noPanel) nodeEl.addEventListener('click', () => openPanel(node));
+        nodeEl.addEventListener('mouseenter', (e) => {
+          const tooltip = document.getElementById('tooltip');
+          tooltip.textContent = node.label;
+          tooltip.style.left = (e.clientX + 12) + 'px';
+          tooltip.style.top = (e.clientY - 10) + 'px';
+          tooltip.classList.add('visible');
+        });
+        nodeEl.addEventListener('mousemove', (e) => {
+          const tooltip = document.getElementById('tooltip');
+          tooltip.style.left = (e.clientX + 12) + 'px';
+          tooltip.style.top = (e.clientY - 10) + 'px';
+        });
+        nodeEl.addEventListener('mouseleave', () => {
+          document.getElementById('tooltip').classList.remove('visible');
+        });
+
+        cell.appendChild(nodeEl);
+      });
+
+      grid.appendChild(cell);
+    });
+  });
+
+  // Draw arrows after a brief delay for DOM layout
+  requestAnimationFrame(() => { requestAnimationFrame(() => { drawArrows(); }); });
+}
+
+// ════════════════════════════════════════════════════════════════
+// ARROW RENDERING
+// ════════════════════════════════════════════════════════════════
+
+// Cross-lane connection maps per flow (from → to)
+const crossLaneConnections = {
+  marcus_a: [
+    ['ma_s3_p', 'ma_s3_c'],    // Platform → Contractor (ATB → review)
+    ['ma_s3_c', 'ma_s2_p', 'elbow-right'],  // Contractor ATB → Platform Job record (right then down into open space)
+    ['ma_s3_cpq', 'ma_s3_p'],  // CPQ → Platform (CPQ powers the ATB Build flow)
+    ['ma_s5_skip', 'ma_s5_p', 'elbow'],  // Skip node → down to SMS platform card at 4.5
+    ['ma_s5_p', 'ma_s6_h', 'elbow'],  // SMS card → down then right to homeowner at stage 5
+    ['ma_s6_h', 'ma_s6_c'],    // Homeowner → Contractor (acceptance triggers notification)
+    ['ma_s7_p', 'ma_s7_c'],    // Platform → Contractor (delivery)
+    ['ma_s7_5_c', 'ma_s7_5_p'],// Contractor → Platform (supplemental)
+    ['ma_s8_p', 'ma_s8_c'],    // Platform → Contractor (invoice)
+    ['ma_s9_p', 'ma_s9_c'],    // Platform → Contractor (records)
+    ['ma_s10_p', 'ma_s10_c'],  // Platform → Contractor (AI)
+  ],
+  marcus_b: [
+    ['mb_s1', 'mb_s2_p', 'elbow'],  // Contractor → Platform (lead triggers Job creation)
+    ['mb_s4_cpq', 'mb_s4_p'],  // CPQ → Platform (validates Build)
+    ['mb_s4_p', 'mb_s4_c'],    // Platform → Contractor (intelligence powers template)
+    ['mb_s5_skip', 'mb_s6_p', 'right-down-right'],  // Skip node → right, down, right into Order fires to branch
+    ['mb_s6_c', 'mb_s6_p', 'side-down'],    // Contractor → Platform (order fires, routed to side)
+    ['mb_s6_p', 'mb_s6_b', 'side-down'],    // Platform → Branch (order visible instantly, routed to side)
+    ['mb_s7_p', 'mb_s7_c'],
+    ['mb_s7_5_c', 'mb_s7_5_p'],
+    ['mb_s8_p', 'mb_s8_c'],
+    ['mb_s9_p', 'mb_s9_c'],
+    ['mb_s10_p', 'mb_s10_c'],
+  ],
+  marcus_c: [
+    ['mc_s1', 'mc_s2_p', 'elbow'],  // Contractor → Platform (lead triggers Job creation)
+    ['mc_s4_cpq', 'mc_s4_p'],   // CPQ → Platform (validates Build)
+    ['mc_s4_p', 'mc_s4_c'],     // Platform → Contractor (intelligence powers template)
+    ['mc_s5_c1', 'mc_s5_b1'],   // 2. Submits build → Jake (down)
+    ['mc_s5_b1', 'mc_s5_cpq'],  // 3. Jake → CPQ diamond (down-right)
+    ['mc_s5_cpq', 'mc_s5_revise'],  // 4. CPQ diamond → Requests pricing revision (up)
+    ['mc_s5_revise', 'mc_s5_b2'],  // 6. Requests pricing revision → Branch mgr approves (down)
+    ['mc_s5_c2', 'mc_s5_revise', 'loop-top'],  // Reviews pricing → Requests revision (revision loop, curves above)
+    ['mc_s7_p', 'mc_s7_c'],
+    ['mc_s7_5_c', 'mc_s7_5_p'],
+    ['mc_s8_p', 'mc_s8_c'],
+    ['mc_s9_p', 'mc_s9_c'],
+    ['mc_s10_p', 'mc_s10_c'],
+  ]
+};
+
+function drawArrows() {
+  const wrapper = document.querySelector('.swimlane-wrapper');
+  const grid = document.getElementById('swimlane-grid');
+  if (!grid || !wrapper) return;
+
+  // Create SVG overlay
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.id = 'arrow-svg';
+  svg.style.position = 'absolute';
+  svg.style.top = '0';
+  svg.style.left = '0';
+  svg.style.width = grid.scrollWidth + 'px';
+  svg.style.height = grid.scrollHeight + 'px';
+  svg.style.pointerEvents = 'none';
+  svg.style.zIndex = '1';
+
+  // Arrowhead marker
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+  marker.setAttribute('id', 'arrowhead');
+  marker.setAttribute('markerWidth', '8');
+  marker.setAttribute('markerHeight', '6');
+  marker.setAttribute('refX', '7');
+  marker.setAttribute('refY', '3');
+  marker.setAttribute('orient', 'auto');
+  const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  polygon.setAttribute('points', '0 0, 8 3, 0 6');
+  polygon.setAttribute('fill', 'rgba(148,163,184,0.6)');
+  marker.appendChild(polygon);
+  defs.appendChild(marker);
+
+  // Colored arrowhead markers for cross-lane
+  const colors = { contractor: '#06b6d4', branch: '#f59e0b', platform: '#3b82f6', cpq: '#a78bfa', homeowner: '#22c55e' };
+  Object.entries(colors).forEach(([lane, color]) => {
+    const m = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+    m.setAttribute('id', 'arrowhead-' + lane);
+    m.setAttribute('markerWidth', '8');
+    m.setAttribute('markerHeight', '6');
+    m.setAttribute('refX', '7');
+    m.setAttribute('refY', '3');
+    m.setAttribute('orient', 'auto');
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    p.setAttribute('points', '0 0, 8 3, 0 6');
+    p.setAttribute('fill', color);
+    m.appendChild(p);
+    defs.appendChild(m);
+  });
+
+  svg.appendChild(defs);
+
+  const gridRect = grid.getBoundingClientRect();
+
+  function getNodeCenter(nodeId) {
+    const el = document.getElementById(nodeId);
+    if (!el) return null;
+    const box = el.querySelector('.node-box');
+    if (!box) return null;
+    const r = box.getBoundingClientRect();
+    return {
+      x: r.left + r.width / 2 - gridRect.left,
+      y: r.top + r.height / 2 - gridRect.top,
+      left: r.left - gridRect.left,
+      right: r.right - gridRect.left,
+      top: r.top - gridRect.top,
+      bottom: r.bottom - gridRect.top,
+      width: r.width,
+      height: r.height
+    };
+  }
+
+  // 1. Draw same-lane sequential arrows
+  const allLanes = ['contractor', 'branch', 'platform', 'cpq', 'homeowner'];
+  allLanes.forEach(laneKey => {
+    const laneNodes = currentFlow
+      .filter(n => n.lane === laneKey)
+      .sort((a, b) => a.stage - b.stage);
+    for (let i = 0; i < laneNodes.length - 1; i++) {
+      if (laneNodes[i].noNextArrow) continue;
+      const from = getNodeCenter(laneNodes[i].id);
+      const to = getNodeCenter(laneNodes[i + 1].id);
+      if (!from || !to) continue;
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      const startX = from.right + 2;
+      const startY = from.y;
+      const endX = to.left - 2;
+      const endY = to.y;
+      const midX = (startX + endX) / 2;
+
+      path.setAttribute('d', `M ${startX} ${startY} C ${midX} ${startY}, ${midX} ${endY}, ${endX} ${endY}`);
+      path.setAttribute('stroke', 'rgba(148,163,184,0.35)');
+      path.setAttribute('stroke-width', '1.5');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('marker-end', 'url(#arrowhead)');
+      svg.appendChild(path);
+    }
+  });
+
+  // 2. Draw cross-lane arrows
+  const connections = crossLaneConnections[currentFlowKey] || [];
+  connections.forEach((conn) => {
+    const fromId = conn[0];
+    const toId = conn[1];
+    const connType = conn[2] || 'normal'; // 'revise' = backward loop
+    const from = getNodeCenter(fromId);
+    const to = getNodeCenter(toId);
+    if (!from || !to) return;
+
+    // Determine the target lane for coloring
+    const toNode = currentFlow.find(n => n.id === toId);
+    const targetLane = toNode ? toNode.lane : 'contractor';
+    const color = colors[targetLane] || 'rgba(148,163,184,0.6)';
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+    if (connType === 'revise') {
+      // Backward loop arrow — curves above the node
+      const startX = from.left - 2;
+      const startY = from.top;
+      const endX = to.right + 2;
+      const endY = to.top;
+      const loopY = Math.min(from.top, to.top) - 32;
+      path.setAttribute('d', `M ${startX} ${startY} C ${startX - 20} ${loopY}, ${endX + 20} ${loopY}, ${endX} ${endY}`);
+      path.setAttribute('stroke', 'var(--red)');
+      path.setAttribute('stroke-width', '1.5');
+      path.setAttribute('stroke-opacity', '0.6');
+      path.setAttribute('stroke-dasharray', '6 3');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('marker-end', 'url(#arrowhead)');
+
+      // Add "Revise" label
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      const labelX = (startX + endX) / 2;
+      const labelY = loopY - 4;
+      label.setAttribute('x', labelX);
+      label.setAttribute('y', labelY);
+      label.setAttribute('text-anchor', 'middle');
+      label.setAttribute('fill', '#fca5a5');
+      label.setAttribute('font-size', '9');
+      label.setAttribute('font-weight', '500');
+      label.setAttribute('font-family', '-apple-system, sans-serif');
+      label.textContent = 'Revise';
+      svg.appendChild(label);
+    } else if (connType === 'right-up') {
+      // Exit right side of source, go right to clear cards, then up to target's Y, then right to target
+      const startX = from.right + 2;
+      const startY = from.y;
+      const endX = to.left - 2;
+      const endY = to.y;
+      // Route through a gutter to the right of the stage 4.5 column, past all intermediate cards
+      const gutterX = Math.max(from.right, to.right) + 24;
+      path.setAttribute('d', `M ${startX} ${startY} L ${gutterX} ${startY} L ${gutterX} ${endY} L ${endX} ${endY}`);
+      path.setAttribute('stroke', color);
+      path.setAttribute('stroke-width', '1.5');
+      path.setAttribute('stroke-opacity', '0.7');
+    } else if (connType === 'loop-top') {
+      // Backward same-lane arrow — curves ABOVE both cards cleanly
+      const startX = from.x;
+      const startY = from.top - 2;
+      const endX = to.x;
+      const endY = to.top - 2;
+      const loopY = Math.min(from.top, to.top) - 36;
+      path.setAttribute('d', `M ${startX} ${startY} C ${startX} ${loopY}, ${endX} ${loopY}, ${endX} ${endY}`);
+      path.setAttribute('stroke', color);
+      path.setAttribute('stroke-width', '1.5');
+      path.setAttribute('stroke-opacity', '0.6');
+    } else if (connType === 'left-down') {
+      // Exit left side of source, go far left into gutter to clear ALL cards, then down to target
+      const startX = from.left - 2;
+      const startY = from.y;
+      const endX = to.left - 2;
+      const endY = to.y;
+      // Route through the gutter BETWEEN stage 3 and stage 4 columns
+      const gutterX = Math.min(from.left, to.left) - 40;
+      path.setAttribute('d', `M ${startX} ${startY} L ${gutterX} ${startY} L ${gutterX} ${endY} L ${endX} ${endY}`);
+      path.setAttribute('stroke', color);
+      path.setAttribute('stroke-width', '1.5');
+      path.setAttribute('stroke-opacity', '0.7');
+    } else if (connType === 'right-of-cards') {
+      // Exit right side of source, route along right gutter past any cards in between, then down to target
+      const startX = from.right + 2;
+      const startY = from.y;
+      const endX = to.x;
+      const endY = to.top - 2;
+      const gutterX = Math.max(from.right, to.right) + 20;
+      path.setAttribute('d', `M ${startX} ${startY} L ${gutterX} ${startY} L ${gutterX} ${endY} L ${endX} ${endY}`);
+      path.setAttribute('stroke', color);
+      path.setAttribute('stroke-width', '1.5');
+      path.setAttribute('stroke-opacity', '0.7');
+    } else if (connType === 'elbow-right') {
+      // 90-degree elbow: right from source, then down to target
+      const startX = from.right + 2;
+      const startY = from.y;
+      const endX = to.x;
+      const endY = to.top - 2;
+      const cornerX = endX;
+      const cornerY = startY;
+      path.setAttribute('d', `M ${startX} ${startY} L ${cornerX} ${cornerY} L ${endX} ${endY}`);
+      path.setAttribute('stroke', color);
+      path.setAttribute('stroke-width', '1.5');
+      path.setAttribute('stroke-opacity', '0.7');
+    } else if (connType === 'side-down') {
+      // Route along the right edge of the column: exit right side, go down, enter right side of target
+      const offset = 12; // pixels outside the card edge
+      const sideX = Math.max(from.right, to.right) + offset;
+      const startX = from.right + 2;
+      const startY = from.y;
+      const endX = to.right + 2;
+      const endY = to.y;
+      path.setAttribute('d', `M ${startX} ${startY} L ${sideX} ${startY} L ${sideX} ${endY} L ${endX} ${endY}`);
+      path.setAttribute('stroke', color);
+      path.setAttribute('stroke-width', '1.5');
+      path.setAttribute('stroke-opacity', '0.7');
+    } else if (connType === 'right-down-right') {
+      // Right from source, down at midpoint, then right to target
+      const startX = from.right + 2;
+      const startY = from.y;
+      const endX = to.left - 2;
+      const endY = to.y;
+      const midX = (startX + endX) / 2;
+      path.setAttribute('d', `M ${startX} ${startY} L ${midX} ${startY} L ${midX} ${endY} L ${endX} ${endY}`);
+      path.setAttribute('stroke', color);
+      path.setAttribute('stroke-width', '1.5');
+      path.setAttribute('stroke-opacity', '0.7');
+    } else if (connType === 'elbow') {
+      // 90-degree elbow: down from source, then right to target
+      // This avoids cutting through nodes in intermediate stage columns
+      const startX = from.x;
+      const startY = from.bottom + 2;
+      const endX = to.left - 2;
+      const endY = to.y;
+      const cornerX = startX;
+      const cornerY = endY;
+      path.setAttribute('d', `M ${startX} ${startY} L ${cornerX} ${cornerY} L ${endX} ${endY}`);
+      path.setAttribute('stroke', color);
+      path.setAttribute('stroke-width', '1.5');
+      path.setAttribute('stroke-opacity', '0.7');
+    } else {
+      // Same stage (vertical handoff) vs different stage
+      const sameStage = Math.abs(from.x - to.x) < 50;
+
+      let startX, startY, endX, endY;
+
+      if (sameStage) {
+        // Vertical connection — exit bottom/top
+        if (to.y > from.y) {
+          startX = from.x; startY = from.bottom + 2;
+          endX = to.x; endY = to.top - 2;
+        } else {
+          startX = from.x; startY = from.top - 2;
+          endX = to.x; endY = to.bottom + 2;
+        }
+        const midY = (startY + endY) / 2;
+        path.setAttribute('d', `M ${startX} ${startY} C ${startX} ${midY}, ${endX} ${midY}, ${endX} ${endY}`);
+      } else {
+        // Cross-lane diagonal — use elbow-style routing to avoid cutting through nodes
+        // Exit bottom/top of source, travel vertically to target lane Y, then horizontally to target
+        const goingDown = to.y > from.y;
+        const goingRight = to.x > from.x;
+
+        if (goingDown) {
+          startX = from.x;
+          startY = from.bottom + 2;
+        } else {
+          startX = from.x;
+          startY = from.top - 2;
+        }
+
+        if (goingRight) {
+          endX = to.left - 2;
+        } else {
+          endX = to.right + 2;
+        }
+        endY = to.y;
+
+        // Smooth elbow with rounded corner
+        const cornerX = startX;
+        const cornerY = endY;
+        const rawRadius = Math.min(16, Math.abs(endY - startY) * 0.3, Math.abs(endX - startX) * 0.3);
+        const radius = Math.max(4, rawRadius);
+        const dirY = goingDown ? 1 : -1;
+        const dirX = goingRight ? 1 : -1;
+        path.setAttribute('d',
+          `M ${startX} ${startY} ` +
+          `L ${cornerX} ${cornerY - dirY * radius} ` +
+          `Q ${cornerX} ${cornerY}, ${cornerX + dirX * radius} ${cornerY} ` +
+          `L ${endX} ${endY}`
+        );
+      }
+
+      path.setAttribute('stroke', color);
+      path.setAttribute('stroke-width', '1.5');
+      path.setAttribute('stroke-opacity', '0.7');
+    }
+
+    path.setAttribute('fill', 'none');
+    if (connType !== 'revise') {
+      path.setAttribute('marker-end', `url(#arrowhead-${targetLane})`);
+    }
+    svg.appendChild(path);
+  });
+
+  wrapper.style.position = 'relative';
+  wrapper.appendChild(svg);
+}
+
+function openPanel(node) {
+  const narrative = node.narrative;
+
+  document.getElementById('p-stage').textContent = `Stage ${node.stage}`;
+  document.getElementById('p-persona').textContent = 'Marcus';
+  document.getElementById('p-persona-name').textContent = narrative.cellLabel;
+  document.getElementById('p-emoji').textContent = narrative.emoji;
+  document.getElementById('p-state').textContent = narrative.state;
+
+  const skipBadgeContainer = document.getElementById('p-skip-badge');
+  if (node.type === 'skip') {
+    skipBadgeContainer.innerHTML = '<div class="panel-skip-badge">SKIPPED</div>';
+  } else {
+    skipBadgeContainer.innerHTML = '';
+  }
+
+  document.getElementById('p-narrative').textContent = narrative.text;
+  document.getElementById('p-narrative').classList.toggle('skip-text', node.type === 'skip');
+
+  document.getElementById('panel').classList.add('open');
+}
+
+function closePanel() {
+  document.getElementById('panel').classList.remove('open');
+}
+
+document.getElementById('panel-close').addEventListener('click', closePanel);
+
+document.querySelectorAll('.ctx-tab').forEach(tab => {
+  tab.addEventListener('click', (e) => {
+    const tabName = e.target.dataset.tab;
+    document.querySelectorAll('.ctx-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.ctx-panel').forEach(p => p.classList.remove('active'));
+    e.target.classList.add('active');
+    document.getElementById(`ctx-${tabName}`).classList.add('active');
+  });
+});
+
+renderSwimlane();
+
+// Redraw arrows on resize
+window.addEventListener('resize', () => { requestAnimationFrame(drawArrows); });
+</script>
+
+</body>
+</html>
